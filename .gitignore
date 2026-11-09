@@ -1,0 +1,40 @@
+# Master .gitignore for AutoCanvas Monorepo
+
+# Dependencies
+**/node_modules/
+backend/vendor/
+renderer/node_modules/
+frontend/node_modules/
+
+# Environment files
+.env
+.env.*
+!.env.example
+backend/.env
+backend/.env.*
+!backend/.env.example
+
+# Build outputs
+frontend/dist/
+backend/public/build/
+backend/public/hot/
+backend/storage/*.key
+backend/storage/app/public/*
+backend/storage/framework/cache/*
+backend/storage/framework/sessions/*
+backend/storage/framework/testing/*
+backend/storage/framework/views/*
+backend/storage/logs/*.log
+renderer/test-output/*.png
+renderer/dist/
+
+# OS and IDE files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
