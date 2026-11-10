@@ -2,6 +2,7 @@
 
 namespace App\Modules\Knowledge\Services;
 
+use App\Core\Security\UrlSafetyValidator;
 use App\Modules\Brand\Models\Brand;
 use App\Modules\Knowledge\Models\KnowledgeSource;
 use App\Modules\Knowledge\Models\SourceChunk;
@@ -98,42 +99,7 @@ class KnowledgeIngestionService
      */
     public function validateUrlForSsrf(string $url): void
     {
-        $parts = parse_url($url);
-        if (! isset($parts['scheme']) || ! in_array(strtolower($parts['scheme']), ['http', 'https'], true)) {
-            throw ValidationException::withMessages([
-                'url' => ['Only HTTP and HTTPS URLs are permitted.'],
-            ]);
-        }
-
-        $host = $parts['host'] ?? '';
-        if (empty($host)) {
-            throw ValidationException::withMessages(['url' => ['Invalid URL host.']]);
-        }
-
-        // Reject localhost keywords
-        if (in_array(strtolower($host), ['localhost', '127.0.0.1', '::1', '0.0.0.0'], true)) {
-            throw ValidationException::withMessages([
-                'url' => ['SSRF Security Violation: Access to loopback hosts is blocked.'],
-            ]);
-        }
-
-        $ip = gethostbyname($host);
-        if (! filter_var($ip, FILTER_VALIDATE_IP)) {
-            throw ValidationException::withMessages(['url' => ['Unable to resolve hostname IP address.']]);
-        }
-
-        // Validate IP is NOT private, reserved, or loopback
-        $isPublic = filter_var(
-            $ip,
-            FILTER_VALIDATE_IP,
-            FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE
-        );
-
-        if (! $isPublic || str_starts_with($ip, '127.') || str_starts_with($ip, '169.254.')) {
-            throw ValidationException::withMessages([
-                'url' => ["SSRF Security Violation: Resolved IP [{$ip}] is internal or restricted."],
-            ]);
-        }
+        UrlSafetyValidator::assertSafeUrl($url);
     }
 
     /**

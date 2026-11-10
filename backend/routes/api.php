@@ -16,6 +16,9 @@ use App\Modules\Knowledge\Controllers\KnowledgeController;
 use App\Modules\Organization\Controllers\AuditLogController;
 use App\Modules\Organization\Controllers\MemberController;
 use App\Modules\Organization\Controllers\OrganizationController;
+use App\Modules\Research\Controllers\CompetitorController;
+use App\Modules\Research\Controllers\RssFeedController;
+use App\Modules\Research\Controllers\TrendOpportunityController;
 use App\Modules\Workspace\Controllers\WorkspaceController;
 use Illuminate\Support\Facades\Route;
 
@@ -131,6 +134,39 @@ Route::prefix('v1')->group(function () {
                 Route::post('/{id}/content/{contentId}/submit-review', [ContentItemController::class, 'submitReview']);
                 Route::post('/{id}/content/{contentId}/approve', [ContentItemController::class, 'approve']);
                 Route::post('/{id}/content/{contentId}/reject', [ContentItemController::class, 'reject']);
+
+                // RSS Feeds & Ingestion (MOD-04)
+                Route::get('/{id}/feeds', [RssFeedController::class, 'index']);
+                Route::post('/{id}/feeds', [RssFeedController::class, 'store']);
+                Route::get('/{id}/articles', [RssFeedController::class, 'articles']);
+
+                // Competitor Social Observation (MOD-05)
+                Route::get('/{id}/competitors', [CompetitorController::class, 'index']);
+                Route::post('/{id}/competitors', [CompetitorController::class, 'store']);
+                Route::get('/{id}/competitor-insights', [CompetitorController::class, 'insights']);
+
+                // Trend Signals & Content Opportunities (MOD-05)
+                Route::get('/{id}/opportunities', [TrendOpportunityController::class, 'index']);
+                Route::post('/{id}/opportunities/detect', [TrendOpportunityController::class, 'detect']);
+                Route::get('/{id}/trends', [TrendOpportunityController::class, 'trends']);
+            });
+
+            // Direct Research Actions (MOD-04 / MOD-05)
+            Route::prefix('research')->group(function () {
+                // Feeds & Articles
+                Route::post('/feeds/{feedId}/sync', [RssFeedController::class, 'sync']);
+                Route::delete('/feeds/{feedId}', [RssFeedController::class, 'destroy']);
+                Route::post('/articles/{articleId}/toggle-save', [RssFeedController::class, 'toggleSaveArticle']);
+
+                // Competitors
+                Route::put('/competitors/{competitorId}', [CompetitorController::class, 'update']);
+                Route::delete('/competitors/{competitorId}', [CompetitorController::class, 'destroy']);
+                Route::get('/competitors/{competitorId}/posts', [CompetitorController::class, 'posts']);
+                Route::post('/competitors/{competitorId}/posts', [CompetitorController::class, 'logPost']);
+
+                // Opportunities
+                Route::post('/opportunities/{opportunityId}/convert', [TrendOpportunityController::class, 'convert']);
+                Route::post('/opportunities/{opportunityId}/dismiss', [TrendOpportunityController::class, 'dismiss']);
             });
 
             // Content Variants

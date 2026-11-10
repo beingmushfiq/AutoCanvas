@@ -288,3 +288,4 @@ export const PillarsManagerModal: React.FC<PillarsManagerModalProps> = ({
     </div>
   )
 }
+

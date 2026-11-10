@@ -87,6 +87,38 @@ class DeterministicMockProvider implements AIProviderInterface
                     'Hashtag distribution complies with channel limits.',
                 ],
             ]);
+        } elseif ($task === 'opportunity_detection') {
+            $response = json_encode([
+                'opportunities' => [
+                    [
+                        'title' => 'Autonomous Brand Velocity: Navigating Real-Time Trends Without Noise',
+                        'angle' => 'Why reactionary social posting damages brand equity, and how automated intelligence pipelines maintain pillar discipline.',
+                        'why_it_matters' => 'Recent industry discussions show brands struggle to balance publishing speed with brand voice fidelity.',
+                        'recommended_channels' => ['linkedin', 'facebook', 'instagram'],
+                        'urgency_score' => 88,
+                        'freshness_score' => 95,
+                        'overall_opportunity_score' => 92,
+                    ],
+                    [
+                        'title' => 'Engineering Precision in Modern Digital Storytelling',
+                        'angle' => 'Translating technical milestones and product architecture into executive-level thought leadership.',
+                        'why_it_matters' => 'Audiences engage 3x more with transparent engineering breakdowns than generic promotional claims.',
+                        'recommended_channels' => ['linkedin', 'facebook'],
+                        'urgency_score' => 74,
+                        'freshness_score' => 86,
+                        'overall_opportunity_score' => 80,
+                    ],
+                ],
+            ]);
+        } elseif ($task === 'competitor_analysis') {
+            $response = json_encode([
+                'top_themes' => [
+                    ['theme' => 'AI Adoption & Workflow Automation', 'count' => 12],
+                    ['theme' => 'Product Engineering Deep-dives', 'count' => 8],
+                    ['theme' => 'Customer Case Studies', 'count' => 5],
+                ],
+                'tactical_takeaway' => 'Competitors are heavily investing in product engineering breakdown posts on LinkedIn, which generate 40% higher comment activity than short link shares.',
+            ]);
         } else {
             $response = 'Generated synthesized content based on input prompt.';
         }

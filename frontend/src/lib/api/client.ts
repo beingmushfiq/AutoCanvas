@@ -312,5 +312,106 @@ export interface CreativeRenderResult {
   creative_document: Record<string, unknown>
 }
 
+// Phase 4: Research & Trend Discovery Interfaces
+export interface RssFeed {
+  id: string
+  brand_id: string | null
+  name: string
+  url: string
+  category: string
+  fetch_frequency_minutes: number
+  last_fetched_at: string | null
+  status: 'active' | 'failing' | 'paused'
+  error_count: number
+  last_error: string | null
+  articles_count?: number
+  created_at: string
+}
+
+export interface FeedArticle {
+  id: string
+  rss_feed_id: string
+  title: string
+  url: string
+  author: string | null
+  summary: string | null
+  content: string | null
+  published_at: string
+  relevance_score: number
+  topics: string[] | null
+  is_saved: boolean
+  feed?: { id: string; name: string; category: string }
+  created_at: string
+}
+
+export interface CompetitorProfile {
+  id: string
+  brand_id: string
+  name: string
+  website_url: string | null
+  social_handles: Record<string, string> | null
+  strengths: string | null
+  weaknesses: string | null
+  target_audience: string | null
+  observation_frequency: 'daily' | 'weekly' | 'monthly'
+  status: 'active' | 'paused' | 'archived'
+  posts_count?: number
+  created_at: string
+}
+
+export interface CompetitorPost {
+  id: string
+  competitor_profile_id: string
+  platform: 'linkedin' | 'facebook' | 'instagram' | 'twitter' | 'tiktok' | 'youtube' | 'other'
+  post_url: string | null
+  post_text: string
+  published_at: string | null
+  engagement_signals: { likes?: number; comments?: number; shares?: number } | null
+  observed_themes: string[] | null
+  tone: string | null
+  tactical_takeaway: string | null
+  created_at: string
+}
+
+export interface CompetitorInsights {
+  total_competitors: number
+  total_posts_observed: number
+  avg_posts_per_week: number
+  total_engagements_observed: number
+  top_themes: { theme: string; count: number }[]
+  platform_distribution: Record<string, number>
+}
+
+export interface TrendSignal {
+  id: string
+  topic: string
+  description: string | null
+  source_type: 'rss' | 'competitor' | 'industry_radar' | 'manual'
+  signal_strength: number
+  sample_urls: string[] | null
+  status: 'active' | 'fading' | 'archived'
+  detected_at: string
+  created_at: string
+}
+
+export interface ContentOpportunity {
+  id: string
+  brand_id: string
+  content_pillar_id: string | null
+  feed_article_id: string | null
+  title: string
+  angle: string
+  why_it_matters: string
+  recommended_channels: string[]
+  urgency_score: number
+  freshness_score: number
+  overall_opportunity_score: number
+  status: 'new' | 'dismissed' | 'converted'
+  converted_content_item_id: string | null
+  pillar?: { id: string; name: string; color_tag: string; weight_percentage: number } | null
+  article?: { id: string; title: string; url: string; summary: string | null; published_at: string } | null
+  created_at: string
+}
+
 export const apiClient = new ApiClient()
 

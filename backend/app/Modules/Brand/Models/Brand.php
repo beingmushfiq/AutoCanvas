@@ -10,6 +10,10 @@ use App\Modules\ContentStrategy\Models\ContentPillar;
 use App\Modules\Knowledge\Models\KnowledgeSource;
 use App\Modules\Knowledge\Models\SourceChunk;
 use App\Modules\Organization\Models\Organization;
+use App\Modules\Research\Models\CompetitorProfile;
+use App\Modules\Research\Models\ContentOpportunity;
+use App\Modules\Research\Models\RssFeed;
+use App\Modules\Research\Models\TrendSignal;
 use App\Modules\Workspace\Models\Workspace;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -99,5 +103,25 @@ class Brand extends Model
     public function contentItems(): HasMany
     {
         return $this->hasMany(ContentItem::class);
+    }
+
+    public function rssFeeds(): HasMany
+    {
+        return $this->hasMany(RssFeed::class);
+    }
+
+    public function competitors(): HasMany
+    {
+        return $this->hasMany(CompetitorProfile::class);
+    }
+
+    public function trendSignals(): HasMany
+    {
+        return $this->hasMany(TrendSignal::class);
+    }
+
+    public function contentOpportunities(): HasMany
+    {
+        return $this->hasMany(ContentOpportunity::class);
     }
 }

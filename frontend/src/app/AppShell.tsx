@@ -23,6 +23,7 @@ import {
   ChevronDown,
   LogOut,
   Check,
+  Compass,
 } from 'lucide-react'
 import { apiClient, type HealthCheckData } from '../lib/api/client'
 import { useAuth } from '../modules/auth/AuthContext'
@@ -32,6 +33,7 @@ import { BillingSettings } from '../modules/settings/BillingSettings'
 import { AuditLogView } from '../modules/settings/AuditLogView'
 import { BrandStudio } from '../modules/brands/BrandStudio'
 import { ContentStudio } from '../modules/content/ContentStudio'
+import { ResearchStudio } from '../modules/research/ResearchStudio'
 
 interface NavItem {
   id: string
@@ -43,9 +45,10 @@ interface NavItem {
 const navItems: NavItem[] = [
   { id: 'overview', label: 'Command Center', icon: LayoutDashboard },
   { id: 'brands', label: 'Brands', icon: Layers },
-  { id: 'accounts', label: 'Social Accounts', icon: Share2 },
+  { id: 'research', label: 'Research & Trends', icon: Compass },
   { id: 'content', label: 'Content Studio', icon: PenSquare },
   { id: 'creative', label: 'Creative Studio', icon: Palette },
+  { id: 'accounts', label: 'Social Accounts', icon: Share2 },
   { id: 'calendar', label: 'Publishing Calendar', icon: Calendar },
   { id: 'inbox', label: 'Unified Inbox', icon: Inbox },
   { id: 'listening', label: 'Social Listening', icon: Radio },
@@ -285,6 +288,7 @@ export const AppShell: React.FC = () => {
           {activeTab === 'audit' && <AuditLogView />}
           {activeTab === 'brands' && <BrandStudio initialTab="profile" />}
           {activeTab === 'knowledge' && <BrandStudio initialTab="knowledge" />}
+          {activeTab === 'research' && <ResearchStudio onNavigateToContent={() => setActiveTab('content')} />}
           {activeTab === 'content' && <ContentStudio initialView="posts" />}
           {activeTab === 'creative' && <ContentStudio initialView="creative" />}
 
@@ -367,7 +371,7 @@ export const AppShell: React.FC = () => {
             </>
           )}
 
-          {!['team', 'billing', 'audit', 'overview', 'brands', 'knowledge', 'content', 'creative'].includes(activeTab) && (
+          {!['team', 'billing', 'audit', 'overview', 'brands', 'knowledge', 'content', 'creative', 'research'].includes(activeTab) && (
             <div className="bg-white rounded-xl border border-[#EAECF0] p-12 text-center">
               <div className="w-12 h-12 rounded-xl bg-[#F2F4F7] text-[#6257E8] flex items-center justify-center mx-auto mb-3">
                 <Sparkles className="w-6 h-6" />
