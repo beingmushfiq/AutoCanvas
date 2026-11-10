@@ -4,6 +4,9 @@ namespace App\Modules\Brand\Models;
 
 use App\Core\Concerns\HasTenantScope;
 use App\Core\Concerns\HasUlid;
+use App\Modules\ContentProduction\Models\ContentItem;
+use App\Modules\ContentStrategy\Models\Campaign;
+use App\Modules\ContentStrategy\Models\ContentPillar;
 use App\Modules\Knowledge\Models\KnowledgeSource;
 use App\Modules\Knowledge\Models\SourceChunk;
 use App\Modules\Organization\Models\Organization;
@@ -81,5 +84,20 @@ class Brand extends Model
     public function sourceChunks(): HasMany
     {
         return $this->hasMany(SourceChunk::class);
+    }
+
+    public function contentPillars(): HasMany
+    {
+        return $this->hasMany(ContentPillar::class);
+    }
+
+    public function campaigns(): HasMany
+    {
+        return $this->hasMany(Campaign::class);
+    }
+
+    public function contentItems(): HasMany
+    {
+        return $this->hasMany(ContentItem::class);
     }
 }

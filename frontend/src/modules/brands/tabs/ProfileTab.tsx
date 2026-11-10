@@ -207,3 +207,4 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({ brandId, initialProfile,
     </form>
   )
 }
+

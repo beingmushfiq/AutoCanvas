@@ -7,6 +7,11 @@ use App\Modules\Brand\Controllers\BrandAssetController;
 use App\Modules\Brand\Controllers\BrandController;
 use App\Modules\Brand\Controllers\BrandDiscoveryController;
 use App\Modules\Brand\Controllers\BrandMemoryController;
+use App\Modules\ContentProduction\Controllers\ContentItemController;
+use App\Modules\ContentProduction\Controllers\ContentVariantController;
+use App\Modules\ContentStrategy\Controllers\CampaignController;
+use App\Modules\ContentStrategy\Controllers\ContentPillarController;
+use App\Modules\Creative\Controllers\CreativeStudioController;
 use App\Modules\Knowledge\Controllers\KnowledgeController;
 use App\Modules\Organization\Controllers\AuditLogController;
 use App\Modules\Organization\Controllers\MemberController;
@@ -102,7 +107,41 @@ Route::prefix('v1')->group(function () {
                 Route::get('/{id}/memory', [BrandMemoryController::class, 'index']);
                 Route::post('/{id}/memory', [BrandMemoryController::class, 'store']);
                 Route::delete('/{id}/memory/{memoryId}', [BrandMemoryController::class, 'destroy']);
+
+                // Content Pillars (MOD-06)
+                Route::get('/{id}/pillars', [ContentPillarController::class, 'index']);
+                Route::post('/{id}/pillars', [ContentPillarController::class, 'store']);
+                Route::put('/{id}/pillars/{pillarId}', [ContentPillarController::class, 'update']);
+                Route::delete('/{id}/pillars/{pillarId}', [ContentPillarController::class, 'destroy']);
+
+                // Campaigns (MOD-06)
+                Route::get('/{id}/campaigns', [CampaignController::class, 'index']);
+                Route::post('/{id}/campaigns', [CampaignController::class, 'store']);
+                Route::put('/{id}/campaigns/{campaignId}', [CampaignController::class, 'update']);
+                Route::delete('/{id}/campaigns/{campaignId}', [CampaignController::class, 'destroy']);
+
+                // Content Items & AI Production (MOD-07)
+                Route::get('/{id}/content', [ContentItemController::class, 'index']);
+                Route::post('/{id}/content', [ContentItemController::class, 'store']);
+                Route::get('/{id}/content/{contentId}', [ContentItemController::class, 'show']);
+                Route::put('/{id}/content/{contentId}', [ContentItemController::class, 'update']);
+                Route::delete('/{id}/content/{contentId}', [ContentItemController::class, 'destroy']);
+                Route::post('/{id}/content/generate', [ContentItemController::class, 'generate']);
+                Route::post('/{id}/content/{contentId}/qa-evaluate', [ContentItemController::class, 'evaluateQa']);
+                Route::post('/{id}/content/{contentId}/submit-review', [ContentItemController::class, 'submitReview']);
+                Route::post('/{id}/content/{contentId}/approve', [ContentItemController::class, 'approve']);
+                Route::post('/{id}/content/{contentId}/reject', [ContentItemController::class, 'reject']);
             });
+
+            // Content Variants
+            Route::put('/content/variants/{variantId}', [ContentVariantController::class, 'update']);
+
+            // Creative Studio (MOD-08)
+            Route::prefix('creative')->group(function () {
+                Route::get('/templates', [CreativeStudioController::class, 'templates']);
+                Route::post('/render', [CreativeStudioController::class, 'render']);
+            });
+            Route::post('/content/variants/{variantId}/render-creative', [CreativeStudioController::class, 'renderForVariant']);
         });
     });
 });

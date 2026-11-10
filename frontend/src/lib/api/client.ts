@@ -218,5 +218,99 @@ export interface BrandDiscoverySuggestion {
   }
 }
 
+export interface ContentPillar {
+  id: string
+  name: string
+  slug: string
+  description: string | null
+  target_audience: string | null
+  weight_percentage: number
+  color_tag: string
+  status: 'active' | 'archived'
+  content_items_count?: number
+  created_at: string
+}
+
+export interface Campaign {
+  id: string
+  name: string
+  slug: string
+  objective: string | null
+  key_messaging: string | null
+  start_date: string | null
+  end_date: string | null
+  status: 'planning' | 'active' | 'completed' | 'paused'
+  content_items_count?: number
+  created_at: string
+}
+
+export interface ContentVariant {
+  id: string
+  content_item_id: string
+  platform: 'linkedin' | 'facebook' | 'instagram' | 'twitter' | 'threads' | 'generic'
+  caption: string
+  hashtags: string[]
+  cta_text: string | null
+  cta_url: string | null
+  character_count: number
+  media_urls: string[] | null
+  creative_document: Record<string, unknown> | null
+  quality_score: number
+  platform_options: Record<string, unknown> | null
+  created_at: string
+}
+
+export interface ContentQAReport {
+  brand_alignment_score: number
+  platform_fit_score: number
+  readability_score: number
+  overall_quality_score: number
+  risk_level: 'low' | 'medium' | 'high' | 'critical'
+  safety_checks: {
+    contains_prohibited_terms: boolean
+    unsubstantiated_claims: boolean
+    competitor_mentions: boolean
+  }
+  suggestions: string[]
+}
+
+export interface ContentItem {
+  id: string
+  brand_id: string
+  content_pillar_id: string | null
+  campaign_id: string | null
+  title: string
+  concept: string
+  status: 'draft' | 'review' | 'approved' | 'rejected' | 'scheduled' | 'published'
+  risk_level: 'low' | 'medium' | 'high' | 'critical'
+  overall_quality_score: number
+  qa_report: ContentQAReport | null
+  review_feedback: string | null
+  reviewed_at: string | null
+  created_at: string
+  pillar?: ContentPillar | null
+  campaign?: Campaign | null
+  variants?: ContentVariant[]
+}
+
+export interface CreativeTemplateInfo {
+  id: string
+  name: string
+  category: string
+  description: string
+  aspect_ratios: string[]
+}
+
+export interface CreativeRenderResult {
+  success: boolean
+  file_path: string
+  file_url: string
+  format: 'png' | 'svg'
+  width: number
+  height: number
+  renderer: string
+  creative_document: Record<string, unknown>
+}
+
 export const apiClient = new ApiClient()
 

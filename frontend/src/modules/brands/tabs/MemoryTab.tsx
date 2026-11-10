@@ -260,3 +260,4 @@ export const MemoryTab: React.FC<MemoryTabProps> = ({ brandId }) => {
     </div>
   )
 }
+

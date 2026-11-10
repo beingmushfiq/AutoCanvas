@@ -31,6 +31,7 @@ import { TeamSettings } from '../modules/settings/TeamSettings'
 import { BillingSettings } from '../modules/settings/BillingSettings'
 import { AuditLogView } from '../modules/settings/AuditLogView'
 import { BrandStudio } from '../modules/brands/BrandStudio'
+import { ContentStudio } from '../modules/content/ContentStudio'
 
 interface NavItem {
   id: string
@@ -240,7 +241,9 @@ export const AppShell: React.FC = () => {
               {activeTab === 'overview' && 'AutoCanvas Command Center'}
               {activeTab === 'brands' && 'Brand Intelligence Studio'}
               {activeTab === 'knowledge' && 'Brand Knowledge Base & Citations'}
-              {!['team', 'billing', 'audit', 'overview', 'brands', 'knowledge'].includes(activeTab) && 'AutoCanvas Operations'}
+              {activeTab === 'content' && 'Content Studio & Copy Engine'}
+              {activeTab === 'creative' && 'Creative Studio & Deterministic Renderer'}
+              {!['team', 'billing', 'audit', 'overview', 'brands', 'knowledge', 'content', 'creative'].includes(activeTab) && 'AutoCanvas Operations'}
             </h2>
             <p className="text-xs text-[#667085]">
               {activeOrg ? `${activeOrg.name} • Plan: ${activeOrg.plan}` : 'Organization operations & brand governance'}
@@ -282,6 +285,8 @@ export const AppShell: React.FC = () => {
           {activeTab === 'audit' && <AuditLogView />}
           {activeTab === 'brands' && <BrandStudio initialTab="profile" />}
           {activeTab === 'knowledge' && <BrandStudio initialTab="knowledge" />}
+          {activeTab === 'content' && <ContentStudio initialView="posts" />}
+          {activeTab === 'creative' && <ContentStudio initialView="creative" />}
 
           {activeTab === 'overview' && (
             <>
@@ -362,14 +367,14 @@ export const AppShell: React.FC = () => {
             </>
           )}
 
-          {!['team', 'billing', 'audit', 'overview', 'brands', 'knowledge'].includes(activeTab) && (
+          {!['team', 'billing', 'audit', 'overview', 'brands', 'knowledge', 'content', 'creative'].includes(activeTab) && (
             <div className="bg-white rounded-xl border border-[#EAECF0] p-12 text-center">
               <div className="w-12 h-12 rounded-xl bg-[#F2F4F7] text-[#6257E8] flex items-center justify-center mx-auto mb-3">
                 <Sparkles className="w-6 h-6" />
               </div>
               <h3 className="text-base font-bold text-[#101828]">Scheduled for Next Phase</h3>
               <p className="text-xs text-[#667085] max-w-md mx-auto mt-1">
-                This module connects to the Content Production and Multi-Channel Engine coming in Phase 3 & 4.
+                This module connects to the Publishing Engine and Social Connectors coming in Phase 5 & 6.
               </p>
             </div>
           )}
