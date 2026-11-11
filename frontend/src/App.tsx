@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, lazy, Suspense } from 'react'
 import {
   BrowserRouter,
   Routes,
@@ -11,11 +11,8 @@ import {
 import { AuthProvider, useAuth } from './modules/auth/AuthContext'
 import { PreferencesProvider } from './lib/theme/PreferencesContext'
 import { AppShell } from './app/AppShell'
-import { LandingPage } from './modules/marketing/LandingPage'
 import { AuthModal } from './modules/auth/AuthModal'
 import { OnboardingWizard } from './modules/onboarding/OnboardingWizard'
-import { MasterControlDashboard } from './modules/master-control/MasterControlDashboard'
-import { ClientReviewView } from './modules/publishing/ClientReviewView'
 import { usePwaManifest } from './components/pwa/usePwaManifest'
 import { SmoothScrollProvider, useSmoothScroll } from './lib/scroll/SmoothScrollProvider'
 import { TooltipProvider } from './components/ui/tooltip'
@@ -31,6 +28,20 @@ import {
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClient } from './lib/query/queryClient'
 import { OfflineIndicator } from './lib/state/OfflineIndicator'
+import { DashboardSkeleton, MasterControlSkeleton } from './components/ui/skeleton'
+
+// Route-level code-splitting & lazy evaluation
+const LandingPage = lazy(() =>
+  import('./modules/marketing/LandingPage').then((m) => ({ default: m.LandingPage }))
+)
+const MasterControlDashboard = lazy(() =>
+  import('./modules/master-control/MasterControlDashboard').then((m) => ({
+    default: m.MasterControlDashboard,
+  }))
+)
+const ClientReviewView = lazy(() =>
+  import('./modules/publishing/ClientReviewView').then((m) => ({ default: m.ClientReviewView }))
+)
 
 // Review route wrapper to extract token from params
 const ReviewRoute: React.FC = () => {
@@ -113,19 +124,28 @@ const AppContent: React.FC = () => {
         <Route
           path="/"
           element={
-            <LandingPage
-              isAuthenticated={isAuthenticated}
-              onOpenAuth={(mode) => {
-                setAuthMode(mode)
-                setAuthModalOpen(true)
-              }}
-              onEnterApp={() => navigate('/workspace/overview')}
-            />
+            <Suspense fallback={<DashboardSkeleton />}>
+              <LandingPage
+                isAuthenticated={isAuthenticated}
+                onOpenAuth={(mode) => {
+                  setAuthMode(mode)
+                  setAuthModalOpen(true)
+                }}
+                onEnterApp={() => navigate('/workspace/overview')}
+              />
+            </Suspense>
           }
         />
 
         {/* 2. Client Magic Review (No workspace auth required) */}
-        <Route path="/review/:token" element={<ReviewRoute />} />
+        <Route
+          path="/review/:token"
+          element={
+            <Suspense fallback={<DashboardSkeleton />}>
+              <ReviewRoute />
+            </Suspense>
+          }
+        />
 
         {/* 3. Workspace Operations Platform */}
         <Route path="/workspace" element={<Navigate to="/workspace/overview" replace />} />
@@ -154,11 +174,19 @@ const AppContent: React.FC = () => {
         <Route path="/master-control" element={<Navigate to="/master-control/white-label" replace />} />
         <Route
           path="/master-control/:tab"
-          element={<MasterControlDashboard onExitToWorkspace={() => navigate('/workspace/overview')} />}
+          element={
+            <Suspense fallback={<MasterControlSkeleton />}>
+              <MasterControlDashboard onExitToWorkspace={() => navigate('/workspace/overview')} />
+            </Suspense>
+          }
         />
         <Route
           path="/master-control/:tab/:subtab"
-          element={<MasterControlDashboard onExitToWorkspace={() => navigate('/workspace/overview')} />}
+          element={
+            <Suspense fallback={<MasterControlSkeleton />}>
+              <MasterControlDashboard onExitToWorkspace={() => navigate('/workspace/overview')} />
+            </Suspense>
+          }
         />
 
         {/* Catch-all fallback */}

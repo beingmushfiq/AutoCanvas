@@ -1,4 +1,6 @@
 import React, { useEffect } from 'react'
+import { motion, AnimatePresence } from 'motion/react'
+import { modalBackdropVariants, commandPaletteVariants } from '../lib/motion/variants'
 import { Command } from 'cmdk'
 import {
   LayoutDashboard,
@@ -66,22 +68,38 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [open, onOpenChange])
 
-  if (!open) return null
-
   const handleSelect = (action: () => void) => {
     action()
     onOpenChange(false)
   }
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-label="Global Command Palette"
-      className="fixed inset-0 z-50 flex items-start justify-center pt-24 bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-100"
-    >
-      <div className="relative w-full max-w-xl rounded-2xl bg-surface-overlay border border-border text-foreground shadow-2xl overflow-hidden font-sans">
-        <Command label="Global Command Palette" className="w-full">
+    <AnimatePresence>
+      {open && (
+        <div className="fixed inset-0 z-50 flex items-start justify-center pt-24 p-4">
+          {/* Backdrop Overlay */}
+          <motion.div
+            variants={modalBackdropVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="fixed inset-0 bg-black/60 backdrop-blur-xs"
+            onClick={() => onOpenChange(false)}
+            aria-hidden="true"
+          />
+
+          {/* Dialog Container */}
+          <motion.div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Global Command Palette"
+            variants={commandPaletteVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="relative w-full max-w-xl rounded-2xl bg-surface-overlay border border-border text-foreground shadow-2xl overflow-hidden font-sans z-10"
+          >
+            <Command label="Global Command Palette" className="w-full">
           {/* Search Input */}
           <div className="flex items-center px-4 border-b border-border bg-surface">
             <Compass className="w-4 h-4 text-brand-accent mr-3 shrink-0" aria-hidden="true" />
@@ -310,7 +328,9 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
             </div>
           </div>
         </Command>
-      </div>
-    </div>
+          </motion.div>
+        </div>
+      )}
+    </AnimatePresence>
   )
 }

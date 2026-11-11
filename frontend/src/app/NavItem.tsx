@@ -1,5 +1,7 @@
 import React from 'react'
+import { motion } from 'motion/react'
 import { Tooltip, TooltipTrigger, TooltipContent } from '../components/ui/tooltip'
+import { SPRINGS } from '../lib/motion/tokens'
 
 interface NavItemProps {
   id: string
@@ -38,9 +40,11 @@ export const NavItem: React.FC<NavItemProps> = ({
           : 'text-nav-item-fg hover:bg-nav-item-hover-bg hover:text-nav-item-hover-fg'
       }`}
     >
-      {/* Editorial Amber Left Indicator Mark */}
+      {/* Editorial Amber Left Indicator Mark with layoutId Glide */}
       {isActive && (
-        <span
+        <motion.span
+          layoutId="activeNavIndicator"
+          transition={SPRINGS.snappy}
           className={`absolute left-0 w-[3px] rounded-r-full bg-nav-item-active-mark ${
             isCollapsed ? 'top-2 bottom-2' : 'top-1.5 bottom-1.5'
           }`}

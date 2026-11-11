@@ -1,10 +1,28 @@
 import React from 'react'
 import { Check, X, ShieldAlert, Layers } from 'lucide-react'
+import { useGsap, gsap } from '../../../lib/motion/useGsap'
 
 export const DeterministicComparisonSection: React.FC = () => {
+  const sectionRef = useGsap(() => {
+    gsap.fromTo(
+      '.comparison-card',
+      { opacity: 0, y: 35 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 0.75,
+        stagger: 0.2,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: '.comparison-grid',
+          start: 'top 85%',
+        },
+      }
+    )
+  })
 
   return (
-    <section id="comparison" className="py-24 border-t border-border bg-background">
+    <section ref={sectionRef} id="comparison" className="py-24 border-t border-border bg-background">
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center max-w-2xl mx-auto mb-16">
           <span className="text-xs font-mono font-semibold uppercase tracking-wider text-brand-accent">
@@ -19,9 +37,9 @@ export const DeterministicComparisonSection: React.FC = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
+        <div className="comparison-grid grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
           {/* Flawed Generative Tool Card */}
-          <div className="p-8 rounded-2xl border border-status-danger/30 bg-surface/50 flex flex-col justify-between relative overflow-hidden">
+          <div className="comparison-card opacity-0 p-8 rounded-2xl border border-status-danger/30 bg-surface/50 flex flex-col justify-between relative overflow-hidden">
             <div className="absolute top-0 right-0 px-4 py-1.5 bg-status-danger/10 text-status-danger text-[11px] font-mono font-semibold rounded-bl-xl border-l border-b border-status-danger/20">
               TRADITIONAL AI GENERATORS
             </div>
@@ -63,7 +81,7 @@ export const DeterministicComparisonSection: React.FC = () => {
           </div>
 
           {/* AutoCanvas Deterministic Renderer Card */}
-          <div className="p-8 rounded-2xl border border-brand-accent/40 bg-surface flex flex-col justify-between relative shadow-md">
+          <div className="comparison-card opacity-0 p-8 rounded-2xl border border-brand-accent/40 bg-surface flex flex-col justify-between relative shadow-md">
             <div className="absolute top-0 right-0 px-4 py-1.5 bg-brand-accent text-interactive-primary-fg text-[11px] font-mono font-bold rounded-bl-xl shadow-xs">
               THE AUTOCANVAS ENGINE
             </div>

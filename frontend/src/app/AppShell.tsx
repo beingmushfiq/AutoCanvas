@@ -1,5 +1,9 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, lazy, Suspense } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
+import { motion, AnimatePresence } from 'motion/react'
+import { pageTransitionVariants } from '../lib/motion/variants'
+import { SPRINGS } from '../lib/motion/tokens'
+import { ViewSkeleton } from '../components/ui/skeleton'
 import {
   LayoutDashboard,
   Layers,
@@ -46,19 +50,47 @@ import { NavItem } from './NavItem'
 import { BreadcrumbBar } from '../components/navigation/BreadcrumbBar'
 import { MobileBottomDock } from '../components/navigation/MobileBottomDock'
 import { MobileNavDrawer } from '../components/navigation/MobileNavDrawer'
-import { TeamSettings } from '../modules/settings/TeamSettings'
-import { BillingSettings } from '../modules/settings/BillingSettings'
-import { AuditLogView } from '../modules/settings/AuditLogView'
-import { BrandStudio } from '../modules/brands/BrandStudio'
-import { ContentStudio } from '../modules/content/ContentStudio'
-import { ResearchStudio } from '../modules/research/ResearchStudio'
-import { SocialAccountsManager } from '../modules/social/SocialAccountsManager'
-import { InteractiveCanvasStudio } from '../modules/creative/InteractiveCanvasStudio'
-import { PublishingCalendar } from '../modules/publishing/PublishingCalendar'
-import { CommandCenterOverview } from '../modules/overview/CommandCenterOverview'
-import { SocialInboxStream } from '../modules/community/SocialInboxStream'
-import { AnalyticsDashboard } from '../modules/analytics/AnalyticsDashboard'
-import { AutopilotCommandDeck } from '../modules/automation/AutopilotCommandDeck'
+
+// Component-level code splitting & on-demand lazy imports
+const CommandCenterOverview = lazy(() =>
+  import('../modules/overview/CommandCenterOverview').then((m) => ({ default: m.CommandCenterOverview }))
+)
+const InteractiveCanvasStudio = lazy(() =>
+  import('../modules/creative/InteractiveCanvasStudio').then((m) => ({ default: m.InteractiveCanvasStudio }))
+)
+const PublishingCalendar = lazy(() =>
+  import('../modules/publishing/PublishingCalendar').then((m) => ({ default: m.PublishingCalendar }))
+)
+const AnalyticsDashboard = lazy(() =>
+  import('../modules/analytics/AnalyticsDashboard').then((m) => ({ default: m.AnalyticsDashboard }))
+)
+const AutopilotCommandDeck = lazy(() =>
+  import('../modules/automation/AutopilotCommandDeck').then((m) => ({ default: m.AutopilotCommandDeck }))
+)
+const BrandStudio = lazy(() =>
+  import('../modules/brands/BrandStudio').then((m) => ({ default: m.BrandStudio }))
+)
+const ContentStudio = lazy(() =>
+  import('../modules/content/ContentStudio').then((m) => ({ default: m.ContentStudio }))
+)
+const SocialAccountsManager = lazy(() =>
+  import('../modules/social/SocialAccountsManager').then((m) => ({ default: m.SocialAccountsManager }))
+)
+const SocialInboxStream = lazy(() =>
+  import('../modules/community/SocialInboxStream').then((m) => ({ default: m.SocialInboxStream }))
+)
+const ResearchStudio = lazy(() =>
+  import('../modules/research/ResearchStudio').then((m) => ({ default: m.ResearchStudio }))
+)
+const TeamSettings = lazy(() =>
+  import('../modules/settings/TeamSettings').then((m) => ({ default: m.TeamSettings }))
+)
+const BillingSettings = lazy(() =>
+  import('../modules/settings/BillingSettings').then((m) => ({ default: m.BillingSettings }))
+)
+const AuditLogView = lazy(() =>
+  import('../modules/settings/AuditLogView').then((m) => ({ default: m.AuditLogView }))
+)
 
 interface NavItemConfig {
   id: string
@@ -305,12 +337,12 @@ export const AppShell: React.FC<AppShellProps> = ({
       />
 
       {/* Desktop / Tablet Expandable & Collapsible Sidebar */}
-      <aside
+      <motion.aside
         role="navigation"
         aria-label="Main Navigation"
-        className={`hidden lg:flex flex-col justify-between border-r border-nav-border bg-nav-bg transition-[width] duration-200 ease-in-out shrink-0 select-none ${
-          isSidebarCollapsed ? 'w-18' : 'w-64'
-        }`}
+        animate={{ width: isSidebarCollapsed ? 72 : 256 }}
+        transition={SPRINGS.snappy}
+        className="hidden lg:flex flex-col justify-between border-r border-nav-border bg-nav-bg shrink-0 select-none overflow-hidden"
         data-lenis-prevent
       >
         <div>
@@ -559,7 +591,7 @@ export const AppShell: React.FC<AppShellProps> = ({
             </>
           )}
         </div>
-      </aside>
+      </motion.aside>
 
       {/* Main Content Area */}
       <main role="main" className="flex-1 flex flex-col overflow-hidden">
@@ -750,55 +782,68 @@ export const AppShell: React.FC<AppShellProps> = ({
             </div>
           )}
 
-          {/* Conditional View Rendering based on activeTab and route parameters */}
-          {activeTab === 'overview' && (
-            <CommandCenterOverview onNavigate={handleSelectTab} isEmergencyPaused={isPaused} />
-          )}
-          {activeTab === 'creative' && <InteractiveCanvasStudio />}
-          {activeTab === 'calendar' && (
-            <PublishingCalendar
-              initialView={(routeSubtab as any) || 'month'}
-              onViewChange={(v) => navigate(`/workspace/calendar/${v}`)}
-              onNavigateToContent={() => navigate('/workspace/content')}
-            />
-          )}
-          {activeTab === 'team' && <TeamSettings />}
-          {activeTab === 'billing' && <BillingSettings />}
-          {activeTab === 'audit' && <AuditLogView />}
-          {activeTab === 'brands' && (
-            <BrandStudio
-              initialTab={(routeSubtab as any) || 'profile'}
-              onTabChange={(t) => navigate(`/workspace/brands/${t}`)}
-            />
-          )}
-          {activeTab === 'knowledge' && (
-            <BrandStudio
-              initialTab="knowledge"
-              onTabChange={(t) => navigate(`/workspace/brands/${t}`)}
-            />
-          )}
-          {activeTab === 'research' && (
-            <ResearchStudio onNavigateToContent={() => navigate('/workspace/content')} />
-          )}
-          {activeTab === 'content' && (
-            <ContentStudio initialView={(routeSubtab as any) || 'posts'} />
-          )}
-          {activeTab === 'accounts' && <SocialAccountsManager />}
-          {activeTab === 'inbox' && <SocialInboxStream />}
-          {activeTab === 'analytics' && <AnalyticsDashboard />}
-          {activeTab === 'autopilot' && <AutopilotCommandDeck />}
+          {/* Conditional View Rendering with Fluid Page Transitions and Skeletons */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeTab}
+              variants={pageTransitionVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              className="w-full"
+            >
+              <Suspense fallback={<ViewSkeleton type={activeTab} />}>
+                {activeTab === 'overview' && (
+                  <CommandCenterOverview onNavigate={handleSelectTab} isEmergencyPaused={isPaused} />
+                )}
+                {activeTab === 'creative' && <InteractiveCanvasStudio />}
+                {activeTab === 'calendar' && (
+                  <PublishingCalendar
+                    initialView={(routeSubtab as any) || 'month'}
+                    onViewChange={(v) => navigate(`/workspace/calendar/${v}`)}
+                    onNavigateToContent={() => navigate('/workspace/content')}
+                  />
+                )}
+                {activeTab === 'team' && <TeamSettings />}
+                {activeTab === 'billing' && <BillingSettings />}
+                {activeTab === 'audit' && <AuditLogView />}
+                {activeTab === 'brands' && (
+                  <BrandStudio
+                    initialTab={(routeSubtab as any) || 'profile'}
+                    onTabChange={(t) => navigate(`/workspace/brands/${t}`)}
+                  />
+                )}
+                {activeTab === 'knowledge' && (
+                  <BrandStudio
+                    initialTab="knowledge"
+                    onTabChange={(t) => navigate(`/workspace/brands/${t}`)}
+                  />
+                )}
+                {activeTab === 'research' && (
+                  <ResearchStudio onNavigateToContent={() => navigate('/workspace/content')} />
+                )}
+                {activeTab === 'content' && (
+                  <ContentStudio initialView={(routeSubtab as any) || 'posts'} />
+                )}
+                {activeTab === 'accounts' && <SocialAccountsManager />}
+                {activeTab === 'inbox' && <SocialInboxStream />}
+                {activeTab === 'analytics' && <AnalyticsDashboard />}
+                {activeTab === 'autopilot' && <AutopilotCommandDeck />}
 
-          {!['overview', 'creative', 'calendar', 'team', 'billing', 'audit', 'brands', 'knowledge', 'content', 'research', 'accounts', 'inbox', 'analytics', 'autopilot'].includes(activeTab) && (
-            <EmptyState
-              icon={Sparkles}
-              title="Operational Workspace Ready"
-              description="Connected to background ingestion and social API connectors. Switch tabs or use the Command Palette (⌘K) to explore."
-              action={{
-                label: 'Return to Command Center',
-                onClick: () => handleSelectTab('overview'),
-              }}
-            />
-          )}
+                {!['overview', 'creative', 'calendar', 'team', 'billing', 'audit', 'brands', 'knowledge', 'content', 'research', 'accounts', 'inbox', 'analytics', 'autopilot'].includes(activeTab) && (
+                  <EmptyState
+                    icon={Sparkles}
+                    title="Operational Workspace Ready"
+                    description="Connected to background ingestion and social API connectors. Switch tabs or use the Command Palette (⌘K) to explore."
+                    action={{
+                      label: 'Return to Command Center',
+                      onClick: () => handleSelectTab('overview'),
+                    }}
+                  />
+                )}
+              </Suspense>
+            </motion.div>
+          </AnimatePresence>
         </div>
       </main>
 

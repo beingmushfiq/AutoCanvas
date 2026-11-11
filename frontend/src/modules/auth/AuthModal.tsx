@@ -1,4 +1,6 @@
 import React, { useState } from 'react'
+import { motion, AnimatePresence } from 'motion/react'
+import { modalBackdropVariants, modalCardVariants } from '../../lib/motion/variants'
 import { apiClient } from '../../lib/api/client'
 import { useAuth } from './AuthContext'
 import { Logo } from '../../components/brand/Logo'
@@ -28,8 +30,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [error, setError] = useState<string | null>(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
-
-  if (!isOpen) return null
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -77,14 +77,32 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   }
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="auth-modal-title"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-200"
-    >
-      <div className="bg-surface rounded-2xl border border-border shadow-xl w-full max-w-md overflow-hidden relative">
-        {/* Close Button */}
+    <AnimatePresence>
+      {isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Backdrop Overlay */}
+          <motion.div
+            variants={modalBackdropVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="fixed inset-0 bg-black/60 backdrop-blur-xs"
+            onClick={onClose}
+            aria-hidden="true"
+          />
+
+          {/* Modal Card */}
+          <motion.div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="auth-modal-title"
+            variants={modalCardVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="bg-surface rounded-2xl border border-border shadow-2xl w-full max-w-md overflow-hidden relative z-10"
+          >
+            {/* Close Button */}
         <button
           onClick={onClose}
           aria-label="Close modal"
@@ -257,7 +275,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             </p>
           )}
         </div>
-      </div>
-    </div>
+          </motion.div>
+        </div>
+      )}
+    </AnimatePresence>
   )
 }

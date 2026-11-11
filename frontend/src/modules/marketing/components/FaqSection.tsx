@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { motion, AnimatePresence } from 'motion/react'
 import { ChevronDown } from 'lucide-react'
 
 interface FaqItem {
@@ -76,11 +77,21 @@ export const FaqSection: React.FC = () => {
                     aria-hidden="true"
                   />
                 </button>
-                {isOpen && (
-                  <div className="px-6 pb-6 text-xs text-foreground-secondary leading-relaxed border-t border-border-subtle pt-4 animate-in fade-in duration-150">
-                    {faq.answer}
-                  </div>
-                )}
+                <AnimatePresence initial={false}>
+                  {isOpen && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+                      className="overflow-hidden"
+                    >
+                      <div className="px-6 pb-6 text-xs text-foreground-secondary leading-relaxed border-t border-border-subtle pt-4">
+                        {faq.answer}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             )
           })}

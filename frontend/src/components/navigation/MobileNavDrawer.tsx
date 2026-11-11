@@ -1,4 +1,6 @@
 import React, { useEffect } from 'react'
+import { motion, AnimatePresence } from 'motion/react'
+import { drawerLeftVariants, modalBackdropVariants } from '../../lib/motion/variants'
 import {
   X,
   Search,
@@ -76,8 +78,6 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
     }
   }, [isOpen])
 
-  if (!isOpen) return null
-
   const visibleNavItems = navItems.filter((item) => {
     if (persona === 'business_owner') {
       return item.tier === 'core'
@@ -86,23 +86,33 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
   })
 
   return (
-    <div className="fixed inset-0 z-50 flex lg:hidden">
-      {/* Backdrop Overlay */}
-      <div
-        className="fixed inset-0 bg-background/80 backdrop-blur-xs transition-opacity animate-in fade-in duration-200"
-        aria-hidden="true"
-        onClick={onClose}
-      />
+    <AnimatePresence>
+      {isOpen && (
+        <div className="fixed inset-0 z-50 flex lg:hidden">
+          {/* Backdrop Overlay */}
+          <motion.div
+            variants={modalBackdropVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="fixed inset-0 bg-background/80 backdrop-blur-xs"
+            aria-hidden="true"
+            onClick={onClose}
+          />
 
-      {/* Drawer Surface */}
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-label="Navigation Menu"
-        className="relative w-80 max-w-[85vw] bg-nav-bg border-r border-nav-border flex flex-col justify-between h-full shadow-2xl z-10 animate-in slide-in-from-left duration-250 ease-out"
-        data-lenis-prevent
-      >
-        <div className="overflow-y-auto flex-1">
+          {/* Drawer Surface */}
+          <motion.div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Navigation Menu"
+            variants={drawerLeftVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="relative w-80 max-w-[85vw] bg-nav-bg border-r border-nav-border flex flex-col justify-between h-full shadow-2xl z-10"
+            data-lenis-prevent
+          >
+            <div className="overflow-y-auto flex-1">
           {/* Header with Logo and Close Button */}
           <div className="p-4 border-b border-border flex items-center justify-between">
             <button
@@ -282,8 +292,10 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
             )}
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
+  )}
+</AnimatePresence>
   )
 }
 

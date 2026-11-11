@@ -1,9 +1,28 @@
 import React from 'react'
 import { Compass, Palette, Calendar } from 'lucide-react'
+import { useGsap, gsap } from '../../../lib/motion/useGsap'
 
 export const PlatformPillarsSection: React.FC = () => {
+  const sectionRef = useGsap(() => {
+    gsap.fromTo(
+      '.pillar-card',
+      { opacity: 0, y: 40 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 0.7,
+        stagger: 0.15,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: '.pillar-grid',
+          start: 'top 85%',
+        },
+      }
+    )
+  })
+
   return (
-    <section id="features" className="py-24 border-t border-border bg-surface/50">
+    <section ref={sectionRef} id="features" className="py-24 border-t border-border bg-surface/50">
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center max-w-2xl mx-auto mb-16">
           <span className="text-xs font-mono font-semibold uppercase tracking-wider text-brand-accent">
@@ -18,9 +37,9 @@ export const PlatformPillarsSection: React.FC = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="pillar-grid grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Pillar 1 */}
-          <div className="p-8 rounded-2xl border border-border bg-surface flex flex-col justify-between shadow-2xs hover:border-brand-accent/50 transition-colors group">
+          <div className="pillar-card opacity-0 p-8 rounded-2xl border border-border bg-surface flex flex-col justify-between shadow-2xs hover:border-brand-accent/50 transition-colors group">
             <div>
               <div className="w-12 h-12 rounded-xl bg-background-subtle border border-border flex items-center justify-center text-brand-accent mb-6 group-hover:scale-105 transition-transform">
                 <Compass className="w-6 h-6" aria-hidden="true" />
@@ -49,7 +68,7 @@ export const PlatformPillarsSection: React.FC = () => {
           </div>
 
           {/* Pillar 2 */}
-          <div className="p-8 rounded-2xl border border-border bg-surface flex flex-col justify-between shadow-2xs hover:border-brand-accent/50 transition-colors group">
+          <div className="pillar-card opacity-0 p-8 rounded-2xl border border-border bg-surface flex flex-col justify-between shadow-2xs hover:border-brand-accent/50 transition-colors group">
             <div>
               <div className="w-12 h-12 rounded-xl bg-background-subtle border border-border flex items-center justify-center text-brand-accent mb-6 group-hover:scale-105 transition-transform">
                 <Palette className="w-6 h-6" aria-hidden="true" />
@@ -78,7 +97,7 @@ export const PlatformPillarsSection: React.FC = () => {
           </div>
 
           {/* Pillar 3 */}
-          <div className="p-8 rounded-2xl border border-border bg-surface flex flex-col justify-between shadow-2xs hover:border-brand-accent/50 transition-colors group">
+          <div className="pillar-card opacity-0 p-8 rounded-2xl border border-border bg-surface flex flex-col justify-between shadow-2xs hover:border-brand-accent/50 transition-colors group">
             <div>
               <div className="w-12 h-12 rounded-xl bg-background-subtle border border-border flex items-center justify-center text-brand-accent mb-6 group-hover:scale-105 transition-transform">
                 <Calendar className="w-6 h-6" aria-hidden="true" />

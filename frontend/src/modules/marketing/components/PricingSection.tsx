@@ -1,14 +1,33 @@
 import React from 'react'
 import { Check } from 'lucide-react'
 import { Badge } from '../../../components/ui/badge'
+import { useGsap, gsap } from '../../../lib/motion/useGsap'
 
 interface PricingSectionProps {
   onSelectPlan: (planName: string) => void
 }
 
 export const PricingSection: React.FC<PricingSectionProps> = ({ onSelectPlan }) => {
+  const sectionRef = useGsap(() => {
+    gsap.fromTo(
+      '.pricing-card',
+      { opacity: 0, y: 35 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 0.65,
+        stagger: 0.12,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: '.pricing-grid',
+          start: 'top 85%',
+        },
+      }
+    )
+  })
+
   return (
-    <section id="pricing" className="py-24 border-t border-border bg-surface/50">
+    <section ref={sectionRef} id="pricing" className="py-24 border-t border-border bg-surface/50">
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center max-w-2xl mx-auto mb-16">
           <span className="text-xs font-mono font-semibold uppercase tracking-wider text-brand-accent">
@@ -22,9 +41,9 @@ export const PricingSection: React.FC<PricingSectionProps> = ({ onSelectPlan }) 
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
+        <div className="pricing-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
           {/* Starter Plan */}
-          <div className="p-6 rounded-2xl border border-border bg-surface flex flex-col justify-between shadow-2xs">
+          <div className="pricing-card opacity-0 p-6 rounded-2xl border border-border bg-surface flex flex-col justify-between shadow-2xs">
             <div>
               <div className="text-xs font-mono font-semibold uppercase text-foreground-muted">STARTER</div>
               <div className="mt-3 flex items-baseline gap-1">
@@ -64,7 +83,7 @@ export const PricingSection: React.FC<PricingSectionProps> = ({ onSelectPlan }) 
           </div>
 
           {/* Growth Plan (Highlighted) */}
-          <div className="p-6 rounded-2xl border-2 border-brand-accent bg-surface flex flex-col justify-between shadow-lg relative">
+          <div className="pricing-card opacity-0 p-6 rounded-2xl border-2 border-brand-accent bg-surface flex flex-col justify-between shadow-lg relative">
             <div className="absolute -top-3 left-1/2 -translate-x-1/2">
               <Badge variant="accent">MOST POPULAR</Badge>
             </div>
@@ -112,7 +131,7 @@ export const PricingSection: React.FC<PricingSectionProps> = ({ onSelectPlan }) 
           </div>
 
           {/* Agency Plan */}
-          <div className="p-6 rounded-2xl border border-border bg-surface flex flex-col justify-between shadow-2xs">
+          <div className="pricing-card opacity-0 p-6 rounded-2xl border border-border bg-surface flex flex-col justify-between shadow-2xs">
             <div>
               <div className="text-xs font-mono font-semibold uppercase text-foreground-muted">AGENCY</div>
               <div className="mt-3 flex items-baseline gap-1">
@@ -156,7 +175,7 @@ export const PricingSection: React.FC<PricingSectionProps> = ({ onSelectPlan }) 
           </div>
 
           {/* Enterprise Plan */}
-          <div className="p-6 rounded-2xl border border-border bg-surface flex flex-col justify-between shadow-2xs">
+          <div className="pricing-card opacity-0 p-6 rounded-2xl border border-border bg-surface flex flex-col justify-between shadow-2xs">
             <div>
               <div className="text-xs font-mono font-semibold uppercase text-foreground-muted">ENTERPRISE</div>
               <div className="mt-3 flex items-baseline gap-1">
