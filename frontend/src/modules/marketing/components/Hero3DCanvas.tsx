@@ -27,7 +27,7 @@ interface SocialOption {
   stat: string
   desc: string
   icon: React.ComponentType<{ className?: string }>
-  position3D: [number, number, number] // [x, y, z] relative to mascot
+  position3D: [number, number, number]
   side: 'left' | 'right'
 }
 
@@ -39,7 +39,7 @@ const SOCIAL_OPTIONS: SocialOption[] = [
     stat: 'Peak-time queue active',
     desc: 'Autonomous slot scheduling based on audience engagement velocity.',
     icon: Calendar,
-    position3D: [-2.6, 1.4, 0.4],
+    position3D: [-2.6, 1.35, 0.4],
     side: 'left',
   },
   {
@@ -59,7 +59,7 @@ const SOCIAL_OPTIONS: SocialOption[] = [
     stat: '180-Day SimHash novelty',
     desc: 'Scours breaking industry signals and filters duplicate angles.',
     icon: Radio,
-    position3D: [-2.5, -1.3, 0.4],
+    position3D: [-2.5, -1.35, 0.4],
     side: 'left',
   },
   {
@@ -69,7 +69,7 @@ const SOCIAL_OPTIONS: SocialOption[] = [
     stat: 'Zero blurry AI raster text',
     desc: 'Dynamic brand font typography rendered with crisp vector accuracy.',
     icon: Palette,
-    position3D: [2.6, 1.4, 0.4],
+    position3D: [2.6, 1.35, 0.4],
     side: 'right',
   },
   {
@@ -89,7 +89,7 @@ const SOCIAL_OPTIONS: SocialOption[] = [
     stat: '100% Originality gate',
     desc: 'Multi-tier safety checks ensure every post aligns with brand guidelines.',
     icon: ShieldCheck,
-    position3D: [2.5, -1.3, 0.4],
+    position3D: [2.5, -1.35, 0.4],
     side: 'right',
   },
 ]
@@ -97,24 +97,28 @@ const SOCIAL_OPTIONS: SocialOption[] = [
 const STORY_CHAPTERS = [
   {
     index: 0,
+    shortTitle: '1. Radar',
     title: '1. Autonomous Radar',
     subtitle: 'Hourly Industry Scouring',
     desc: 'Dex tracks market shifts, filters duplicate topics, and spots novel angles before competitors.',
   },
   {
     index: 1,
+    shortTitle: '2. Hooks',
     title: '2. Multi-Tone Hooks',
     subtitle: 'Audience-Specific Copy',
     desc: 'Dex crafts tone-matched narratives calibrated for LinkedIn executives and X speed-readers.',
   },
   {
     index: 2,
+    shortTitle: '3. Studio',
     title: '3. Vector Creative Studio',
     subtitle: 'Pixel-Perfect Visuals',
     desc: 'Deterministic rendering engine composites brand assets with zero blurry AI text drift.',
   },
   {
     index: 3,
+    shortTitle: '4. Cadence',
     title: '4. Cadence & Auto-Publish',
     subtitle: 'Always in Rhythm',
     desc: 'Safe multi-channel queue dispatches at peak engagement hours with atomic token protection.',
@@ -139,7 +143,7 @@ export const Hero3DCanvas: React.FC<Hero3DCanvasProps> = ({ onExplore }) => {
   const targetMousePosRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 })
 
   // Active option 3D target ref
-  const target3DRef = useRef<THREE.Vector3 | null>(new THREE.Vector3(-2.6, 1.4, 0.4))
+  const target3DRef = useRef<THREE.Vector3>(new THREE.Vector3(-2.6, 1.35, 0.4))
 
   // Three.js Scene References
   const sceneRef = useRef<THREE.Scene | null>(null)
@@ -154,19 +158,20 @@ export const Hero3DCanvas: React.FC<Hero3DCanvasProps> = ({ onExplore }) => {
   const eyeRRef = useRef<THREE.Mesh | null>(null)
   const pupilLRef = useRef<THREE.Mesh | null>(null)
   const pupilRRef = useRef<THREE.Mesh | null>(null)
+  const mouthRef = useRef<THREE.Mesh | null>(null)
   const leftHandRef = useRef<THREE.Group | null>(null)
   const rightHandRef = useRef<THREE.Group | null>(null)
+  const stylusTipRef = useRef<THREE.Mesh | null>(null)
   const antennaOrbRef = useRef<THREE.Mesh | null>(null)
-  const holographicTabletRef = useRef<THREE.Group | null>(null)
   const energyBeamRef = useRef<THREE.Line | null>(null)
-  const optionNodesRef = useRef<THREE.Group[]>([])
+  const badgeCapsulesRef = useRef<THREE.Group[]>([])
 
   const activeOption = useMemo(
     () => SOCIAL_OPTIONS.find((opt) => opt.id === activeOptionId) || SOCIAL_OPTIONS[0],
     [activeOptionId]
   )
 
-  // Handle Scroll Synchronization
+  // Handle Scroll Synchronization with Page Scroll Depth
   useEffect(() => {
     const handleScroll = () => {
       const scrollY = window.scrollY
@@ -174,7 +179,6 @@ export const Hero3DCanvas: React.FC<Hero3DCanvasProps> = ({ onExplore }) => {
       const rawProgress = docHeight > 0 ? Math.min(1, Math.max(0, scrollY / (docHeight * 0.85))) : 0
       targetScrollProgressRef.current = rawProgress
 
-      // Sync active chapter with scroll depth
       const chapterIdx = Math.min(3, Math.floor(rawProgress * 4))
       setCurrentChapter(chapterIdx)
     }
@@ -187,21 +191,21 @@ export const Hero3DCanvas: React.FC<Hero3DCanvasProps> = ({ onExplore }) => {
     }
   }, [])
 
-  // WebGL Mascot Initialization
+  // WebGL Mascot Scene Initialization
   useEffect(() => {
     const container = containerRef.current
     if (!container) return
 
     const width = container.clientWidth
-    const height = container.clientHeight || 560
+    const height = container.clientHeight || 580
 
     // 1. Scene, Camera, High-Performance WebGL Renderer
     const scene = new THREE.Scene()
     sceneRef.current = scene
 
     const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100)
-    camera.position.set(0, 0.6, 7.5)
-    camera.lookAt(0, 0.2, 0)
+    camera.position.set(0, 0.5, 7.8)
+    camera.lookAt(0, 0.15, 0)
     cameraRef.current = camera
 
     const renderer = new THREE.WebGLRenderer({
@@ -212,51 +216,69 @@ export const Hero3DCanvas: React.FC<Hero3DCanvasProps> = ({ onExplore }) => {
     renderer.setSize(width, height)
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     renderer.toneMapping = THREE.ACESFilmicToneMapping
-    renderer.toneMappingExposure = 1.25
+    renderer.toneMappingExposure = 1.3
     container.appendChild(renderer.domElement)
     rendererRef.current = renderer
 
     const isDark = theme === 'dark' || document.documentElement.getAttribute('data-theme') === 'dark'
 
-    // Color definitions
-    const brandAccentHex = 0xf59e0b // Editorial Amber
-    const cyanLightHex = 0x38bdf8 // High-tech Cyan
-    const ceramicHex = isDark ? 0x1e293b : 0xf1f5f9
-    const darkVisorHex = 0x050811
-    const goldKernelHex = 0xfbbf24
+    // Brand-accent Editorial Color Palette
+    const amberPrimaryHex = 0xf59e0b // AutoCanvas Brand Amber
+    const amberBrightHex = 0xfbbf24
+    const porcelainHex = isDark ? 0x1e293b : 0xfefce8 // Warm porcelain white in light mode
+    const darkPlateHex = isDark ? 0x0f172a : 0x1c1917 // Architectural dark accent trim
+    const eyeGlowHex = 0x38bdf8 // Luminous Cyan
+    const darkVisorHex = 0x090d16 // Sleek obsidian faceplate
 
-    // 2. Dynamic Lighting System
-    const ambientLight = new THREE.AmbientLight(isDark ? 0xffffff : 0xf8fafc, isDark ? 1.4 : 1.9)
+    // 2. High-Fidelity Studio Lighting
+    const ambientLight = new THREE.AmbientLight(isDark ? 0xffffff : 0xfffbeb, isDark ? 1.6 : 2.2)
     scene.add(ambientLight)
 
-    const keyLight = new THREE.DirectionalLight(brandAccentHex, 3.2)
-    keyLight.position.set(4, 7, 5)
+    const keyLight = new THREE.DirectionalLight(amberBrightHex, 3.4)
+    keyLight.position.set(4, 7, 6)
     scene.add(keyLight)
 
-    const rimLight = new THREE.DirectionalLight(cyanLightHex, isDark ? 2.5 : 1.6)
-    rimLight.position.set(-5, -2, -3)
-    scene.add(rimLight)
+    const fillLight = new THREE.DirectionalLight(0x38bdf8, isDark ? 2.2 : 1.6)
+    fillLight.position.set(-6, -3, -4)
+    scene.add(fillLight)
 
-    const mascotGlowPoint = new THREE.PointLight(brandAccentHex, 2.8, 8)
-    mascotGlowPoint.position.set(0, 0.4, 1.2)
-    scene.add(mascotGlowPoint)
+    const topRimLight = new THREE.DirectionalLight(0xffffff, 2.0)
+    topRimLight.position.set(0, 8, -2)
+    scene.add(topRimLight)
 
-    // 3. Hierarchical Mascot Group Construction ("Dex")
-    const mascotRoot = new THREE.Group()
-    mascotRoot.position.set(0, 0, 0)
-    scene.add(mascotRoot)
-    mascotRootRef.current = mascotRoot
+    const mascotChestGlow = new THREE.PointLight(amberBrightHex, 3.0, 9)
+    mascotChestGlow.position.set(0, 0.3, 1.4)
+    scene.add(mascotChestGlow)
 
-    // Mascot Common Materials
-    const ceramicMat = new THREE.MeshPhysicalMaterial({
-      color: ceramicHex,
-      metalness: 0.2,
-      roughness: 0.18,
-      clearcoat: 0.95,
+    // 3. Materials
+    // Body Armor: Warm Brand-Accent Amber Satin Ceramic
+    const amberArmorMat = new THREE.MeshPhysicalMaterial({
+      color: amberPrimaryHex,
+      emissive: amberPrimaryHex,
+      emissiveIntensity: 0.12,
+      metalness: 0.22,
+      roughness: 0.22,
+      clearcoat: 0.9,
       clearcoatRoughness: 0.1,
-      reflectivity: 0.85,
+      reflectivity: 0.9,
     })
 
+    // Porcelain Front Plate & Accent Panels
+    const porcelainMat = new THREE.MeshPhysicalMaterial({
+      color: porcelainHex,
+      metalness: 0.1,
+      roughness: 0.16,
+      clearcoat: 0.85,
+    })
+
+    // Dark Architectural Trims & Joint Details
+    const trimMat = new THREE.MeshStandardMaterial({
+      color: darkPlateHex,
+      metalness: 0.85,
+      roughness: 0.25,
+    })
+
+    // Visor Faceplate
     const visorMat = new THREE.MeshPhysicalMaterial({
       color: darkVisorHex,
       metalness: 0.95,
@@ -264,264 +286,320 @@ export const Hero3DCanvas: React.FC<Hero3DCanvasProps> = ({ onExplore }) => {
       clearcoat: 1.0,
       clearcoatRoughness: 0.05,
       reflectivity: 0.98,
-      transmission: 0.4,
+      transmission: 0.3,
+      thickness: 0.6,
+    })
+
+    // Translucent Glass for Floating Capsules
+    const capsuleGlassMat = new THREE.MeshPhysicalMaterial({
+      color: isDark ? 0x1e293b : 0xffffff,
+      transmission: 0.9,
+      opacity: 1,
+      transparent: true,
+      roughness: 0.08,
+      ior: 1.5,
       thickness: 0.8,
     })
 
-    const accentMat = new THREE.MeshStandardMaterial({
-      color: brandAccentHex,
-      emissive: brandAccentHex,
-      emissiveIntensity: 0.6,
-      metalness: 0.8,
-      roughness: 0.2,
-    })
+    // 4. Mascot Construction ("Dex" - Stylized Editorial Character)
+    const mascotRoot = new THREE.Group()
+    scene.add(mascotRoot)
+    mascotRootRef.current = mascotRoot
 
-    // --- A. Torso / Capsule Body ---
+    // --- A. Torso Body & Belly Plate ---
     const bodyGroup = new THREE.Group()
     mascotRoot.add(bodyGroup)
 
-    const torsoGeo = new THREE.CapsuleGeometry(0.72, 0.65, 16, 32)
-    const torsoMesh = new THREE.Mesh(torsoGeo, ceramicMat)
-    torsoMesh.position.y = -0.1
+    // Outer Amber Armor Torso
+    const torsoGeo = new THREE.CapsuleGeometry(0.74, 0.68, 16, 32)
+    const torsoMesh = new THREE.Mesh(torsoGeo, amberArmorMat)
+    torsoMesh.position.y = -0.08
     bodyGroup.add(torsoMesh)
 
-    // Glowing Waist Ring
-    const beltGeo = new THREE.TorusGeometry(0.74, 0.035, 16, 64)
-    const beltMesh = new THREE.Mesh(beltGeo, accentMat)
+    // Front Belly Plate (Warm Cream Inlay)
+    const bellyGeo = new THREE.SphereGeometry(0.66, 32, 24, -Math.PI / 3, (Math.PI * 2) / 3, Math.PI / 3.2, Math.PI / 2.2)
+    const bellyMesh = new THREE.Mesh(bellyGeo, porcelainMat)
+    bellyMesh.position.set(0, -0.06, 0.16)
+    bellyMesh.scale.set(1.0, 1.0, 0.95)
+    bodyGroup.add(bellyMesh)
+
+    // Waist Belt Trim Ring
+    const beltGeo = new THREE.TorusGeometry(0.76, 0.035, 16, 64)
+    const beltMesh = new THREE.Mesh(beltGeo, trimMat)
     beltMesh.rotation.x = Math.PI / 2
     beltMesh.position.y = -0.15
     bodyGroup.add(beltMesh)
 
-    // Chest Emblem (Octahedral Core)
-    const emblemGeo = new THREE.OctahedronGeometry(0.18, 0)
+    // Chest Emblem (Illuminated Octahedral Diamond Core)
+    const emblemGeo = new THREE.OctahedronGeometry(0.19, 0)
     const emblemMat = new THREE.MeshStandardMaterial({
-      color: goldKernelHex,
-      emissive: goldKernelHex,
-      emissiveIntensity: 0.9,
+      color: amberBrightHex,
+      emissive: amberBrightHex,
+      emissiveIntensity: 1.2,
+      metalness: 0.8,
     })
     const emblemMesh = new THREE.Mesh(emblemGeo, emblemMat)
-    emblemMesh.position.set(0, 0.12, 0.72)
+    emblemMesh.position.set(0, 0.15, 0.74)
     bodyGroup.add(emblemMesh)
 
-    // Base Floating Repulsor Ring
-    const repulsorGeo = new THREE.TorusGeometry(0.48, 0.025, 16, 32)
-    const repulsorMat = new THREE.MeshBasicMaterial({
-      color: cyanLightHex,
+    // Floating Base Repulsor Rings (Anti-Gravity Thruster)
+    const thrusterGeo = new THREE.TorusGeometry(0.46, 0.028, 16, 32)
+    const thrusterMat = new THREE.MeshBasicMaterial({
+      color: eyeGlowHex,
       transparent: true,
-      opacity: 0.8,
+      opacity: 0.85,
     })
-    const repulsorMesh = new THREE.Mesh(repulsorGeo, repulsorMat)
-    repulsorMesh.rotation.x = Math.PI / 2
-    repulsorMesh.position.y = -0.75
-    bodyGroup.add(repulsorMesh)
+    const thrusterMesh = new THREE.Mesh(thrusterGeo, thrusterMat)
+    thrusterMesh.rotation.x = Math.PI / 2
+    thrusterMesh.position.y = -0.76
+    bodyGroup.add(thrusterMesh)
 
-    // --- B. Articulated Head & Face Visor ---
+    const thrusterInnerGeo = new THREE.TorusGeometry(0.32, 0.02, 16, 32)
+    const thrusterInner = new THREE.Mesh(thrusterInnerGeo, thrusterMat)
+    thrusterInner.rotation.x = Math.PI / 2
+    thrusterInner.position.y = -0.84
+    bodyGroup.add(thrusterInner)
+
+    // --- B. Head, Curved Visor & Expressive Face ---
     const headPivot = new THREE.Group()
-    headPivot.position.set(0, 0.72, 0)
+    headPivot.position.set(0, 0.74, 0)
     mascotRoot.add(headPivot)
     headGroupRef.current = headPivot
 
-    // Outer Helmet
-    const headGeo = new THREE.SphereGeometry(0.78, 32, 32)
-    const headMesh = new THREE.Mesh(headGeo, ceramicMat)
-    headMesh.scale.set(1.04, 0.96, 1.0)
-    headPivot.add(headMesh)
+    // Amber Helmet Outer Shell
+    const helmetGeo = new THREE.SphereGeometry(0.8, 32, 32)
+    const helmetMesh = new THREE.Mesh(helmetGeo, amberArmorMat)
+    helmetMesh.scale.set(1.06, 0.98, 1.02)
+    headPivot.add(helmetMesh)
 
-    // Curved Glossy Visor Faceplate
-    const visorGeo = new THREE.SphereGeometry(0.8, 32, 24, -Math.PI / 2.3, Math.PI / 1.15, Math.PI / 4.5, Math.PI / 2)
+    // Visor Faceplate Frame (Dark Architectural Bevel)
+    const visorFrameGeo = new THREE.SphereGeometry(0.81, 32, 24, -Math.PI / 2.2, Math.PI / 1.1, Math.PI / 4.2, Math.PI / 2)
+    const visorFrameMesh = new THREE.Mesh(visorFrameGeo, trimMat)
+    headPivot.add(visorFrameMesh)
+
+    // Deep Obsidian Glossy Visor
+    const visorGeo = new THREE.SphereGeometry(0.82, 32, 24, -Math.PI / 2.3, Math.PI / 1.15, Math.PI / 4.5, Math.PI / 2)
     const visorMesh = new THREE.Mesh(visorGeo, visorMat)
     headPivot.add(visorMesh)
 
-    // Eyes: Glowing Digital Sockets & Mouse-Tracking Pupils
-    const eyeSocketGeo = new THREE.PlaneGeometry(0.24, 0.28)
-    const eyeSocketMat = new THREE.MeshBasicMaterial({
-      color: 0x0284c7,
+    // Large Expressive Eyes (Digital Display Behind Visor)
+    const eyeOuterGeo = new THREE.PlaneGeometry(0.3, 0.36)
+    const eyeOuterMat = new THREE.MeshBasicMaterial({
+      color: eyeGlowHex,
       transparent: true,
-      opacity: 0.25,
+      opacity: 0.28,
       side: THREE.DoubleSide,
     })
 
-    const eyeL = new THREE.Mesh(eyeSocketGeo, eyeSocketMat)
-    eyeL.position.set(-0.25, 0.08, 0.74)
+    const eyeL = new THREE.Mesh(eyeOuterGeo, eyeOuterMat)
+    eyeL.position.set(-0.27, 0.08, 0.76)
     headPivot.add(eyeL)
     eyeLRef.current = eyeL
 
-    const eyeR = new THREE.Mesh(eyeSocketGeo, eyeSocketMat)
-    eyeR.position.set(0.25, 0.08, 0.74)
+    const eyeR = new THREE.Mesh(eyeOuterGeo, eyeOuterMat)
+    eyeR.position.set(0.27, 0.08, 0.76)
     headPivot.add(eyeR)
     eyeRRef.current = eyeR
 
-    // Digital Pupil Nodes (Track Mouse)
-    const pupilGeo = new THREE.CircleGeometry(0.085, 24)
+    // Digital Pupil Discs (Track Cursor In Real Time)
+    const pupilGeo = new THREE.CircleGeometry(0.11, 32)
     const pupilMat = new THREE.MeshBasicMaterial({
-      color: brandAccentHex,
+      color: amberBrightHex,
       side: THREE.DoubleSide,
     })
 
     const pupilL = new THREE.Mesh(pupilGeo, pupilMat)
-    pupilL.position.set(-0.25, 0.08, 0.75)
+    pupilL.position.set(-0.27, 0.08, 0.77)
     headPivot.add(pupilL)
     pupilLRef.current = pupilL
 
     const pupilR = new THREE.Mesh(pupilGeo, pupilMat)
-    pupilR.position.set(0.25, 0.08, 0.75)
+    pupilR.position.set(0.27, 0.08, 0.77)
     headPivot.add(pupilR)
     pupilRRef.current = pupilR
 
-    // Headphone Ear Pods
-    const earPodGeo = new THREE.CylinderGeometry(0.22, 0.22, 0.12, 24)
-    const earPodL = new THREE.Mesh(earPodGeo, ceramicMat)
+    // Catchlight Sparkles (Gives Sentient, Friendly Personality)
+    const sparkleGeo = new THREE.CircleGeometry(0.035, 16)
+    const sparkleMat = new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide })
+    const sparkleL = new THREE.Mesh(sparkleGeo, sparkleMat)
+    sparkleL.position.set(0.04, 0.04, 0.01)
+    pupilL.add(sparkleL)
+
+    const sparkleR = new THREE.Mesh(sparkleGeo, sparkleMat)
+    sparkleR.position.set(0.04, 0.04, 0.01)
+    pupilR.add(sparkleR)
+
+    // Animated Digital Mouth Arc (Smile / Focus)
+    const mouthGeo = new THREE.TorusGeometry(0.12, 0.02, 16, 32, Math.PI)
+    const mouthMat = new THREE.MeshBasicMaterial({
+      color: amberBrightHex,
+      side: THREE.DoubleSide,
+    })
+    const mouthMesh = new THREE.Mesh(mouthGeo, mouthMat)
+    mouthMesh.rotation.z = Math.PI // Smiling Arc
+    mouthMesh.position.set(0, -0.15, 0.78)
+    headPivot.add(mouthMesh)
+    mouthRef.current = mouthMesh
+
+    // Studio Headphone Ear Cushions & Top Headband
+    const bandGeo = new THREE.TorusGeometry(0.85, 0.04, 16, 64, Math.PI * 0.9)
+    const bandMesh = new THREE.Mesh(bandGeo, trimMat)
+    bandMesh.rotation.z = Math.PI * 0.05
+    bandMesh.position.set(0, 0.08, -0.05)
+    headPivot.add(bandMesh)
+
+    const earPodGeo = new THREE.CylinderGeometry(0.26, 0.26, 0.14, 28)
+    const earPodL = new THREE.Mesh(earPodGeo, porcelainMat)
     earPodL.rotation.z = Math.PI / 2
-    earPodL.position.set(-0.84, 0.02, 0)
+    earPodL.position.set(-0.86, 0.04, 0)
     headPivot.add(earPodL)
 
-    const earRingGeo = new THREE.TorusGeometry(0.2, 0.02, 16, 32)
-    const earRingL = new THREE.Mesh(earRingGeo, accentMat)
+    const earRingGeo = new THREE.TorusGeometry(0.22, 0.025, 16, 32)
+    const earRingMat = new THREE.MeshStandardMaterial({
+      color: amberPrimaryHex,
+      emissive: amberPrimaryHex,
+      emissiveIntensity: 0.9,
+    })
+    const earRingL = new THREE.Mesh(earRingGeo, earRingMat)
     earRingL.rotation.y = Math.PI / 2
-    earRingL.position.set(-0.91, 0.02, 0)
+    earRingL.position.set(-0.94, 0.04, 0)
     headPivot.add(earRingL)
 
-    const earPodR = new THREE.Mesh(earPodGeo, ceramicMat)
+    const earPodR = new THREE.Mesh(earPodGeo, porcelainMat)
     earPodR.rotation.z = Math.PI / 2
-    earPodR.position.set(0.84, 0.02, 0)
+    earPodR.position.set(0.86, 0.04, 0)
     headPivot.add(earPodR)
 
-    const earRingR = new THREE.Mesh(earRingGeo, accentMat)
+    const earRingR = new THREE.Mesh(earRingGeo, earRingMat)
     earRingR.rotation.y = Math.PI / 2
-    earRingR.position.set(0.91, 0.02, 0)
+    earRingR.position.set(0.94, 0.04, 0)
     headPivot.add(earRingR)
 
     // Antenna & Top Signal Beacon
-    const stalkGeo = new THREE.CylinderGeometry(0.02, 0.035, 0.38, 16)
-    const stalkMesh = new THREE.Mesh(stalkGeo, ceramicMat)
-    stalkMesh.position.set(0, 0.88, -0.05)
-    stalkMesh.rotation.x = -0.15
+    const stalkGeo = new THREE.CylinderGeometry(0.02, 0.035, 0.42, 16)
+    const stalkMesh = new THREE.Mesh(stalkGeo, trimMat)
+    stalkMesh.position.set(0, 0.92, -0.06)
+    stalkMesh.rotation.x = -0.16
     headPivot.add(stalkMesh)
 
-    const orbGeo = new THREE.SphereGeometry(0.11, 16, 16)
+    const orbGeo = new THREE.SphereGeometry(0.12, 24, 24)
     const orbMat = new THREE.MeshStandardMaterial({
-      color: brandAccentHex,
-      emissive: brandAccentHex,
-      emissiveIntensity: 1.2,
+      color: amberBrightHex,
+      emissive: amberBrightHex,
+      emissiveIntensity: 1.4,
     })
     const orbMesh = new THREE.Mesh(orbGeo, orbMat)
-    orbMesh.position.set(0, 1.08, -0.08)
+    orbMesh.position.set(0, 1.14, -0.1)
     headPivot.add(orbMesh)
     antennaOrbRef.current = orbMesh
 
-    // --- C. Floating Magnetic Hands ---
-    const handMat = new THREE.MeshPhysicalMaterial({
-      color: ceramicHex,
-      metalness: 0.3,
-      roughness: 0.2,
-      clearcoat: 0.9,
-    })
+    // --- C. Floating Magnetic Hands & Studio Stylus Tool ---
+    const handGeo = new THREE.SphereGeometry(0.18, 24, 24)
+    handGeo.scale(1.0, 0.85, 1.1)
 
-    const handGeo = new THREE.SphereGeometry(0.17, 24, 24)
-    handGeo.scale(1.0, 0.8, 1.2)
-
-    // Left Hand
+    // Left Floating Hand (Support & Wave)
     const leftHand = new THREE.Group()
-    leftHand.position.set(-1.15, 0.05, 0.3)
-    const leftHandMesh = new THREE.Mesh(handGeo, handMat)
+    leftHand.position.set(-1.18, 0.05, 0.3)
+    const leftHandMesh = new THREE.Mesh(handGeo, porcelainMat)
     leftHand.add(leftHandMesh)
     mascotRoot.add(leftHand)
     leftHandRef.current = leftHand
 
-    // Right Hand (Interactive Pointer)
+    // Right Floating Hand Holding Digital Creative Stylus
     const rightHand = new THREE.Group()
-    rightHand.position.set(1.15, 0.05, 0.3)
-    const rightHandMesh = new THREE.Mesh(handGeo, handMat)
+    rightHand.position.set(1.18, 0.05, 0.3)
+    const rightHandMesh = new THREE.Mesh(handGeo, porcelainMat)
     rightHand.add(rightHandMesh)
+
+    // Digital Creative Stylus / Pen
+    const stylusGroup = new THREE.Group()
+    stylusGroup.rotation.x = Math.PI / 3
+    stylusGroup.rotation.z = -Math.PI / 6
+    stylusGroup.position.set(0.05, 0.1, 0.1)
+
+    const penBodyGeo = new THREE.CylinderGeometry(0.035, 0.03, 0.65, 16)
+    const penBody = new THREE.Mesh(penBodyGeo, trimMat)
+    stylusGroup.add(penBody)
+
+    const penTipGeo = new THREE.ConeGeometry(0.035, 0.12, 16)
+    const penTipMat = new THREE.MeshStandardMaterial({
+      color: amberBrightHex,
+      emissive: amberBrightHex,
+      emissiveIntensity: 1.8,
+    })
+    const penTip = new THREE.Mesh(penTipGeo, penTipMat)
+    penTip.position.y = 0.36
+    stylusGroup.add(penTip)
+    stylusTipRef.current = penTip
+
+    rightHand.add(stylusGroup)
     mascotRoot.add(rightHand)
     rightHandRef.current = rightHand
 
-    // --- D. Floating Holographic Canvas (Creative Studio Morph Target) ---
-    const holoGroup = new THREE.Group()
-    holoGroup.position.set(0, 0.15, 0.95)
-    holoGroup.scale.set(0.001, 0.001, 0.001) // hidden by default, expands in Chapter 3
-    mascotRoot.add(holoGroup)
-    holographicTabletRef.current = holoGroup
-
-    const tabletBorderGeo = new THREE.BoxGeometry(1.3, 0.85, 0.02)
-    const tabletBorderMat = new THREE.MeshStandardMaterial({
-      color: 0x0f172a,
-      metalness: 0.8,
-      roughness: 0.2,
-      wireframe: true,
-    })
-    const tabletBorder = new THREE.Mesh(tabletBorderGeo, tabletBorderMat)
-    holoGroup.add(tabletBorder)
-
-    const tabletScreenGeo = new THREE.PlaneGeometry(1.24, 0.79)
-    const tabletScreenMat = new THREE.MeshBasicMaterial({
-      color: brandAccentHex,
-      transparent: true,
-      opacity: 0.35,
-      side: THREE.DoubleSide,
-    })
-    const tabletScreen = new THREE.Mesh(tabletScreenGeo, tabletScreenMat)
-    holoGroup.add(tabletScreen)
-
-    // --- E. 3D Floating Option Pedestals Around Dex ---
-    const optionNodes: THREE.Group[] = []
+    // --- D. Floating 3D Holographic Social Badges (Replacing Dark Puck Pedestals) ---
+    const badgeCapsules: THREE.Group[] = []
     SOCIAL_OPTIONS.forEach((opt) => {
-      const nodeGroup = new THREE.Group()
-      nodeGroup.position.set(...opt.position3D)
+      const capsuleGroup = new THREE.Group()
+      capsuleGroup.position.set(...opt.position3D)
 
-      // Hexagonal Crystal Pod
-      const crystalGeo = new THREE.CylinderGeometry(0.18, 0.18, 0.06, 6)
-      const crystalMat = new THREE.MeshStandardMaterial({
-        color: opt.id === activeOptionId ? brandAccentHex : isDark ? 0x334155 : 0x94a3b8,
-        emissive: opt.id === activeOptionId ? brandAccentHex : 0x000000,
-        emissiveIntensity: opt.id === activeOptionId ? 0.8 : 0.0,
-        metalness: 0.8,
-        roughness: 0.25,
+      // Outer Glowing Translucent Gem/Glass Capsule
+      const outerGeo = new THREE.CylinderGeometry(0.24, 0.24, 0.1, 32)
+      const outerMesh = new THREE.Mesh(outerGeo, capsuleGlassMat)
+      outerMesh.rotation.x = Math.PI / 5
+      capsuleGroup.add(outerMesh)
+
+      // Inner Glowing Core (Unique Icon Shape)
+      const coreGeo = new THREE.OctahedronGeometry(0.12, 0)
+      const coreMat = new THREE.MeshStandardMaterial({
+        color: opt.id === activeOptionId ? amberBrightHex : eyeGlowHex,
+        emissive: opt.id === activeOptionId ? amberBrightHex : eyeGlowHex,
+        emissiveIntensity: opt.id === activeOptionId ? 1.4 : 0.4,
       })
-      const crystalMesh = new THREE.Mesh(crystalGeo, crystalMat)
-      nodeGroup.add(crystalMesh)
+      const coreMesh = new THREE.Mesh(coreGeo, coreMat)
+      capsuleGroup.add(coreMesh)
 
-      // Orbiting Halo
-      const haloGeo = new THREE.TorusGeometry(0.28, 0.015, 16, 32)
-      const haloMat = new THREE.MeshBasicMaterial({
-        color: opt.id === activeOptionId ? brandAccentHex : cyanLightHex,
+      // Orbiting Holographic Light Ring
+      const auraRingGeo = new THREE.TorusGeometry(0.34, 0.016, 16, 32)
+      const auraRingMat = new THREE.MeshBasicMaterial({
+        color: opt.id === activeOptionId ? amberBrightHex : eyeGlowHex,
         transparent: true,
-        opacity: 0.6,
+        opacity: 0.75,
       })
-      const haloMesh = new THREE.Mesh(haloGeo, haloMat)
-      nodeGroup.add(haloMesh)
+      const auraRing = new THREE.Mesh(auraRingGeo, auraRingMat)
+      auraRing.rotation.x = Math.PI / 3
+      capsuleGroup.add(auraRing)
 
-      scene.add(nodeGroup)
-      optionNodes.push(nodeGroup)
+      scene.add(capsuleGroup)
+      badgeCapsules.push(capsuleGroup)
     })
-    optionNodesRef.current = optionNodes
+    badgeCapsulesRef.current = badgeCapsules
 
-    // --- F. Dynamic Energy Beam (Links Dex's chest to active option) ---
+    // --- E. Dynamic Stylus Energy Beam ---
     const beamCurve = new THREE.CatmullRomCurve3([
-      new THREE.Vector3(0, 0.12, 0.72),
-      new THREE.Vector3(-1.2, 0.8, 0.5),
-      new THREE.Vector3(-2.6, 1.4, 0.4),
+      new THREE.Vector3(1.2, 0.2, 0.4),
+      new THREE.Vector3(0, 0.8, 0.8),
+      new THREE.Vector3(-2.6, 1.35, 0.4),
     ])
     const beamGeo = new THREE.BufferGeometry().setFromPoints(beamCurve.getPoints(24))
     const beamMat = new THREE.LineBasicMaterial({
-      color: brandAccentHex,
+      color: amberBrightHex,
       transparent: true,
-      opacity: 0.75,
+      opacity: 0.85,
     })
     const energyBeam = new THREE.Line(beamGeo, beamMat)
     scene.add(energyBeam)
     energyBeamRef.current = energyBeam
 
-    // --- G. Background Signal Constellation ---
-    const particleCount = 220
+    // --- F. Ambient Constellation Particle Field ---
+    const particleCount = 200
     const particlePositions = new Float32Array(particleCount * 3)
     const particleColors = new Float32Array(particleCount * 3)
-    const colorAmber = new THREE.Color(brandAccentHex)
-    const colorCyan = new THREE.Color(cyanLightHex)
+    const colorAmber = new THREE.Color(amberPrimaryHex)
+    const colorCyan = new THREE.Color(eyeGlowHex)
     const colorWhite = new THREE.Color(isDark ? 0xffffff : 0x64748b)
 
     for (let i = 0; i < particleCount; i++) {
-      const radius = 3.0 + Math.random() * 4.5
+      const radius = 3.2 + Math.random() * 4.2
       const theta = Math.random() * Math.PI * 2
       const phi = Math.acos(Math.random() * 2 - 1)
 
@@ -540,16 +618,16 @@ export const Hero3DCanvas: React.FC<Hero3DCanvasProps> = ({ onExplore }) => {
     starGeo.setAttribute('color', new THREE.BufferAttribute(particleColors, 3))
 
     const starMat = new THREE.PointsMaterial({
-      size: 0.04,
+      size: 0.045,
       vertexColors: true,
       transparent: true,
-      opacity: isDark ? 0.8 : 0.5,
+      opacity: isDark ? 0.85 : 0.55,
       blending: THREE.AdditiveBlending,
     })
     const starField = new THREE.Points(starGeo, starMat)
     scene.add(starField)
 
-    // 4. Mouse Move Tracking Handler
+    // 5. Pointer Tracking Handler
     const handlePointerMove = (e: PointerEvent) => {
       const rect = container.getBoundingClientRect()
       const x = ((e.clientX - rect.left) / rect.width) * 2 - 1
@@ -559,24 +637,24 @@ export const Hero3DCanvas: React.FC<Hero3DCanvasProps> = ({ onExplore }) => {
 
     container.addEventListener('pointermove', handlePointerMove)
 
-    // 5. Blinking Animation State
+    // 6. Blinking Animation State
     let blinkTimer = 0
     let nextBlinkInterval = 3.2
     let blinkProgress = 0
 
-    // 6. Camera Keyframes for Scroll Sync (Guiding Through Brand Story)
+    // 7. Camera Keyframes for Scroll Narrative (Guiding through AutoCanvas Brand Story)
     const cameraKeyframes = [
       // Chapter 0: Autonomous Radar (Hero overview)
-      { camPos: new THREE.Vector3(0, 0.4, 7.6), lookAt: new THREE.Vector3(0, 0.1, 0), mascotY: 0, mascotRotY: 0 },
+      { camPos: new THREE.Vector3(0, 0.45, 7.8), lookAt: new THREE.Vector3(0, 0.15, 0), mascotY: 0, mascotRotY: 0 },
       // Chapter 1: Multi-Tone Hooks (Focused discovery)
-      { camPos: new THREE.Vector3(-1.8, 0.8, 6.2), lookAt: new THREE.Vector3(-0.4, 0.2, 0), mascotY: 0.15, mascotRotY: 0.35 },
+      { camPos: new THREE.Vector3(-1.7, 0.8, 6.4), lookAt: new THREE.Vector3(-0.35, 0.2, 0), mascotY: 0.12, mascotRotY: 0.32 },
       // Chapter 2: Vector Studio (Close creative inspection)
-      { camPos: new THREE.Vector3(1.8, 0.3, 5.4), lookAt: new THREE.Vector3(0.3, 0.1, 0), mascotY: -0.1, mascotRotY: -0.38 },
+      { camPos: new THREE.Vector3(1.7, 0.35, 5.6), lookAt: new THREE.Vector3(0.3, 0.1, 0), mascotY: -0.08, mascotRotY: -0.35 },
       // Chapter 3: Cadence & Publishing (Elevated launch stance)
-      { camPos: new THREE.Vector3(0, 1.8, 8.2), lookAt: new THREE.Vector3(0, 0.4, 0), mascotY: 0.25, mascotRotY: 0 },
+      { camPos: new THREE.Vector3(0, 1.8, 8.4), lookAt: new THREE.Vector3(0, 0.35, 0), mascotY: 0.22, mascotRotY: 0 },
     ]
 
-    // 7. Master Animation & Render Loop
+    // 8. Master Animation & Render Loop
     const clock = new THREE.Clock()
 
     const animate = () => {
@@ -585,7 +663,7 @@ export const Hero3DCanvas: React.FC<Hero3DCanvasProps> = ({ onExplore }) => {
       const delta = clock.getDelta()
       const elapsed = clock.getElapsedTime()
 
-      // --- A. Smooth Pointer Interpolation ---
+      // --- A. Smooth Cursor Interpolation ---
       mousePosRef.current.x += (targetMousePosRef.current.x - mousePosRef.current.x) * 0.08
       mousePosRef.current.y += (targetMousePosRef.current.y - mousePosRef.current.y) * 0.08
       const curX = mousePosRef.current.x
@@ -595,8 +673,7 @@ export const Hero3DCanvas: React.FC<Hero3DCanvasProps> = ({ onExplore }) => {
       scrollProgressRef.current += (targetScrollProgressRef.current - scrollProgressRef.current) * 0.06
       const scrollT = scrollProgressRef.current
 
-      // Compute Camera Keyframe Interpolation
-      const stageSegment = scrollT * 3 // 0 to 3
+      const stageSegment = scrollT * 3
       const baseIdx = Math.min(2, Math.floor(stageSegment))
       const segT = stageSegment - baseIdx
 
@@ -611,9 +688,7 @@ export const Hero3DCanvas: React.FC<Hero3DCanvasProps> = ({ onExplore }) => {
       const floatY = Math.sin(elapsed * 2.2) * 0.09
       const targetMascotY = THREE.MathUtils.lerp(kfStart.mascotY, kfEnd.mascotY, segT) + floatY
       mascotRoot.position.y += (targetMascotY - mascotRoot.position.y) * 0.08
-
-      // Lean body into mouse velocity
-      mascotRoot.rotation.z = -curX * 0.08
+      mascotRoot.rotation.z = -curX * 0.07
       mascotRoot.position.x = curX * 0.35
 
       // --- D. Mascot Head Tracking (Eyes & Visor Follow Pointer) ---
@@ -627,10 +702,10 @@ export const Hero3DCanvas: React.FC<Hero3DCanvasProps> = ({ onExplore }) => {
 
       // --- E. Eye Pupils Direct Tracking on Visor ---
       if (pupilL && pupilR) {
-        pupilL.position.x = -0.25 + curX * 0.05
-        pupilL.position.y = 0.08 + curY * 0.04
-        pupilR.position.x = 0.25 + curX * 0.05
-        pupilR.position.y = 0.08 + curY * 0.04
+        pupilL.position.x = -0.27 + curX * 0.06
+        pupilL.position.y = 0.08 + curY * 0.05
+        pupilR.position.x = 0.27 + curX * 0.06
+        pupilR.position.y = 0.08 + curY * 0.05
       }
 
       // --- F. Expressive Natural Blinking ---
@@ -654,19 +729,19 @@ export const Hero3DCanvas: React.FC<Hero3DCanvasProps> = ({ onExplore }) => {
         }
       }
 
-      // --- G. Magnetic Hands Animation ---
+      // --- G. Magnetic Hands & Stylus Pointer Kinematics ---
       if (leftHand && rightHand) {
-        // Left hand gently stabilizes & bobs
-        leftHand.position.y = 0.05 + Math.sin(elapsed * 2.5 + 1) * 0.08
-        leftHand.position.x = -1.15 + curX * 0.1
-        leftHand.rotation.z = Math.sin(elapsed * 1.8) * 0.15
+        // Left hand stabilizes with soft floating motion
+        leftHand.position.y = 0.05 + Math.sin(elapsed * 2.4 + 1.2) * 0.08
+        leftHand.position.x = -1.18 + curX * 0.1
+        leftHand.rotation.z = Math.sin(elapsed * 1.8) * 0.14
 
-        // Right hand points toward active option or mouse position
-        const targetHandX = 1.15 + curX * 0.3
-        const targetHandY = 0.05 + curY * 0.35 + Math.sin(elapsed * 2.5) * 0.06
+        // Right hand points the creative stylus toward mouse or target
+        const targetHandX = 1.18 + curX * 0.35
+        const targetHandY = 0.05 + curY * 0.4 + Math.sin(elapsed * 2.5) * 0.07
         rightHand.position.x += (targetHandX - rightHand.position.x) * 0.12
         rightHand.position.y += (targetHandY - rightHand.position.y) * 0.12
-        rightHand.rotation.z = -0.25 + curX * 0.4
+        rightHand.rotation.z = -0.3 + curX * 0.45
       }
 
       // --- H. Antenna Beacon Pulsation ---
@@ -675,45 +750,39 @@ export const Hero3DCanvas: React.FC<Hero3DCanvasProps> = ({ onExplore }) => {
         antennaOrbRef.current.scale.set(pulse, pulse, pulse)
       }
 
-      // --- I. Chapter Morph Target: Holographic Tablet (Expanded in Chapter 2) ---
-      if (holoGroup) {
-        const isStudioChapter = baseIdx === 2
-        const targetScale = isStudioChapter ? 1.0 : 0.001
-        holoGroup.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 0.08)
-        if (isStudioChapter) {
-          holoGroup.rotation.y = Math.sin(elapsed * 1.5) * 0.1
-          holoGroup.rotation.x = 0.1 + Math.sin(elapsed * 2) * 0.05
-        }
-      }
-
-      // --- J. Floating Option Pedestals Gentle Float & Active Highlight ---
-      if (optionNodesRef.current.length > 0) {
-        optionNodesRef.current.forEach((node, idx) => {
+      // --- I. Floating Holographic Option Capsules Floating & Spin ---
+      if (badgeCapsulesRef.current.length > 0) {
+        badgeCapsulesRef.current.forEach((capsule, idx) => {
           const opt = SOCIAL_OPTIONS[idx]
           const isActive = opt.id === activeOptionId
-          node.position.y = opt.position3D[1] + Math.sin(elapsed * 2 + idx) * 0.08
-          node.rotation.y += 0.015
+          capsule.position.y = opt.position3D[1] + Math.sin(elapsed * 2.2 + idx * 1.1) * 0.09
+          capsule.rotation.y += 0.018
 
-          // Active node scales up slightly
-          const targetScale = isActive ? 1.25 : 1.0
-          node.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 0.1)
+          // Active capsule elevates and scales gracefully
+          const targetScale = isActive ? 1.3 : 1.0
+          capsule.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 0.1)
         })
       }
 
-      // --- K. Dynamic Energy Streamer Update ---
-      if (energyBeamRef.current && target3DRef.current) {
-        const chestPos = new THREE.Vector3(0, mascotRoot.position.y + 0.12, 0.72)
+      // --- J. Dynamic Energy Beam (Stylus Tip -> Active Option) ---
+      if (energyBeamRef.current && target3DRef.current && rightHand) {
+        const stylusPos = new THREE.Vector3()
+        if (stylusTipRef.current) {
+          stylusTipRef.current.getWorldPosition(stylusPos)
+        } else {
+          stylusPos.set(rightHand.position.x, rightHand.position.y, rightHand.position.z)
+        }
         const targetPos = target3DRef.current
         const midPos = new THREE.Vector3(
-          (chestPos.x + targetPos.x) * 0.5,
-          (chestPos.y + targetPos.y) * 0.5 + 0.3,
-          (chestPos.z + targetPos.z) * 0.5
+          (stylusPos.x + targetPos.x) * 0.5,
+          (stylusPos.y + targetPos.y) * 0.5 + 0.4,
+          (stylusPos.z + targetPos.z) * 0.5
         )
-        const curve = new THREE.CatmullRomCurve3([chestPos, midPos, targetPos])
+        const curve = new THREE.CatmullRomCurve3([stylusPos, midPos, targetPos])
         energyBeamRef.current.geometry.setFromPoints(curve.getPoints(24))
       }
 
-      // --- L. Constellation Starfield Drift ---
+      // --- K. Starfield Constellation Drift ---
       starField.rotation.y = elapsed * 0.018
 
       renderer.render(scene, camera)
@@ -721,11 +790,11 @@ export const Hero3DCanvas: React.FC<Hero3DCanvasProps> = ({ onExplore }) => {
 
     animate()
 
-    // 8. Container Resize Observer
+    // 9. Resize Observer
     const handleResize = () => {
       if (!container || !rendererRef.current || !cameraRef.current) return
       const newWidth = container.clientWidth
-      const newHeight = container.clientHeight || 560
+      const newHeight = container.clientHeight || 580
       cameraRef.current.aspect = newWidth / newHeight
       cameraRef.current.updateProjectionMatrix()
       rendererRef.current.setSize(newWidth, newHeight)
@@ -733,7 +802,7 @@ export const Hero3DCanvas: React.FC<Hero3DCanvasProps> = ({ onExplore }) => {
 
     window.addEventListener('resize', handleResize)
 
-    // Cleanup Resources on Unmount
+    // Clean up
     return () => {
       window.removeEventListener('resize', handleResize)
       container.removeEventListener('pointermove', handlePointerMove)
@@ -744,57 +813,66 @@ export const Hero3DCanvas: React.FC<Hero3DCanvasProps> = ({ onExplore }) => {
         rendererRef.current.dispose()
       }
 
-      // Dispose Geometries & Materials
+      // Dispose Geometries
       torsoGeo.dispose()
+      bellyGeo.dispose()
       beltGeo.dispose()
       emblemGeo.dispose()
-      repulsorGeo.dispose()
-      headGeo.dispose()
+      thrusterGeo.dispose()
+      thrusterInnerGeo.dispose()
+      helmetGeo.dispose()
+      visorFrameGeo.dispose()
       visorGeo.dispose()
-      eyeSocketGeo.dispose()
+      eyeOuterGeo.dispose()
       pupilGeo.dispose()
+      sparkleGeo.dispose()
+      mouthGeo.dispose()
+      bandGeo.dispose()
       earPodGeo.dispose()
       earRingGeo.dispose()
       stalkGeo.dispose()
       orbGeo.dispose()
       handGeo.dispose()
-      tabletBorderGeo.dispose()
-      tabletScreenGeo.dispose()
+      penBodyGeo.dispose()
+      penTipGeo.dispose()
       starGeo.dispose()
 
-      ceramicMat.dispose()
+      // Dispose Materials
+      amberArmorMat.dispose()
+      porcelainMat.dispose()
+      trimMat.dispose()
       visorMat.dispose()
-      accentMat.dispose()
+      capsuleGlassMat.dispose()
       emblemMat.dispose()
-      repulsorMat.dispose()
-      eyeSocketMat.dispose()
+      thrusterMat.dispose()
+      eyeOuterMat.dispose()
       pupilMat.dispose()
-      handMat.dispose()
-      tabletBorderMat.dispose()
-      tabletScreenMat.dispose()
+      sparkleMat.dispose()
+      mouthMat.dispose()
+      earRingMat.dispose()
+      orbMat.dispose()
+      penTipMat.dispose()
       starMat.dispose()
     }
   }, [theme])
 
-  // Select Option and Update Mascot Target Point
+  // Select Option Handler
   const handleSelectOption = (opt: SocialOption) => {
     setActiveOptionId(opt.id)
     target3DRef.current = new THREE.Vector3(...opt.position3D)
     setInteractionCount((prev) => prev + 1)
 
-    // Mascot emotion reaction
     if (opt.id === 'cadence' || opt.id === 'omni') setMascotMood('launch')
     else if (opt.id === 'hook' || opt.id === 'radar') setMascotMood('focus')
     else if (opt.id === 'canvas') setMascotMood('creative')
     else setMascotMood('greeting')
   }
 
-  // Chapter Jump (Scroll Sync or Direct Click)
+  // Chapter Jump Handler
   const handleSelectChapter = (idx: number) => {
     setCurrentChapter(idx)
     targetScrollProgressRef.current = idx / 3
 
-    // Smoothly scroll the window to the corresponding section on page
     const sectionIds = ['hero', 'features', 'comparison', 'pricing']
     const targetElement = document.getElementById(sectionIds[idx])
     if (targetElement) {
@@ -853,7 +931,7 @@ export const Hero3DCanvas: React.FC<Hero3DCanvasProps> = ({ onExplore }) => {
                 onClick={() => handleSelectOption(opt)}
                 className={`p-3.5 rounded-2xl border text-left transition-all duration-200 group relative backdrop-blur-md ${
                   isSelected
-                    ? 'border-brand-accent bg-surface shadow-lg shadow-brand-accent/10 translate-x-1'
+                    ? 'border-brand-accent bg-surface shadow-lg shadow-brand-accent/10 translate-x-1 ring-1 ring-brand-accent/30'
                     : 'border-border/80 bg-surface/75 hover:bg-surface hover:border-brand-accent/50'
                 }`}
               >
@@ -893,7 +971,7 @@ export const Hero3DCanvas: React.FC<Hero3DCanvasProps> = ({ onExplore }) => {
                 onClick={() => handleSelectOption(opt)}
                 className={`p-3.5 rounded-2xl border text-left transition-all duration-200 group relative backdrop-blur-md ${
                   isSelected
-                    ? 'border-brand-accent bg-surface shadow-lg shadow-brand-accent/10 -translate-x-1'
+                    ? 'border-brand-accent bg-surface shadow-lg shadow-brand-accent/10 -translate-x-1 ring-1 ring-brand-accent/30'
                     : 'border-border/80 bg-surface/75 hover:bg-surface hover:border-brand-accent/50'
                 }`}
               >
@@ -934,7 +1012,7 @@ export const Hero3DCanvas: React.FC<Hero3DCanvasProps> = ({ onExplore }) => {
               onClick={() => handleSelectOption(opt)}
               className={`min-w-[190px] p-3 rounded-xl border text-left shrink-0 transition-all snap-start ${
                 isSelected
-                  ? 'border-brand-accent bg-background shadow-xs'
+                  ? 'border-brand-accent bg-background shadow-xs ring-1 ring-brand-accent/40'
                   : 'border-border bg-surface'
               }`}
             >
@@ -956,41 +1034,46 @@ export const Hero3DCanvas: React.FC<Hero3DCanvasProps> = ({ onExplore }) => {
         })}
       </div>
 
-      {/* Bottom Floating Story Progression Bar (Synchronized with Page Scroll) */}
-      <div className="p-4 sm:p-5 bg-surface/95 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4">
-        {/* Chapter Steps Indicator */}
-        <div className="flex items-center gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
+      {/* Bottom Floating Glass Pill Stepper (Synchronized with Page Scroll) */}
+      <div className="p-3 sm:p-4 bg-surface/90 border-t border-border/80 flex flex-col md:flex-row items-center justify-between gap-3">
+        {/* Floating Segmented Glass Pill Stepper */}
+        <div className="flex items-center gap-1.5 p-1 rounded-full bg-surface/95 border border-border shadow-xs overflow-x-auto max-w-full">
           {STORY_CHAPTERS.map((ch) => {
             const isActive = currentChapter === ch.index
             return (
               <button
                 key={ch.index}
                 onClick={() => handleSelectChapter(ch.index)}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-mono transition-all shrink-0 ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-mono transition-all shrink-0 ${
                   isActive
-                    ? 'bg-brand-accent text-interactive-primary-fg font-bold shadow-xs'
+                    ? 'bg-brand-accent text-interactive-primary-fg font-bold shadow-2xs'
                     : 'text-foreground-secondary hover:text-foreground hover:bg-background-subtle'
                 }`}
                 title={ch.desc}
               >
-                {isActive && <Check className="w-3.5 h-3.5" />}
-                <span>{ch.title}</span>
+                {isActive ? (
+                  <Check className="w-3 h-3 stroke-[2.5]" />
+                ) : (
+                  <span className="w-1.5 h-1.5 rounded-full bg-border-strong" />
+                )}
+                <span className="hidden sm:inline">{ch.title}</span>
+                <span className="sm:hidden">{ch.shortTitle}</span>
               </button>
             )
           })}
         </div>
 
-        {/* Tactical Story Action */}
+        {/* Tactical Story Action & Quick Launch */}
         <div className="flex items-center gap-3 w-full md:w-auto justify-end">
           <div className="hidden sm:flex items-center gap-1.5 text-xs text-foreground-muted font-mono">
-            <RotateCcw className="w-3 h-3 text-brand-accent" />
-            <span>Scroll page to fly camera & morph Dex</span>
+            <RotateCcw className="w-3 h-3 text-brand-accent animate-spin-slow" />
+            <span>Scroll page to fly camera</span>
           </div>
 
           {onExplore && (
             <button
               onClick={onExplore}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-interactive-primary text-interactive-primary-fg text-xs font-semibold hover:opacity-90 active:scale-98 transition-all shadow-md shrink-0"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-interactive-primary text-interactive-primary-fg text-xs font-semibold hover:opacity-90 active:scale-98 transition-all shadow-md shrink-0"
             >
               <Zap className="w-3.5 h-3.5 text-brand-accent" />
               <span>Launch Live Workspace</span>
