@@ -23,9 +23,9 @@ import {
   PenSquare,
   Compass,
   AlertTriangle,
+  ArrowRight,
 } from 'lucide-react'
 import { usePreferences } from '../../lib/theme/PreferencesContext'
-import { Button } from '../../components/ui/button'
 import { Badge } from '../../components/ui/badge'
 import { Card } from '../../components/ui/card'
 
@@ -315,37 +315,96 @@ export const CommandCenterOverview: React.FC<CommandCenterOverviewProps> = ({
         </Card>
       </div>
 
-      {/* Quick Launch Buttons */}
-      <div className="flex flex-wrap items-center gap-3 pt-2">
-        <Button
-          variant="default"
-          size="sm"
-          onClick={() => onNavigate('content')}
-          className="gap-2"
-        >
-          <PenSquare className="w-4 h-4" aria-hidden="true" />
-          <span>Draft Post In Content Studio</span>
-        </Button>
+      {/* Centered Executive Studio Action Dock */}
+      <div className="pt-6 pb-2">
+        <div className="text-center mb-5">
+          <h3 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-foreground-secondary">
+            Production Studios & Publishing Schedulers
+          </h3>
+          <p className="text-xs text-foreground-muted mt-0.5">
+            Launch multi-channel post authoring, deterministic graphic generation, or calendar queues
+          </p>
+        </div>
 
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => onNavigate('creative')}
-          className="gap-2"
-        >
-          <Zap className="w-4 h-4 text-brand-accent" aria-hidden="true" />
-          <span>Open Brand Graphic Studio</span>
-        </Button>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto w-full">
+          {/* Studio 1: Content Studio */}
+          <button
+            type="button"
+            onClick={() => onNavigate('content')}
+            className="group relative flex flex-col justify-between p-5 rounded-2xl border border-border bg-surface-raised hover:border-brand-accent/60 hover:shadow-lg transition-all duration-200 text-left cursor-pointer outline-hidden focus-visible:ring-2 focus-visible:ring-focus-ring"
+          >
+            <div>
+              <div className="w-12 h-12 rounded-xl bg-background-subtle border border-border flex items-center justify-center text-foreground group-hover:scale-105 group-hover:border-brand-accent/40 transition-transform mb-3 shadow-2xs">
+                <PenSquare className="w-5 h-5 text-brand-accent" aria-hidden="true" />
+              </div>
+              <h4 className="text-base font-bold text-foreground group-hover:text-brand-accent transition-colors flex items-center gap-1.5">
+                <span>Content Studio</span>
+                <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all text-brand-accent" />
+              </h4>
+              <p className="text-xs text-foreground-secondary mt-1.5 leading-relaxed">
+                Draft multi-platform posts with real-time brand tone guidance, hook generation, and compliance checks.
+              </p>
+            </div>
+            <div className="mt-5 pt-3 border-t border-border/50 flex items-center justify-between text-[11px] font-mono text-foreground-muted">
+              <span>Multi-Channel Copy</span>
+              <span className="font-semibold text-brand-accent group-hover:translate-x-0.5 transition-transform flex items-center gap-1">
+                Open Studio <ArrowRight className="w-3.5 h-3.5" />
+              </span>
+            </div>
+          </button>
 
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => onNavigate('calendar')}
-          className="gap-2"
-        >
-          <Calendar className="w-4 h-4 text-status-info" aria-hidden="true" />
-          <span>View Publishing Calendar</span>
-        </Button>
+          {/* Studio 2: Creative Studio */}
+          <button
+            type="button"
+            onClick={() => onNavigate('creative')}
+            className="group relative flex flex-col justify-between p-5 rounded-2xl border border-border bg-surface-raised hover:border-brand-accent/60 hover:shadow-lg transition-all duration-200 text-left cursor-pointer outline-hidden focus-visible:ring-2 focus-visible:ring-focus-ring"
+          >
+            <div>
+              <div className="w-12 h-12 rounded-xl bg-background-subtle border border-border flex items-center justify-center text-foreground group-hover:scale-105 group-hover:border-brand-accent/40 transition-transform mb-3 shadow-2xs">
+                <Zap className="w-5 h-5 text-brand-accent" aria-hidden="true" />
+              </div>
+              <h4 className="text-base font-bold text-foreground group-hover:text-brand-accent transition-colors flex items-center gap-1.5">
+                <span>Brand Graphic Studio</span>
+                <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all text-brand-accent" />
+              </h4>
+              <p className="text-xs text-foreground-secondary mt-1.5 leading-relaxed">
+                Compose pixel-perfect deterministic vector graphics, slide carousels, and verified typography templates.
+              </p>
+            </div>
+            <div className="mt-5 pt-3 border-t border-border/50 flex items-center justify-between text-[11px] font-mono text-foreground-muted">
+              <span>Deterministic SVG</span>
+              <span className="font-semibold text-brand-accent group-hover:translate-x-0.5 transition-transform flex items-center gap-1">
+                Open Studio <ArrowRight className="w-3.5 h-3.5" />
+              </span>
+            </div>
+          </button>
+
+          {/* Studio 3: Publishing Calendar */}
+          <button
+            type="button"
+            onClick={() => onNavigate('calendar')}
+            className="group relative flex flex-col justify-between p-5 rounded-2xl border border-border bg-surface-raised hover:border-brand-accent/60 hover:shadow-lg transition-all duration-200 text-left cursor-pointer outline-hidden focus-visible:ring-2 focus-visible:ring-focus-ring"
+          >
+            <div>
+              <div className="w-12 h-12 rounded-xl bg-background-subtle border border-border flex items-center justify-center text-foreground group-hover:scale-105 group-hover:border-brand-accent/40 transition-transform mb-3 shadow-2xs">
+                <Calendar className="w-5 h-5 text-status-info" aria-hidden="true" />
+              </div>
+              <h4 className="text-base font-bold text-foreground group-hover:text-brand-accent transition-colors flex items-center gap-1.5">
+                <span>Publishing Calendar</span>
+                <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all text-brand-accent" />
+              </h4>
+              <p className="text-xs text-foreground-secondary mt-1.5 leading-relaxed">
+                Orchestrate multi-network publishing queues, inspect scheduled queue slots, and review post timings.
+              </p>
+            </div>
+            <div className="mt-5 pt-3 border-t border-border/50 flex items-center justify-between text-[11px] font-mono text-foreground-muted">
+              <span>FullCalendar Deck</span>
+              <span className="font-semibold text-brand-accent group-hover:translate-x-0.5 transition-transform flex items-center gap-1">
+                Open Studio <ArrowRight className="w-3.5 h-3.5" />
+              </span>
+            </div>
+          </button>
+        </div>
       </div>
     </div>
   )

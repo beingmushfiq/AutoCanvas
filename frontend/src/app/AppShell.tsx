@@ -520,6 +520,21 @@ export const AppShell: React.FC<AppShellProps> = ({
                   </div>
                 </div>
               )}
+
+              {/* Subtle DevCenterPoint OS Footer Signature */}
+              <div className="pt-2 px-1 flex items-center justify-between text-[10px] font-mono text-foreground-muted select-none border-t border-border/40">
+                <span>AutoCanvas OS</span>
+                <a
+                  href="https://devcenterpoint.com"
+                  target="_blank"
+                  rel="noreferrer"
+                  title="DevCenterPoint Autonomous Architecture"
+                  className="hover:text-brand-accent transition-colors flex items-center gap-1"
+                >
+                  <span>by DevCenterPoint</span>
+                  <ExternalLink className="w-2.5 h-2.5" />
+                </a>
+              </div>
             </>
           )}
         </div>
@@ -585,6 +600,21 @@ export const AppShell: React.FC<AppShellProps> = ({
           </div>
 
           <div className="flex items-center gap-2">
+            {/* Subtle DevCenterPoint Creator Provenance */}
+            <a
+              href="https://devcenterpoint.com"
+              target="_blank"
+              rel="noreferrer"
+              title="AutoCanvas Engineered by DevCenterPoint"
+              aria-label="Engineered by DevCenterPoint (opens in new tab)"
+              className="hidden lg:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-border bg-background-subtle text-xs font-semibold text-foreground-secondary hover:bg-surface-raised hover:text-foreground transition-colors group"
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-brand-accent animate-pulse" aria-hidden="true" />
+              <span className="hidden xl:inline text-foreground-muted group-hover:text-foreground-secondary transition-colors">by</span>
+              <span>DevCenterPoint</span>
+              <ExternalLink className="w-3 h-3 text-foreground-muted group-hover:text-brand-accent transition-colors" aria-hidden="true" />
+            </a>
+
             {/* Public Site Link */}
             {onNavigateToMarketing && (
               <button

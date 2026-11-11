@@ -20,6 +20,9 @@ import { usePwaManifest } from './components/pwa/usePwaManifest'
 import { SmoothScrollProvider, useSmoothScroll } from './lib/scroll/SmoothScrollProvider'
 import { TooltipProvider } from './components/ui/tooltip'
 import { Toaster } from 'sonner'
+import { QueryClientProvider } from '@tanstack/react-query'
+import { queryClient } from './lib/query/queryClient'
+import { OfflineIndicator } from './lib/state/OfflineIndicator'
 
 // Review route wrapper to extract token from params
 const ReviewRoute: React.FC = () => {
@@ -94,6 +97,9 @@ const AppContent: React.FC = () => {
         }}
       />
 
+      {/* Network Connectivity & Offline Cached State Banner */}
+      <OfflineIndicator />
+
       <Routes>
         {/* 1. Public Marketing Website */}
         <Route
@@ -156,18 +162,20 @@ const AppContent: React.FC = () => {
 
 export const App: React.FC = () => {
   return (
-    <BrowserRouter>
-      <PreferencesProvider>
-        <SmoothScrollProvider>
-          <AuthProvider>
-            <TooltipProvider delayDuration={150}>
-              <AppContent />
-              <Toaster position="bottom-right" richColors />
-            </TooltipProvider>
-          </AuthProvider>
-        </SmoothScrollProvider>
-      </PreferencesProvider>
-    </BrowserRouter>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <PreferencesProvider>
+          <SmoothScrollProvider>
+            <AuthProvider>
+              <TooltipProvider delayDuration={150}>
+                <AppContent />
+                <Toaster position="bottom-right" richColors />
+              </TooltipProvider>
+            </AuthProvider>
+          </SmoothScrollProvider>
+        </PreferencesProvider>
+      </BrowserRouter>
+    </QueryClientProvider>
   )
 }
 
