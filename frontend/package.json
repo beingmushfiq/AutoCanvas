@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:cpanel": "node ../scripts/build-for-cpanel.mjs",
     "lint": "oxlint",
     "preview": "vite preview",
     "test:a11y": "node scripts/a11y-audit.mjs",

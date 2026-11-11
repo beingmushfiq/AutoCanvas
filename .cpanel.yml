@@ -1,0 +1,6 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/devcente/AutoCanvas
+    - /bin/bash $DEPLOYPATH/scripts/deploy-cpanel.sh
+
