@@ -1,14 +1,11 @@
 import React from 'react'
 import {
-  Sparkles,
   ArrowRight,
-  ShieldCheck,
   Zap,
-  TrendingUp,
   CheckCircle2,
   ExternalLink,
 } from 'lucide-react'
-import { Badge } from '../../../components/ui/badge'
+import { Hero3DCanvas } from './Hero3DCanvas'
 import type { PublicCmsData } from '../../../lib/api/client'
 
 interface HeroSectionProps {
@@ -34,7 +31,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
     <section id="hero" className="relative pt-20 pb-28 overflow-hidden">
       {/* Subtle Background Structural Grid Pattern */}
       <div
-        className="absolute inset-0 pointer-events-none opacity-[0.03] dark:opacity-[0.05]"
+        className="absolute inset-0 pointer-events-none opacity-4"
         style={{
           backgroundImage: `linear-gradient(var(--border-strong) 1px, transparent 1px), linear-gradient(to right, var(--border-strong) 1px, transparent 1px)`,
           backgroundSize: '48px 48px',
@@ -108,89 +105,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           </span>
         </div>
 
-        {/* Product Visual Mockup */}
-        <div className="mt-16 max-w-5xl mx-auto rounded-2xl border border-border bg-surface p-2 sm:p-4 shadow-xl">
-          <div className="rounded-xl border border-border-subtle bg-background overflow-hidden text-left">
-            {/* Window Top Controls */}
-            <div className="px-4 py-3 border-b border-border bg-surface flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-status-danger/70" />
-                <span className="w-2.5 h-2.5 rounded-full bg-status-warning/70" />
-                <span className="w-2.5 h-2.5 rounded-full bg-status-success/70" />
-                <span className="ml-2 text-[11px] font-mono text-foreground-muted">
-                  autocanvas.devcenterpoint.com/command-center
-                </span>
-              </div>
-              <Badge variant="accent">LIVE ENGINE</Badge>
-            </div>
-
-            {/* Dashboard Inner Preview */}
-            <div className="p-6 space-y-6">
-              {/* Header inside preview */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border pb-4">
-                <div>
-                  <h3 className="text-sm font-bold text-foreground">Acme Global • Autumn Campaign</h3>
-                  <p className="text-xs text-foreground-secondary">
-                    3 Channels Connected • 24 Scheduled Slots • Automated Cadence Active
-                  </p>
-                </div>
-                <div className="flex items-center gap-2 text-xs font-mono">
-                  <span className="px-2 py-1 rounded-lg bg-status-success-bg text-status-success border border-transparent font-medium">
-                    DAEMON: RUNNING
-                  </span>
-                </div>
-              </div>
-
-              {/* Metric Row */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="p-4 rounded-xl border border-border bg-surface">
-                  <span className="text-[11px] text-foreground-secondary font-medium">Weekly Cadence</span>
-                  <div className="text-xl font-bold font-mono text-foreground mt-1">18 Posts Dispatched</div>
-                  <span className="text-[10px] text-status-success flex items-center gap-1 mt-1 font-semibold">
-                    <TrendingUp className="w-3 h-3" /> +24% vs Last Week
-                  </span>
-                </div>
-
-                <div className="p-4 rounded-xl border border-border bg-surface">
-                  <span className="text-[11px] text-foreground-secondary font-medium">Scheduled Queue</span>
-                  <div className="text-xl font-bold font-mono text-foreground mt-1">12 Slots Confirmed</div>
-                  <span className="text-[10px] text-foreground-muted mt-1 block">Next: Tomorrow at 09:30 EST</span>
-                </div>
-
-                <div className="p-4 rounded-xl border border-border bg-surface">
-                  <span className="text-[11px] text-foreground-secondary font-medium">Brand Safety Check</span>
-                  <div className="text-xl font-bold font-mono text-foreground mt-1">100% Verified</div>
-                  <span className="text-[10px] text-status-success flex items-center gap-1 mt-1 font-semibold">
-                    <ShieldCheck className="w-3 h-3" /> Zero Compliance Drift
-                  </span>
-                </div>
-              </div>
-
-              {/* Feed Card in preview */}
-              <div className="p-4 rounded-xl border border-border bg-surface flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-brand-accent-subtle text-foreground flex items-center justify-center shrink-0">
-                    <Sparkles className="w-5 h-5 text-brand-accent" />
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-semibold text-foreground">
-                      Signal Detected: "Open-Source AI Orchestration in B2B SaaS"
-                    </h4>
-                    <p className="text-[11px] text-foreground-secondary mt-0.5 max-w-xl">
-                      Confidence: 94% • High engagement opportunity across LinkedIn & Instagram.
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-mono font-medium text-foreground-muted">Ready to publish</span>
-                  <span className="px-2.5 py-1 rounded-lg bg-interactive-primary text-interactive-primary-fg text-xs font-semibold">
-                    Scheduled
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        {/* Interactive 3D Brand Core & Multi-Channel Orbital System */}
+        <Hero3DCanvas onExplore={onExploreDemo} />
       </div>
     </section>
   )
