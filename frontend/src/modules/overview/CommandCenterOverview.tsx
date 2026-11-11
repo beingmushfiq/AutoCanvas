@@ -11,20 +11,23 @@ import {
   CartesianGrid,
 } from 'recharts'
 import {
-  TrendingUp,
-  Share2,
-  Bot,
   Zap,
-  CheckCircle2,
-  Clock,
+  Share2,
   ArrowUpRight,
-  ShieldCheck,
-  Calendar,
-  PenSquare,
-  Compass,
-  AlertTriangle,
-  ArrowRight,
 } from 'lucide-react'
+import { HugeIcon } from '../../components/ui/hugeicon'
+import {
+  Edit02Icon,
+  FlashIcon,
+  Calendar03Icon,
+  ArrowRight01Icon,
+  Analytics01Icon,
+  BotIcon,
+  CheckmarkCircle02Icon,
+  Clock01Icon,
+  SparklesIcon,
+  Alert02Icon,
+} from '@hugeicons/core-free-icons'
 import { usePreferences } from '../../lib/theme/PreferencesContext'
 import { Badge } from '../../components/ui/badge'
 import { Card } from '../../components/ui/card'
@@ -79,7 +82,7 @@ export const CommandCenterOverview: React.FC<CommandCenterOverviewProps> = ({
           role="alert"
           className="p-4 rounded-2xl bg-status-warning-bg border border-status-warning/40 flex items-center gap-3 text-status-warning"
         >
-          <AlertTriangle className="w-5 h-5 shrink-0" aria-hidden="true" />
+          <HugeIcon icon={Alert02Icon} size={20} className="shrink-0 text-status-warning" />
           <div className="text-xs">
             <span className="font-bold">PUBLISHING PAUSED:</span> Automated publishing is currently paused for your workspace. Scheduled posts and drafts remain safely preserved.
           </div>
@@ -91,7 +94,7 @@ export const CommandCenterOverview: React.FC<CommandCenterOverviewProps> = ({
         <Card className="p-5">
           <div className="flex items-center justify-between text-xs text-foreground-secondary">
             <span className="font-medium">Total Multi-Channel Reach</span>
-            <TrendingUp className="w-4 h-4 text-status-success" aria-hidden="true" />
+            <HugeIcon icon={Analytics01Icon} size={16} className="text-status-success" />
           </div>
           <div className="mt-2 flex items-baseline gap-2">
             <span className="text-2xl font-bold font-mono tracking-tight text-foreground">
@@ -110,7 +113,7 @@ export const CommandCenterOverview: React.FC<CommandCenterOverviewProps> = ({
         <Card className="p-5">
           <div className="flex items-center justify-between text-xs text-foreground-secondary">
             <span className="font-medium">Autonomous Automation Rate</span>
-            <Bot className="w-4 h-4 text-brand-accent" aria-hidden="true" />
+            <HugeIcon icon={BotIcon} size={16} className="text-brand-accent" />
           </div>
           <div className="mt-2 flex items-baseline gap-2">
             <span className="text-2xl font-bold font-mono tracking-tight text-foreground">
@@ -128,7 +131,7 @@ export const CommandCenterOverview: React.FC<CommandCenterOverviewProps> = ({
         <Card className="p-5">
           <div className="flex items-center justify-between text-xs text-foreground-secondary">
             <span className="font-medium">Posts In Queue & Scheduled</span>
-            <Calendar className="w-4 h-4 text-status-info" aria-hidden="true" />
+            <HugeIcon icon={Calendar03Icon} size={16} className="text-status-info" />
           </div>
           <div className="mt-2 flex items-baseline gap-2">
             <span className="text-2xl font-bold font-mono tracking-tight text-foreground">
@@ -144,7 +147,7 @@ export const CommandCenterOverview: React.FC<CommandCenterOverviewProps> = ({
         <Card className="p-5">
           <div className="flex items-center justify-between text-xs text-foreground-secondary">
             <span className="font-medium">Publishing Status</span>
-            <ShieldCheck className="w-4 h-4 text-status-success" aria-hidden="true" />
+            <HugeIcon icon={CheckmarkCircle02Icon} size={16} className="text-status-success" />
           </div>
           <div className="mt-2 flex items-baseline gap-2">
             <Badge variant={isEmergencyPaused ? 'warning' : 'success'} className="font-mono text-xs uppercase">
@@ -270,7 +273,7 @@ export const CommandCenterOverview: React.FC<CommandCenterOverviewProps> = ({
         <Card className="p-4">
           <div className="flex items-center justify-between text-xs font-semibold text-foreground">
             <span className="flex items-center gap-1.5">
-              <CheckCircle2 className="w-4 h-4 text-status-success" aria-hidden="true" />
+              <HugeIcon icon={CheckmarkCircle02Icon} size={16} className="text-status-success" />
               <span>Publishing Queue Worker</span>
             </span>
             <Badge variant="success" className="font-mono text-[10px]">
@@ -285,7 +288,7 @@ export const CommandCenterOverview: React.FC<CommandCenterOverviewProps> = ({
         <Card className="p-4">
           <div className="flex items-center justify-between text-xs font-semibold text-foreground">
             <span className="flex items-center gap-1.5">
-              <Compass className="w-4 h-4 text-brand-accent" aria-hidden="true" />
+              <HugeIcon icon={SparklesIcon} size={16} className="text-brand-accent" />
               <span>News & Trend Discovery</span>
             </span>
             <Badge variant="accent" className="font-mono text-[10px]">
@@ -300,7 +303,7 @@ export const CommandCenterOverview: React.FC<CommandCenterOverviewProps> = ({
         <Card className="p-4">
           <div className="flex items-center justify-between text-xs font-semibold text-foreground">
             <span className="flex items-center gap-1.5">
-              <Clock className="w-4 h-4 text-foreground-secondary" aria-hidden="true" />
+              <HugeIcon icon={Clock01Icon} size={16} className="text-foreground-secondary" />
               <span>Persona Complexity</span>
             </span>
             <Badge variant="outline" className="font-mono text-[10px] uppercase">
@@ -335,11 +338,11 @@ export const CommandCenterOverview: React.FC<CommandCenterOverviewProps> = ({
           >
             <div>
               <div className="w-12 h-12 rounded-xl bg-background-subtle border border-border flex items-center justify-center text-foreground group-hover:scale-105 group-hover:border-brand-accent/40 transition-transform mb-3 shadow-2xs">
-                <PenSquare className="w-5 h-5 text-brand-accent" aria-hidden="true" />
+                <HugeIcon icon={Edit02Icon} size={22} className="text-brand-accent" />
               </div>
               <h4 className="text-base font-bold text-foreground group-hover:text-brand-accent transition-colors flex items-center gap-1.5">
                 <span>Content Studio</span>
-                <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all text-brand-accent" />
+                <HugeIcon icon={ArrowRight01Icon} size={16} className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all text-brand-accent" />
               </h4>
               <p className="text-xs text-foreground-secondary mt-1.5 leading-relaxed">
                 Draft multi-platform posts with real-time brand tone guidance, hook generation, and compliance checks.
@@ -348,7 +351,7 @@ export const CommandCenterOverview: React.FC<CommandCenterOverviewProps> = ({
             <div className="mt-5 pt-3 border-t border-border/50 flex items-center justify-between text-[11px] font-mono text-foreground-muted">
               <span>Multi-Channel Copy</span>
               <span className="font-semibold text-brand-accent group-hover:translate-x-0.5 transition-transform flex items-center gap-1">
-                Open Studio <ArrowRight className="w-3.5 h-3.5" />
+                Open Studio <HugeIcon icon={ArrowRight01Icon} size={14} />
               </span>
             </div>
           </button>
@@ -361,11 +364,11 @@ export const CommandCenterOverview: React.FC<CommandCenterOverviewProps> = ({
           >
             <div>
               <div className="w-12 h-12 rounded-xl bg-background-subtle border border-border flex items-center justify-center text-foreground group-hover:scale-105 group-hover:border-brand-accent/40 transition-transform mb-3 shadow-2xs">
-                <Zap className="w-5 h-5 text-brand-accent" aria-hidden="true" />
+                <HugeIcon icon={FlashIcon} size={22} className="text-brand-accent" />
               </div>
               <h4 className="text-base font-bold text-foreground group-hover:text-brand-accent transition-colors flex items-center gap-1.5">
                 <span>Brand Graphic Studio</span>
-                <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all text-brand-accent" />
+                <HugeIcon icon={ArrowRight01Icon} size={16} className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all text-brand-accent" />
               </h4>
               <p className="text-xs text-foreground-secondary mt-1.5 leading-relaxed">
                 Compose pixel-perfect deterministic vector graphics, slide carousels, and verified typography templates.
@@ -374,7 +377,7 @@ export const CommandCenterOverview: React.FC<CommandCenterOverviewProps> = ({
             <div className="mt-5 pt-3 border-t border-border/50 flex items-center justify-between text-[11px] font-mono text-foreground-muted">
               <span>Deterministic SVG</span>
               <span className="font-semibold text-brand-accent group-hover:translate-x-0.5 transition-transform flex items-center gap-1">
-                Open Studio <ArrowRight className="w-3.5 h-3.5" />
+                Open Studio <HugeIcon icon={ArrowRight01Icon} size={14} />
               </span>
             </div>
           </button>
@@ -387,11 +390,11 @@ export const CommandCenterOverview: React.FC<CommandCenterOverviewProps> = ({
           >
             <div>
               <div className="w-12 h-12 rounded-xl bg-background-subtle border border-border flex items-center justify-center text-foreground group-hover:scale-105 group-hover:border-brand-accent/40 transition-transform mb-3 shadow-2xs">
-                <Calendar className="w-5 h-5 text-status-info" aria-hidden="true" />
+                <HugeIcon icon={Calendar03Icon} size={22} className="text-status-info" />
               </div>
               <h4 className="text-base font-bold text-foreground group-hover:text-brand-accent transition-colors flex items-center gap-1.5">
                 <span>Publishing Calendar</span>
-                <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all text-brand-accent" />
+                <HugeIcon icon={ArrowRight01Icon} size={16} className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all text-brand-accent" />
               </h4>
               <p className="text-xs text-foreground-secondary mt-1.5 leading-relaxed">
                 Orchestrate multi-network publishing queues, inspect scheduled queue slots, and review post timings.
@@ -400,7 +403,7 @@ export const CommandCenterOverview: React.FC<CommandCenterOverviewProps> = ({
             <div className="mt-5 pt-3 border-t border-border/50 flex items-center justify-between text-[11px] font-mono text-foreground-muted">
               <span>FullCalendar Deck</span>
               <span className="font-semibold text-brand-accent group-hover:translate-x-0.5 transition-transform flex items-center gap-1">
-                Open Studio <ArrowRight className="w-3.5 h-3.5" />
+                Open Studio <HugeIcon icon={ArrowRight01Icon} size={14} />
               </span>
             </div>
           </button>

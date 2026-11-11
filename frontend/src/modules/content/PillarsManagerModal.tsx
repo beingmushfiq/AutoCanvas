@@ -4,6 +4,7 @@ import { apiClient, type ApiResponse, type ContentPillar } from '../../lib/api/c
 import { Button } from '../../components/ui/button'
 import { Input } from '../../components/ui/input'
 import { Badge } from '../../components/ui/badge'
+import { appToast } from '../../lib/toast'
 
 interface PillarsManagerModalProps {
   isOpen: boolean
@@ -86,8 +87,11 @@ export const PillarsManagerModal: React.FC<PillarsManagerModalProps> = ({
       await apiClient.delete(`/brands/${brandId}/pillars/${id}`)
       setPillars(pillars.filter((p) => p.id !== id))
       onUpdated()
+      appToast.success('Content pillar deleted.')
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Failed to delete pillar')
+      appToast.error('Failed to delete pillar', {
+        description: err instanceof Error ? err.message : 'Unknown server error',
+      })
     }
   }
 

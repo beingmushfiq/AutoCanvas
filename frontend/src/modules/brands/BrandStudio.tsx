@@ -23,6 +23,7 @@ import { KnowledgeTab } from './tabs/KnowledgeTab'
 import { MemoryTab } from './tabs/MemoryTab'
 import { EmptyState } from '../../components/ui/empty-state'
 import { Badge } from '../../components/ui/badge'
+import { appToast } from '../../lib/toast'
 
 interface BrandStudioProps {
   initialTab?: 'profile' | 'visual' | 'voice' | 'knowledge' | 'memory'
@@ -107,8 +108,11 @@ export const BrandStudio: React.FC<BrandStudioProps> = ({ initialTab = 'profile'
     try {
       await apiClient.delete(`/brands/${activeBrandId}`)
       await fetchBrands()
+      appToast.success('Brand deleted successfully.')
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Failed to delete brand')
+      appToast.error('Failed to delete brand', {
+        description: err instanceof Error ? err.message : 'Unknown server error',
+      })
     }
   }
 

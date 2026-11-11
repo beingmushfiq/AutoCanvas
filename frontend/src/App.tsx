@@ -20,6 +20,14 @@ import { usePwaManifest } from './components/pwa/usePwaManifest'
 import { SmoothScrollProvider, useSmoothScroll } from './lib/scroll/SmoothScrollProvider'
 import { TooltipProvider } from './components/ui/tooltip'
 import { Toaster } from 'sonner'
+import { HugeiconsIcon } from '@hugeicons/react'
+import {
+  CheckmarkCircle02Icon,
+  AlertCircleIcon,
+  Alert02Icon,
+  InformationCircleIcon,
+  Loading03Icon,
+} from '@hugeicons/core-free-icons'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClient } from './lib/query/queryClient'
 import { OfflineIndicator } from './lib/state/OfflineIndicator'
@@ -169,7 +177,68 @@ export const App: React.FC = () => {
             <AuthProvider>
               <TooltipProvider delayDuration={150}>
                 <AppContent />
-                <Toaster position="bottom-right" richColors />
+                <Toaster
+                  position="bottom-right"
+                  expand={false}
+                  visibleToasts={5}
+                  closeButton
+                  icons={{
+                    success: (
+                      <HugeiconsIcon
+                        icon={CheckmarkCircle02Icon}
+                        size={18}
+                        className="text-status-success shrink-0"
+                        aria-hidden="true"
+                      />
+                    ),
+                    error: (
+                      <HugeiconsIcon
+                        icon={AlertCircleIcon}
+                        size={18}
+                        className="text-status-danger shrink-0"
+                        aria-hidden="true"
+                      />
+                    ),
+                    warning: (
+                      <HugeiconsIcon
+                        icon={Alert02Icon}
+                        size={18}
+                        className="text-status-warning shrink-0"
+                        aria-hidden="true"
+                      />
+                    ),
+                    info: (
+                      <HugeiconsIcon
+                        icon={InformationCircleIcon}
+                        size={18}
+                        className="text-status-info shrink-0"
+                        aria-hidden="true"
+                      />
+                    ),
+                    loading: (
+                      <HugeiconsIcon
+                        icon={Loading03Icon}
+                        size={18}
+                        className="text-brand-accent animate-spin shrink-0"
+                        aria-hidden="true"
+                      />
+                    ),
+                  }}
+                  toastOptions={{
+                    classNames: {
+                      toast:
+                        'group toast rounded-2xl border border-border bg-surface-raised text-foreground shadow-2xl p-4 font-sans backdrop-blur-md',
+                      title: 'text-xs sm:text-sm font-semibold text-foreground tracking-tight',
+                      description: 'text-xs text-foreground-secondary mt-1 font-normal leading-relaxed',
+                      actionButton:
+                        'rounded-xl bg-interactive-primary text-interactive-primary-fg hover:opacity-90 px-3 py-1.5 text-xs font-semibold shadow-2xs transition-all',
+                      cancelButton:
+                        'rounded-xl bg-background-subtle border border-border text-foreground hover:bg-surface-raised px-3 py-1.5 text-xs font-medium transition-all',
+                      closeButton:
+                        'border border-border bg-surface text-foreground-muted hover:text-foreground rounded-lg transition-colors',
+                    },
+                  }}
+                />
               </TooltipProvider>
             </AuthProvider>
           </SmoothScrollProvider>

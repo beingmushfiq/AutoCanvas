@@ -23,6 +23,7 @@ import { PostDetailModal } from './PostDetailModal'
 import { CreativeEditorModal } from '../creative/CreativeEditorModal'
 import { Button } from '../../components/ui/button'
 import { Badge } from '../../components/ui/badge'
+import { appToast } from '../../lib/toast'
 import { EmptyState } from '../../components/ui/empty-state'
 
 interface ContentStudioProps {
@@ -96,8 +97,11 @@ export const ContentStudio: React.FC<ContentStudioProps> = ({ initialView = 'pos
     try {
       await apiClient.delete(`/brands/${activeBrandId}/content/${id}`)
       setPosts(posts.filter((p) => p.id !== id))
+      appToast.success('Post removed from queue.')
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Failed to delete post')
+      appToast.error('Failed to delete post', {
+        description: err instanceof Error ? err.message : 'Unknown server error',
+      })
     }
   }
 

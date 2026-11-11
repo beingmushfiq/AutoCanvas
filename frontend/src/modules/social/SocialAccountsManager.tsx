@@ -19,6 +19,7 @@ import { Card } from '../../components/ui/card'
 import { EmptyState } from '../../components/ui/empty-state'
 import { apiClient } from '../../lib/api/client'
 import { useAuth } from '../auth/AuthContext'
+import { appToast } from '../../lib/toast'
 
 export interface SocialAccountItem {
   id: string
@@ -170,6 +171,7 @@ export const SocialAccountsManager: React.FC = () => {
     if (!isAuthenticated || account.id.startsWith('mock-')) {
       setProcessingId(account.id)
       await new Promise((r) => setTimeout(r, 600))
+      appToast.success(`Token refreshed for ${account.account_name} (Demo Mode)`)
       setActionSuccess(`Token for ${account.account_name} refreshed successfully (Demo Mode).`)
       setProcessingId(null)
       return
@@ -178,9 +180,11 @@ export const SocialAccountsManager: React.FC = () => {
     try {
       setProcessingId(account.id)
       await apiClient.post(`/social/connectors/${account.id}/refresh`)
+      appToast.success(`Token for ${account.account_name} refreshed successfully.`)
       setActionSuccess(`Token for ${account.account_name} refreshed successfully.`)
       fetchAccounts()
     } catch (err: any) {
+      appToast.error('Token refresh failed', { description: err.message })
       setError(`Refresh failed: ` + err.message)
     } finally {
       setProcessingId(null)
@@ -192,6 +196,9 @@ export const SocialAccountsManager: React.FC = () => {
     if (!isAuthenticated || account.id.startsWith('mock-')) {
       setProcessingId(account.id)
       await new Promise((r) => setTimeout(r, 600))
+      appToast.success(`Connection verified: ${account.account_name}`, {
+        description: 'Account connector active and responsive.',
+      })
       setActionSuccess(`Connection test passed! ${account.account_name} is active and verified in Demo Mode.`)
       setProcessingId(null)
       return
@@ -203,12 +210,19 @@ export const SocialAccountsManager: React.FC = () => {
         `/social/connectors/${account.id}/test`
       )
       if (res.data?.is_valid) {
+        appToast.success(`Connection verified: ${account.account_name}`, {
+          description: 'Account connector active and responsive.',
+        })
         setActionSuccess(`Connection test passed! ${account.account_name} is active and verified.`)
       } else {
+        appToast.error('Connection test failed', {
+          description: 'Token is expired or unauthorized.',
+        })
         setError(`Connection test failed: token is expired or unauthorized.`)
       }
       fetchAccounts()
     } catch (err: any) {
+      appToast.error('Connection test failed', { description: err.message })
       setError(`Connection test failed: ` + err.message)
     } finally {
       setProcessingId(null)
@@ -223,6 +237,7 @@ export const SocialAccountsManager: React.FC = () => {
 
     if (!isAuthenticated || account.id.startsWith('mock-')) {
       setAccounts((prev) => prev.filter((a) => a.id !== account.id))
+      appToast.info(`Disconnected ${account.account_name} (Demo Mode)`)
       setActionSuccess(`Disconnected ${account.account_name} (Demo Mode).`)
       return
     }
@@ -230,9 +245,11 @@ export const SocialAccountsManager: React.FC = () => {
     try {
       setProcessingId(account.id)
       await apiClient.delete(`/social/connectors/${account.id}`)
+      appToast.info(`Disconnected ${account.account_name}`)
       setActionSuccess(`Disconnected ${account.account_name}.`)
       fetchAccounts()
     } catch (err: any) {
+      appToast.error('Disconnect failed', { description: err.message })
       setError(`Disconnect failed: ` + err.message)
     } finally {
       setProcessingId(null)

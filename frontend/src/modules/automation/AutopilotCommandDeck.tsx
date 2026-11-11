@@ -25,6 +25,7 @@ import {
   type AutopilotCycleReport,
 } from '../../lib/api/client'
 import { EmptyState } from '../../components/ui/empty-state'
+import { appToast } from '../../lib/toast'
 
 interface AutopilotCommandDeckProps {
   currentBrandId?: string
@@ -271,6 +272,9 @@ export const AutopilotCommandDeck: React.FC<AutopilotCommandDeckProps> = ({ curr
           duplicates_rejected_and_mutated: 1,
           cycle_timestamp: new Date().toISOString(),
         })
+        appToast.success('Autonomous discovery cycle completed!', {
+          description: 'Discovered 12 sources, evaluated 3 trending stories.',
+        })
         return
       }
 
@@ -278,9 +282,15 @@ export const AutopilotCommandDeck: React.FC<AutopilotCommandDeckProps> = ({ curr
       if (res.data) {
         setLastReport(res.data)
         await loadAutopilotData()
+        appToast.success('Autonomous discovery cycle completed!', {
+          description: `Discovered ${res.data.sources_discovered} sources, minted ${res.data.posts_minted} posts.`,
+        })
       }
     } catch (err) {
       console.error('Failed to trigger autonomous cycle:', err)
+      appToast.error('Failed to trigger autonomous cycle', {
+        description: err instanceof Error ? err.message : 'Operational error',
+      })
     } finally {
       setTriggering(false)
     }
@@ -295,6 +305,7 @@ export const AutopilotCommandDeck: React.FC<AutopilotCommandDeckProps> = ({ curr
       if (selectedBrandId === 'demo-brand-1') {
         await new Promise((resolve) => setTimeout(resolve, 500))
         setSaveSuccessMsg('Demo cadence settings saved successfully!')
+        appToast.success('Demo cadence settings saved successfully!')
         setTimeout(() => setSaveSuccessMsg(''), 4000)
         return
       }
@@ -310,10 +321,14 @@ export const AutopilotCommandDeck: React.FC<AutopilotCommandDeckProps> = ({ curr
       if (res.data) {
         setCadence(res.data)
         setSaveSuccessMsg('Cadence settings saved successfully!')
+        appToast.success('Cadence settings saved successfully!')
         setTimeout(() => setSaveSuccessMsg(''), 4000)
       }
     } catch (err) {
       console.error('Failed to update cadence:', err)
+      appToast.error('Failed to update cadence', {
+        description: err instanceof Error ? err.message : 'Operational error',
+      })
     } finally {
       setSavingCadence(false)
     }

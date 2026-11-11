@@ -387,3 +387,37 @@ html.lenis, html.lenis body {
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-y: contain;
 }
+
+/* ========================================================================= */
+/* SYSTEM-WIDE TOAST STYLING (Studio Editorial Kinetic)                     */
+/* ========================================================================= */
+[data-sonner-toaster] {
+  --normal-bg: var(--surface-raised);
+  --normal-border: var(--border);
+  --normal-text: var(--foreground);
+  --success-bg: var(--surface-raised);
+  --success-border: var(--border);
+  --success-text: var(--foreground);
+  --error-bg: var(--surface-raised);
+  --error-border: var(--border);
+  --error-text: var(--foreground);
+  --warning-bg: var(--surface-raised);
+  --warning-border: var(--border);
+  --warning-text: var(--foreground);
+  --info-bg: var(--surface-raised);
+  --info-border: var(--border);
+  --info-text: var(--foreground);
+}
+
+[data-sonner-toast] {
+  font-family: var(--font-sans);
+  border-radius: var(--radius-xl) !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.08) !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+}
+
+[data-theme='dark'] [data-sonner-toast] {
+  box-shadow: 0 20px 30px -5px rgba(0, 0, 0, 0.6), 0 10px 15px -6px rgba(0, 0, 0, 0.5) !important;
+}
