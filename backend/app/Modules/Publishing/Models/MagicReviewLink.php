@@ -73,3 +73,4 @@ class MagicReviewLink extends Model
         return $this->status === 'active' && !$this->isExpired();
     }
 }
+

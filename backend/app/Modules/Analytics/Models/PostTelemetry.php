@@ -64,3 +64,4 @@ class PostTelemetry extends Model
         return $this->belongsTo(ChannelDispatch::class, 'channel_dispatch_id');
     }
 }
+

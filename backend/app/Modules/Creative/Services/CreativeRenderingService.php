@@ -91,18 +91,21 @@ class CreativeRenderingService
         $engine = 'playwright_chromium';
         $format = 'png';
 
+        /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
+        $disk = Storage::disk('public');
+
         if ($imageBytes !== null) {
             $imagePath = "{$relativeDir}/{$filename}.png";
-            Storage::disk('public')->put($imagePath, $imageBytes);
-            $assetUrl = Storage::disk('public')->url($imagePath);
+            $disk->put($imagePath, $imageBytes);
+            $assetUrl = $disk->url($imagePath);
         } else {
             // 2. Graceful deterministic SVG fallback
             $engine = 'deterministic_svg_fallback';
             $format = 'svg';
             $svgContent = $this->composeFallbackSvg($docPayload);
             $imagePath = "{$relativeDir}/{$filename}.svg";
-            Storage::disk('public')->put($imagePath, $svgContent);
-            $assetUrl = Storage::disk('public')->url($imagePath);
+            $disk->put($imagePath, $svgContent);
+            $assetUrl = $disk->url($imagePath);
         }
 
         // 3. Persist or update CreativeDocument model
@@ -173,16 +176,19 @@ class CreativeRenderingService
 
         $imageBytes = $this->chromiumClient->render($docPayload);
 
+        /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
+        $disk = Storage::disk('public');
+
         if ($imageBytes !== null) {
             $imagePath = "{$relativeDir}/{$filename}.png";
-            Storage::disk('public')->put($imagePath, $imageBytes);
-            $assetUrl = Storage::disk('public')->url($imagePath);
+            $disk->put($imagePath, $imageBytes);
+            $assetUrl = $disk->url($imagePath);
             $engine = 'playwright_chromium';
         } else {
             $imagePath = "{$relativeDir}/{$filename}.svg";
             $svgContent = $this->composeFallbackSvg($docPayload);
-            Storage::disk('public')->put($imagePath, $svgContent);
-            $assetUrl = Storage::disk('public')->url($imagePath);
+            $disk->put($imagePath, $svgContent);
+            $assetUrl = $disk->url($imagePath);
             $engine = 'deterministic_svg_fallback';
         }
 

@@ -343,4 +343,22 @@ class EnterpriseHardeningAndCapabilitiesTest extends TestCase
         $winningPatterns = $telemetryService->getWinningPatterns($this->org->id);
         $this->assertNotEmpty($winningPatterns);
     }
+
+    public function test_twitter_connector_lifecycle(): void
+    {
+        $connector = new \App\Modules\SocialConnectors\Connectors\TwitterConnector();
+        $this->assertEquals('twitter', $connector->getPlatform());
+
+        $authUrl = $connector->getAuthorizationUrl('state_test_123');
+        $this->assertStringContainsString('twitter.com/i/oauth2/authorize', $authUrl);
+        $this->assertStringContainsString('state_test_123', $authUrl);
+
+        Http::fake([
+            'api.twitter.com/2/tweets' => Http::response(['data' => ['id' => 'tweet_123456']], 201),
+        ]);
+
+        $publishResult = $connector->publish(['caption' => 'Hello from AutoCanvas on X!'], ['access_token' => 'mock_token']);
+        $this->assertEquals('tweet_123456', $publishResult['post_id']);
+        $this->assertEquals('https://x.com/i/status/tweet_123456', $publishResult['permalink']);
+    }
 }

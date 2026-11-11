@@ -82,6 +82,8 @@ SVG;
      */
     public function generateCarouselPdf(Brand $brand, array $slides): array
     {
+        /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
+        $disk = Storage::disk('public');
         $renderedSlides = [];
         $dir = "brands/{$brand->id}/carousels/" . Str::ulid();
 
@@ -105,12 +107,12 @@ SVG;
             $svg = $this->renderSvgWithTypography($slideDoc);
             $filename = "slide_{$index}.svg";
             $path = "{$dir}/{$filename}";
-            Storage::disk('public')->put($path, $svg);
+            $disk->put($path, $svg);
 
             $renderedSlides[] = [
                 'slide_number' => $index + 1,
                 'path' => $path,
-                'url' => Storage::disk('public')->url($path),
+                'url' => $disk->url($path),
             ];
         }
 
@@ -118,7 +120,8 @@ SVG;
             'total_slides' => count($renderedSlides),
             'slides' => $renderedSlides,
             'export_format' => 'carousel_document',
-            'manifest_url' => Storage::disk('public')->url("{$dir}/manifest.json"),
+            'manifest_url' => $disk->url("{$dir}/manifest.json"),
         ];
     }
 }
+

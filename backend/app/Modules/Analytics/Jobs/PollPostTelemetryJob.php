@@ -52,3 +52,4 @@ class PollPostTelemetryJob implements ShouldQueue
         Log::info("Recorded telemetry checkpoint [{$this->checkpoint}] for ChannelDispatch [{$this->channelDispatchId}]. Rate: {$record->engagement_rate}%");
     }
 }
+

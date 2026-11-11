@@ -103,3 +103,4 @@ class PostAnalyticsTelemetryService
         return $defaultPeaks;
     }
 }
+
