@@ -17,6 +17,55 @@ class PublishingController extends Controller
     ) {}
 
     /**
+     * Dispatch an existing scheduled or queued dispatch immediately using atomic CAS.
+     */
+    public function dispatchNow(string $dispatchId): JsonResponse
+    {
+        $orgId = app('current_organization_id');
+        $dispatch = PublishingDispatch::where('organization_id', $orgId)->findOrFail($dispatchId);
+
+        $result = $this->orchestrator->executeAtomicPublish($dispatch->id);
+
+        if (!$result['success']) {
+            return response()->json([
+                'success' => false,
+                'error' => [
+                    'code' => 'DISPATCH_CONFLICT',
+                    'message' => $result['message'],
+                    'current_status' => $result['current_status'] ?? null,
+                ],
+            ], $result['code'] ?? 409);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $dispatch->fresh(['channelDispatches']),
+            'message' => $result['message'],
+        ], 202);
+    }
+
+    /**
+     * Configure first comment on a dispatch with optional link / hashtags.
+     */
+    public function configureFirstComment(Request $request, string $dispatchId): JsonResponse
+    {
+        $orgId = app('current_organization_id');
+        $dispatch = PublishingDispatch::where('organization_id', $orgId)->findOrFail($dispatchId);
+
+        $validated = $request->validate([
+            'comment_text' => ['required', 'string', 'max:2000'],
+        ]);
+
+        $updated = $this->orchestrator->configureFirstComment($dispatch->id, $validated['comment_text']);
+
+        return response()->json([
+            'success' => true,
+            'data' => $updated,
+            'message' => 'First comment configured successfully.',
+        ]);
+    }
+
+    /**
      * Dispatch an approved content variant immediately.
      */
     public function publishNow(Request $request, string $variantId): JsonResponse

@@ -13,6 +13,7 @@ use App\Modules\Workspace\Models\Workspace;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class PublishingDispatch extends Model
@@ -31,10 +32,13 @@ class PublishingDispatch extends Model
         'idempotency_key',
         'queue_name',
         'status',
+        'locked_at',
+        'lock_token',
         'attempts',
         'platform_post_id',
         'platform_permalink',
         'payload_snapshot',
+        'first_comment_text',
         'response_payload',
         'error_message',
         'error_code',
@@ -49,6 +53,7 @@ class PublishingDispatch extends Model
             'payload_snapshot' => 'array',
             'response_payload' => 'array',
             'attempts' => 'integer',
+            'locked_at' => 'datetime',
             'scheduled_at' => 'datetime',
             'dispatched_at' => 'datetime',
             'published_at' => 'datetime',
@@ -83,6 +88,16 @@ class PublishingDispatch extends Model
     public function socialAccount(): BelongsTo
     {
         return $this->belongsTo(SocialAccount::class);
+    }
+
+    public function channelDispatches(): HasMany
+    {
+        return $this->hasMany(ChannelDispatch::class, 'dispatch_id');
+    }
+
+    public function magicReviewLinks(): HasMany
+    {
+        return $this->hasMany(MagicReviewLink::class, 'dispatch_id');
     }
 
     public function isSuccessful(): bool

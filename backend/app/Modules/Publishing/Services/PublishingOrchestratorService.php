@@ -4,16 +4,96 @@ namespace App\Modules\Publishing\Services;
 
 use App\Modules\ContentProduction\Models\ContentVariant;
 use App\Modules\Organization\Services\AuditLogger;
+use App\Modules\Publishing\Jobs\ChannelDispatchJob;
 use App\Modules\Publishing\Jobs\PublishVariantJob;
+use App\Modules\Publishing\Models\ChannelDispatch;
 use App\Modules\Publishing\Models\PublishingDispatch;
 use App\Modules\SocialConnectors\Models\SocialAccount;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use RuntimeException;
 
 class PublishingOrchestratorService
 {
+    /**
+     * Atomically transition dispatch state using SQL Compare-And-Swap (CAS)
+     * and fan out isolated child jobs to all channels.
+     */
+    public function executeAtomicPublish(string $dispatchId): array
+    {
+        $lockToken = (string) Str::uuid();
+        
+        $affected = DB::table('publishing_dispatches')
+            ->where('id', $dispatchId)
+            ->whereIn('status', ['queued', 'scheduled', 'retry_pending'])
+            ->update([
+                'status' => 'dispatching',
+                'locked_at' => now(),
+                'lock_token' => $lockToken,
+                'updated_at' => now(),
+            ]);
+
+        if ($affected === 0) {
+            $current = DB::table('publishing_dispatches')->where('id', $dispatchId)->first();
+            return [
+                'success' => false,
+                'code' => 409,
+                'message' => 'Publishing dispatch is already in progress, published, or cancelled.',
+                'current_status' => $current?->status ?? 'not_found',
+            ];
+        }
+
+        $dispatch = PublishingDispatch::with(['contentVariant', 'socialAccount'])->findOrFail($dispatchId);
+
+        if ($this->isPaused($dispatch->organization_id)) {
+            $dispatch->update(['status' => 'cancelled']);
+            throw new RuntimeException("Automated publishing is currently paused by the emergency circuit breaker.");
+        }
+
+        $platform = $dispatch->contentVariant?->platform ?? $dispatch->socialAccount?->platform ?? 'linkedin';
+        $channels = is_array($platform) ? $platform : [$platform];
+        $childDispatches = [];
+
+        foreach ($channels as $channel) {
+            $idempotencyKey = hash('sha256', "{$dispatch->id}:{$channel}:" . ($dispatch->scheduled_at?->timestamp ?? now()->timestamp));
+            $child = ChannelDispatch::firstOrCreate(
+                ['idempotency_key' => $idempotencyKey],
+                [
+                    'dispatch_id' => $dispatch->id,
+                    'organization_id' => $dispatch->organization_id,
+                    'channel' => $channel,
+                    'status' => 'pending',
+                    'first_comment_text' => $dispatch->first_comment_text,
+                    'first_comment_status' => $dispatch->first_comment_text ? 'pending' : 'none',
+                    'first_comment_scheduled_at' => $dispatch->first_comment_text ? now()->addSeconds(60) : null,
+                ]
+            );
+
+            $childDispatches[] = $child;
+            ChannelDispatchJob::dispatch($child->id)->onQueue('publishing-high');
+        }
+
+        return [
+            'success' => true,
+            'code' => 202,
+            'message' => 'Dispatched ' . count($childDispatches) . ' channel worker job(s).',
+            'lock_token' => $lockToken,
+            'child_dispatches' => array_map(fn($c) => $c->id, $childDispatches),
+        ];
+    }
+
+    /**
+     * Configure first comment on a dispatch.
+     */
+    public function configureFirstComment(string $dispatchId, string $commentText): PublishingDispatch
+    {
+        $dispatch = PublishingDispatch::findOrFail($dispatchId);
+        $dispatch->update(['first_comment_text' => $commentText]);
+        return $dispatch;
+    }
+
     /**
      * Dispatch a content variant immediately via high-priority queue.
      */
