@@ -174,6 +174,19 @@ export const AppShell: React.FC<AppShellProps> = ({
   const [cmdOpen, setCmdOpen] = useState(false)
   const [showShortcuts, setShowShortcuts] = useState(false)
 
+  // Global event listener to allow child modules to open the AuthModal
+  useEffect(() => {
+    const handleOpenAuth = (e: Event) => {
+      const customEvent = e as CustomEvent<{ mode?: 'login' | 'register' }>
+      if (customEvent.detail?.mode) {
+        setAuthMode(customEvent.detail.mode)
+      }
+      setShowAuthModal(true)
+    }
+    window.addEventListener('autocanvas:open-auth', handleOpenAuth)
+    return () => window.removeEventListener('autocanvas:open-auth', handleOpenAuth)
+  }, [])
+
   const toggleSidebar = () => {
     setIsSidebarCollapsed((prev) => {
       const next = !prev

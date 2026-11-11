@@ -11,12 +11,14 @@ import {
   Lock,
   Radio,
   Clock,
+  Sparkles,
 } from 'lucide-react'
 import { Button } from '../../components/ui/button'
 import { Badge } from '../../components/ui/badge'
 import { Card } from '../../components/ui/card'
 import { EmptyState } from '../../components/ui/empty-state'
 import { apiClient } from '../../lib/api/client'
+import { useAuth } from '../auth/AuthContext'
 
 export interface SocialAccountItem {
   id: string
@@ -64,9 +66,45 @@ const PLATFORM_CONFIG = {
   },
 }
 
+const DEMO_ACCOUNTS: SocialAccountItem[] = [
+  {
+    id: 'mock-fb-1',
+    organization_id: 'org-demo',
+    platform: 'facebook',
+    provider_id: '1092837465',
+    account_name: 'AutoCanvas Global Official',
+    account_type: 'page',
+    avatar_url: null,
+    connection_status: 'connected',
+    is_active: true,
+    expires_at: new Date(Date.now() + 86400000 * 58).toISOString(),
+    is_expired: false,
+    is_expiring_soon: false,
+    scopes: ['pages_show_list', 'pages_manage_posts'],
+    last_synced_at: new Date().toISOString(),
+  },
+  {
+    id: 'mock-li-1',
+    organization_id: 'org-demo',
+    platform: 'linkedin',
+    provider_id: 'urn:li:person:987654',
+    account_name: 'Lead Architect Profile',
+    account_type: 'profile',
+    avatar_url: null,
+    connection_status: 'connected',
+    is_active: true,
+    expires_at: new Date(Date.now() + 86400000 * 42).toISOString(),
+    is_expired: false,
+    is_expiring_soon: false,
+    scopes: ['openid', 'profile', 'w_member_social'],
+    last_synced_at: new Date().toISOString(),
+  },
+]
+
 export const SocialAccountsManager: React.FC = () => {
-  const [accounts, setAccounts] = useState<SocialAccountItem[]>([])
-  const [loading, setLoading] = useState(true)
+  const { isAuthenticated } = useAuth()
+  const [accounts, setAccounts] = useState<SocialAccountItem[]>(DEMO_ACCOUNTS)
+  const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [actionSuccess, setActionSuccess] = useState<string | null>(null)
   const [connectModalOpen, setConnectModalOpen] = useState(false)
@@ -74,50 +112,27 @@ export const SocialAccountsManager: React.FC = () => {
 
   // Fetch accounts on load
   const fetchAccounts = async () => {
+    if (!isAuthenticated) {
+      setAccounts(DEMO_ACCOUNTS)
+      setLoading(false)
+      return
+    }
+
     try {
       setLoading(true)
       setError(null)
       const res = await apiClient.get<{ success: boolean; data: SocialAccountItem[] }>('/social/connectors')
-      if (res.data) {
+      if (res.data && res.data.length > 0) {
         setAccounts(res.data)
+      } else {
+        setAccounts(DEMO_ACCOUNTS)
       }
     } catch (err: any) {
-      setError(err?.message || 'Failed to load social accounts.')
-      // Fallback sample data if offline/demo
-      setAccounts([
-        {
-          id: 'mock-fb-1',
-          organization_id: 'org-demo',
-          platform: 'facebook',
-          provider_id: '1092837465',
-          account_name: 'AutoCanvas Global Official',
-          account_type: 'page',
-          avatar_url: null,
-          connection_status: 'connected',
-          is_active: true,
-          expires_at: new Date(Date.now() + 86400000 * 58).toISOString(),
-          is_expired: false,
-          is_expiring_soon: false,
-          scopes: ['pages_show_list', 'pages_manage_posts'],
-          last_synced_at: new Date().toISOString(),
-        },
-        {
-          id: 'mock-li-1',
-          organization_id: 'org-demo',
-          platform: 'linkedin',
-          provider_id: 'urn:li:person:987654',
-          account_name: 'Lead Architect Profile',
-          account_type: 'profile',
-          avatar_url: null,
-          connection_status: 'connected',
-          is_active: true,
-          expires_at: new Date(Date.now() + 86400000 * 42).toISOString(),
-          is_expired: false,
-          is_expiring_soon: false,
-          scopes: ['openid', 'profile', 'w_member_social'],
-          last_synced_at: new Date().toISOString(),
-        },
-      ])
+      const isUnauth = err?.message?.toLowerCase().includes('unauthenticated') || err?.status === 401
+      if (!isUnauth) {
+        setError(err?.message || 'Failed to load social accounts.')
+      }
+      setAccounts(DEMO_ACCOUNTS)
     } finally {
       setLoading(false)
     }
@@ -125,10 +140,16 @@ export const SocialAccountsManager: React.FC = () => {
 
   useEffect(() => {
     fetchAccounts()
-  }, [])
+  }, [isAuthenticated])
 
   // Initiate OAuth flow
   const handleConnect = async (platform: 'facebook' | 'instagram' | 'linkedin') => {
+    if (!isAuthenticated) {
+      setConnectModalOpen(false)
+      window.dispatchEvent(new CustomEvent('autocanvas:open-auth', { detail: { mode: 'login' } }))
+      return
+    }
+
     try {
       setProcessingId(platform)
       const res = await apiClient.get<{ success: boolean; data: { authorization_url: string } }>(
@@ -146,6 +167,14 @@ export const SocialAccountsManager: React.FC = () => {
 
   // Refresh token
   const handleRefresh = async (account: SocialAccountItem) => {
+    if (!isAuthenticated || account.id.startsWith('mock-')) {
+      setProcessingId(account.id)
+      await new Promise((r) => setTimeout(r, 600))
+      setActionSuccess(`Token for ${account.account_name} refreshed successfully (Demo Mode).`)
+      setProcessingId(null)
+      return
+    }
+
     try {
       setProcessingId(account.id)
       await apiClient.post(`/social/connectors/${account.id}/refresh`)
@@ -160,6 +189,14 @@ export const SocialAccountsManager: React.FC = () => {
 
   // Test connection
   const handleTest = async (account: SocialAccountItem) => {
+    if (!isAuthenticated || account.id.startsWith('mock-')) {
+      setProcessingId(account.id)
+      await new Promise((r) => setTimeout(r, 600))
+      setActionSuccess(`Connection test passed! ${account.account_name} is active and verified in Demo Mode.`)
+      setProcessingId(null)
+      return
+    }
+
     try {
       setProcessingId(account.id)
       const res = await apiClient.post<{ success: boolean; data: { is_valid: boolean } }>(
@@ -181,6 +218,12 @@ export const SocialAccountsManager: React.FC = () => {
   // Disconnect
   const handleDisconnect = async (account: SocialAccountItem) => {
     if (!confirm(`Are you sure you want to disconnect ${account.account_name}? Scheduled posts for this account will fail.`)) {
+      return
+    }
+
+    if (!isAuthenticated || account.id.startsWith('mock-')) {
+      setAccounts((prev) => prev.filter((a) => a.id !== account.id))
+      setActionSuccess(`Disconnected ${account.account_name} (Demo Mode).`)
       return
     }
 
@@ -221,12 +264,47 @@ export const SocialAccountsManager: React.FC = () => {
 
         <Button
           onClick={() => setConnectModalOpen(true)}
-          className="bg-brand-primary text-brand-primary-fg hover:opacity-90 flex items-center gap-2 shrink-0 shadow-xs"
+          className="bg-interactive-primary text-interactive-primary-fg hover:opacity-90 flex items-center gap-2 shrink-0 shadow-xs"
         >
-          <PlusCircle className="w-4 h-4" />
+          <PlusCircle className="w-4 h-4 text-brand-accent" />
           <span>Connect Channel</span>
         </Button>
       </div>
+
+      {/* Polite Guest Preview Banner */}
+      {!isAuthenticated && (
+        <div
+          role="region"
+          aria-label="Guest Workspace Notice"
+          className="p-4 rounded-xl border border-border bg-surface-raised flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-sm shadow-2xs animate-in fade-in"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-background-subtle border border-border flex items-center justify-center shrink-0 shadow-2xs">
+              <Sparkles className="w-4 h-4 text-brand-accent" aria-hidden="true" />
+            </div>
+            <div>
+              <div className="font-semibold text-foreground flex items-center gap-2">
+                <span>Guest Preview Mode</span>
+                <span className="px-1.5 py-0.5 rounded-full bg-brand-accent-subtle text-foreground text-[9px] font-mono font-bold">
+                  Demo
+                </span>
+              </div>
+              <p className="text-xs text-foreground-secondary mt-0.5">
+                Displaying simulated social connectors. You can test and inspect tokens in demo mode, or sign in to link official live OAuth accounts.
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              window.dispatchEvent(new CustomEvent('autocanvas:open-auth', { detail: { mode: 'login' } }))
+            }}
+            className="shrink-0 inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-interactive-primary text-interactive-primary-fg text-xs font-semibold hover:opacity-90 active:scale-98 transition-all shadow-xs cursor-pointer"
+          >
+            <span>Sign In to Connect</span>
+          </button>
+        </div>
+      )}
 
       {/* Action Banners */}
       {actionSuccess && (
@@ -462,10 +540,10 @@ export const SocialAccountsManager: React.FC = () => {
                     <Button
                       onClick={() => handleConnect(platform)}
                       disabled={isConnecting}
-                      className="bg-brand-primary text-brand-primary-fg hover:opacity-90 text-xs shrink-0 flex items-center gap-1.5"
+                      className="bg-interactive-primary text-interactive-primary-fg hover:opacity-90 text-xs shrink-0 flex items-center gap-1.5"
                     >
                       {isConnecting ? (
-                        <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                        <RefreshCw className="w-3.5 h-3.5 animate-spin text-brand-accent" />
                       ) : (
                         <ExternalLink className="w-3.5 h-3.5" />
                       )}
