@@ -7,6 +7,7 @@ use App\Modules\Automation\Controllers\AutopilotController;
 use App\Modules\Billing\Controllers\BillingController;
 use App\Modules\Billing\Controllers\CheckoutController;
 use App\Modules\Billing\Controllers\PaymentSubmissionController;
+use App\Modules\Billing\Controllers\PaymentWebhookController;
 use App\Modules\Brand\Controllers\BrandAssetController;
 use App\Modules\Brand\Controllers\BrandController;
 use App\Modules\Brand\Controllers\BrandDiscoveryController;
@@ -22,6 +23,7 @@ use App\Modules\ControlPlane\Controllers\MasterCmsController;
 use App\Modules\ControlPlane\Controllers\MasterCommandController;
 use App\Modules\ControlPlane\Controllers\PaymentVerificationController;
 use App\Modules\ControlPlane\Controllers\PlatformMetricsController;
+use App\Modules\ControlPlane\Controllers\PromptSandboxController;
 use App\Modules\ControlPlane\Controllers\SocialAppConfigController;
 use App\Modules\ControlPlane\Controllers\SystemSettingsController;
 use App\Modules\ControlPlane\Controllers\TenantManagementController;
@@ -30,6 +32,7 @@ use App\Modules\Knowledge\Controllers\KnowledgeController;
 use App\Modules\Organization\Controllers\AuditLogController;
 use App\Modules\Organization\Controllers\MemberController;
 use App\Modules\Organization\Controllers\OrganizationController;
+use App\Modules\Publishing\Controllers\ClientReviewController;
 use App\Modules\Publishing\Controllers\PublishingController;
 use App\Modules\Research\Controllers\CompetitorController;
 use App\Modules\Research\Controllers\RssFeedController;
@@ -57,6 +60,19 @@ Route::prefix('v1')->group(function () {
     // 3. Public Plans & CMS
     Route::get('/billing/plans', [BillingController::class, 'plans']);
     Route::get('/cms/public-data', [MasterCmsController::class, 'publicData']);
+
+    // Public Agency Client Magic Review Links (Zero-login signed token)
+    Route::prefix('review')->group(function () {
+        Route::get('/{token}', [ClientReviewController::class, 'show']);
+        Route::post('/{token}/approve', [ClientReviewController::class, 'approve']);
+        Route::post('/{token}/changes', [ClientReviewController::class, 'requestChanges']);
+    });
+
+    // Public Payment Webhooks & IPNs
+    Route::prefix('webhooks')->group(function () {
+        Route::post('/bkash', [PaymentWebhookController::class, 'handleBkash']);
+        Route::post('/sslcommerz', [PaymentWebhookController::class, 'handleSslCommerz']);
+    });
 
     // 4. Control Plane (Superadmin Sovereign Operations Engine)
     Route::prefix('control-plane')
@@ -128,6 +144,12 @@ Route::prefix('v1')->group(function () {
             Route::prefix('crawler-tuning')->group(function () {
                 Route::get('/', [MasterCmsController::class, 'getCrawlerTuning']);
                 Route::post('/', [MasterCmsController::class, 'updateCrawlerTuning']);
+            });
+
+            // Prompt Sandbox & Side-by-Side Evaluation Playground
+            Route::prefix('prompt-sandbox')->group(function () {
+                Route::get('/benchmarks', [PromptSandboxController::class, 'getBenchmarks']);
+                Route::post('/test', [PromptSandboxController::class, 'runComparison']);
             });
         });
 
@@ -316,6 +338,19 @@ Route::prefix('v1')->group(function () {
             Route::prefix('publishing')->group(function () {
                 Route::get('/dispatches', [PublishingController::class, 'index']);
                 Route::get('/dispatches/{id}', [PublishingController::class, 'show']);
+                Route::post('/dispatches/{id}/now', [PublishingController::class, 'dispatchNow']);
+                Route::post('/dispatches/{id}/first-comment', [PublishingController::class, 'configureFirstComment']);
+                Route::post('/dispatches/magic-link', [ClientReviewController::class, 'generate']);
+                Route::get('/telemetry/winning-patterns', function () {
+                    $service = app(\App\Modules\Analytics\Services\PostAnalyticsTelemetryService::class);
+                    $orgId = app('current_organization_id');
+                    return response()->json(['success' => true, 'data' => $service->getWinningPatterns($orgId)]);
+                });
+                Route::get('/telemetry/peak-times', function () {
+                    $service = app(\App\Modules\Analytics\Services\PostAnalyticsTelemetryService::class);
+                    $orgId = app('current_organization_id');
+                    return response()->json(['success' => true, 'data' => $service->getDynamicPeakTimes($orgId)]);
+                });
                 Route::post('/dispatches/{id}/cancel', [PublishingController::class, 'cancel']);
                 Route::get('/circuit-breaker/status', [PublishingController::class, 'circuitBreakerStatus']);
                 Route::post('/circuit-breaker/pause', [PublishingController::class, 'pauseAutomations']);
