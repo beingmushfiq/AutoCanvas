@@ -40,7 +40,6 @@ import { AuthModal } from '../modules/auth/AuthModal'
 import { CommandPalette } from '../components/CommandPalette'
 import { KeyboardShortcutsModal } from '../components/KeyboardShortcutsModal'
 import { Logo } from '../components/brand/Logo'
-import { StatusIndicator } from '../components/ui/status-indicator'
 import { EmptyState } from '../components/ui/empty-state'
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '../components/ui/tooltip'
 import { NavItem } from './NavItem'
@@ -483,42 +482,37 @@ export const AppShell: React.FC<AppShellProps> = ({
                   </button>
                 </div>
               ) : (
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => {
-                      setAuthMode('login')
-                      setShowAuthModal(true)
-                    }}
-                    className="flex-1 py-1.5 px-2.5 rounded-lg border border-border bg-surface text-xs font-semibold text-foreground-secondary hover:bg-surface-raised hover:text-foreground transition-colors"
-                  >
-                    Sign In
-                  </button>
-                  <button
-                    onClick={() => {
-                      setAuthMode('register')
-                      setShowAuthModal(true)
-                    }}
-                    className="flex-1 py-1.5 px-2.5 rounded-lg bg-interactive-primary text-interactive-primary-fg text-xs font-semibold hover:opacity-90 transition-all shadow-2xs"
-                  >
-                    Register
-                  </button>
+                <div className="p-2.5 rounded-xl border border-border bg-surface shadow-2xs">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-[11px] font-mono font-medium text-foreground-muted">Guest Workspace</span>
+                    <span className="px-1.5 py-0.5 rounded-full bg-brand-accent-subtle text-foreground text-[9px] font-mono font-bold">
+                      Demo
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setAuthMode('login')
+                        setShowAuthModal(true)
+                      }}
+                      className="flex-1 py-1.5 px-2 rounded-lg border border-border bg-background-subtle text-[11px] font-semibold text-foreground hover:bg-surface-raised transition-colors text-center"
+                    >
+                      Sign In
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setAuthMode('register')
+                        setShowAuthModal(true)
+                      }}
+                      className="flex-1 py-1.5 px-2 rounded-lg bg-interactive-primary text-interactive-primary-fg text-[11px] font-semibold hover:opacity-90 transition-all text-center shadow-2xs"
+                    >
+                      Register
+                    </button>
+                  </div>
                 </div>
               )}
-
-              <div
-                className="pt-2 border-t border-border flex items-center justify-between text-xs"
-                role="status"
-                aria-live="polite"
-              >
-                <span className="text-foreground-muted font-medium">Core API</span>
-                <div className="flex items-center gap-1.5 font-medium">
-                  {health?.status === 'ok' ? (
-                    <StatusIndicator status="success" label="Healthy (v1.0.0)" />
-                  ) : (
-                    <StatusIndicator status="warning" label="Connecting..." pulse />
-                  )}
-                </div>
-              </div>
             </>
           )}
         </div>
@@ -542,20 +536,18 @@ export const AppShell: React.FC<AppShellProps> = ({
               <Menu className="w-5 h-5" aria-hidden="true" />
             </button>
 
-            {/* Desktop 1-Click Sidebar Toggle Button */}
-            <button
-              type="button"
-              onClick={toggleSidebar}
-              title={isSidebarCollapsed ? 'Expand Sidebar ([)' : 'Collapse Sidebar ([)'}
-              aria-label={isSidebarCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
-              className="hidden lg:flex p-2 rounded-xl border border-border bg-background-subtle text-foreground-secondary hover:text-foreground hover:bg-surface-raised transition-colors outline-hidden focus-visible:ring-2 focus-visible:ring-focus-ring"
-            >
-              {isSidebarCollapsed ? (
+            {/* Desktop 1-Click Sidebar Expand Button (Shown only when sidebar is collapsed) */}
+            {isSidebarCollapsed && (
+              <button
+                type="button"
+                onClick={toggleSidebar}
+                title="Expand Sidebar ([)"
+                aria-label="Expand Sidebar"
+                className="hidden lg:flex p-2 rounded-xl border border-border bg-background-subtle text-foreground-secondary hover:text-foreground hover:bg-surface-raised transition-colors outline-hidden focus-visible:ring-2 focus-visible:ring-focus-ring"
+              >
                 <PanelLeft className="w-4 h-4 text-brand-accent" aria-hidden="true" />
-              ) : (
-                <PanelLeftClose className="w-4 h-4" aria-hidden="true" />
-              )}
-            </button>
+              </button>
+            )}
 
             {/* Breadcrumb Trail */}
             <div>
