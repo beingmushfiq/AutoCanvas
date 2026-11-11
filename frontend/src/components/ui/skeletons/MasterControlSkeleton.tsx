@@ -80,3 +80,4 @@ export const MasterControlSkeleton: React.FC = () => {
     </div>
   )
 }
+

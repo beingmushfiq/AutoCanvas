@@ -77,3 +77,4 @@ export const TableSkeleton: React.FC<TableSkeletonProps> = ({
     </Card>
   )
 }
+

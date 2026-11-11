@@ -75,3 +75,4 @@ export const InboxSkeleton: React.FC = () => {
     </div>
   )
 }
+

@@ -22,3 +22,4 @@ export const useReducedMotion = (): boolean => {
 
   return Boolean(motionPrefers ?? prefersReduced)
 }
+

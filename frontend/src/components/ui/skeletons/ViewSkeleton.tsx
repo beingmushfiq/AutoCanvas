@@ -40,3 +40,4 @@ export const ViewSkeleton: React.FC<ViewSkeletonProps> = ({ type }) => {
       return <DashboardSkeleton />
   }
 }
+

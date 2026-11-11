@@ -73,3 +73,4 @@ export const CanvasStudioSkeleton: React.FC = () => {
     </div>
   )
 }
+
