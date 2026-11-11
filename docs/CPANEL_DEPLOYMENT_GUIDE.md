@@ -6,7 +6,8 @@
 > *Application Root:* `/home/devcente/AutoCanvas/`  
 > *Main Corporate Site:* `https://devcenterpoint.com` (occupies `/home/devcente/public_html/` — untouched)  
 > *Deployment Method:* **Git Version Control with Automated 1-Click Script (`./deploy.sh` & `.cpanel.yml`)**  
-> *Stack:* cPanel / Apache / PHP 8.3 / MySQL 8.x or MariaDB 10.x / React 19 + TypeScript / Laravel 12
+> *Stack:* cPanel / Apache / PHP 8.3 / MySQL 8.x or MariaDB 10.x / React 19 + TypeScript / Laravel 12  
+> *Node.js Dependency on Server:* **Zero (Pre-compiled `frontend/dist` and `backend/public` assets tracked in Git)**
 
 ---
 
