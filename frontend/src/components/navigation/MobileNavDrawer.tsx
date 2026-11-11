@@ -105,7 +105,18 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
         <div className="overflow-y-auto flex-1">
           {/* Header with Logo and Close Button */}
           <div className="p-4 border-b border-border flex items-center justify-between">
-            <Logo size="md" />
+            <button
+              type="button"
+              onClick={() => {
+                onSelectTab('overview')
+                onClose()
+              }}
+              title="Go to Command Center"
+              aria-label="AutoCanvas Home - Command Center"
+              className="text-left rounded-xl transition-opacity hover:opacity-85 outline-hidden focus-visible:ring-2 focus-visible:ring-focus-ring cursor-pointer"
+            >
+              <Logo size="md" />
+            </button>
             <button
               type="button"
               aria-label="Close menu"

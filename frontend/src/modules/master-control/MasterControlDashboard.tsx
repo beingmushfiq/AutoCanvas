@@ -23,6 +23,7 @@ import {
 } from 'lucide-react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { BreadcrumbBar } from '../../components/navigation/BreadcrumbBar'
+import { Logo } from '../../components/brand/Logo'
 import { PromptSandboxModal } from './PromptSandboxModal'
 import {
   apiClient,
@@ -398,9 +399,16 @@ export const MasterControlDashboard: React.FC<MasterControlDashboardProps> = ({ 
       <header className="border-b border-border bg-surface/90 backdrop-blur-md sticky top-0 z-50 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3 sm:gap-4">
-            <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-brand-accent/10 border border-brand-accent/30 text-brand-accent shrink-0">
-              <Crown className="w-5 h-5" aria-hidden="true" />
-            </div>
+            <button
+              type="button"
+              onClick={onExitToWorkspace}
+              title="Return to Command Center"
+              aria-label="AutoCanvas Command Center"
+              className="hover:opacity-85 transition-opacity cursor-pointer text-left shrink-0"
+            >
+              <Logo size="md" />
+            </button>
+            <span className="hidden sm:inline-block w-px h-6 bg-border" />
             <div>
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="text-sm font-bold tracking-tight text-foreground">

@@ -66,8 +66,7 @@ export const Logo: React.FC<LogoProps> = ({
       {showWordmark && (
         <div className="flex flex-col leading-none">
           <span className={`font-sans tracking-tight ${dimensions.text}`}>
-            <span className="font-bold text-foreground">Auto</span>
-            <span className="font-normal text-foreground-secondary ml-0.5">Canvas</span>
+            <span className="font-bold text-foreground">Auto</span><span className="font-normal text-foreground-secondary">Canvas</span>
           </span>
           <span className="text-[10px] font-mono tracking-wider uppercase text-foreground-muted mt-0.5">
             Brand Ops

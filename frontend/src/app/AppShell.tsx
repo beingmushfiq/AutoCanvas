@@ -322,22 +322,30 @@ export const AppShell: React.FC<AppShellProps> = ({
                   <TooltipTrigger asChild>
                     <button
                       type="button"
-                      onClick={toggleSidebar}
-                      title="Expand Sidebar ([)"
-                      aria-label="Expand Sidebar"
-                      className="p-1.5 rounded-xl text-brand-accent hover:bg-background-subtle transition-colors flex items-center justify-center outline-hidden focus-visible:ring-2 focus-visible:ring-focus-ring"
+                      onClick={() => handleSelectTab('overview')}
+                      title="Command Center"
+                      aria-label="AutoCanvas Home - Command Center"
+                      className="p-1.5 rounded-xl text-brand-accent hover:bg-background-subtle transition-colors flex items-center justify-center outline-hidden focus-visible:ring-2 focus-visible:ring-focus-ring cursor-pointer"
                     >
                       <Logo size="md" showWordmark={false} />
                     </button>
                   </TooltipTrigger>
                   <TooltipContent side="right">
-                    <span>AutoCanvas (Expand Sidebar)</span>
+                    <span>AutoCanvas (Command Center)</span>
                   </TooltipContent>
                 </Tooltip>
               </div>
             ) : (
               <div className="flex items-center justify-between">
-                <Logo size="md" />
+                <button
+                  type="button"
+                  onClick={() => handleSelectTab('overview')}
+                  title="Go to Command Center"
+                  aria-label="AutoCanvas Home - Command Center"
+                  className="text-left rounded-xl transition-opacity hover:opacity-85 outline-hidden focus-visible:ring-2 focus-visible:ring-focus-ring cursor-pointer"
+                >
+                  <Logo size="md" />
+                </button>
                 <button
                   type="button"
                   onClick={toggleSidebar}
