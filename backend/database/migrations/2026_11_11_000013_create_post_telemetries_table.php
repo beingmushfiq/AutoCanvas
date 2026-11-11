@@ -32,7 +32,7 @@ return new class extends Migration
             $table->foreign('organization_id')->references('id')->on('organizations')->onDelete('cascade');
             $table->foreign('dispatch_id')->references('id')->on('publishing_dispatches')->onDelete('cascade');
             $table->foreign('channel_dispatch_id')->references('id')->on('channel_dispatches')->onDelete('cascade');
-            $table->index(['organization_id', 'is_winning_pattern', 'engagement_rate']);
+            $table->index(['organization_id', 'is_winning_pattern', 'engagement_rate'], 'ptel_org_winning_eng_idx');
         });
     }
 

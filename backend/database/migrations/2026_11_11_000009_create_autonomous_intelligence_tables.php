@@ -69,7 +69,7 @@ return new class extends Migration
             $table->timestamp('published_or_scheduled_at')->useCurrent();
             $table->timestamps();
 
-            $table->index(['brand_id', 'channel', 'published_or_scheduled_at']);
+            $table->index(['brand_id', 'channel', 'published_or_scheduled_at'], 'cfp_brand_channel_pub_idx');
             $table->index(['brand_id', 'simhash_64']);
         });
 
