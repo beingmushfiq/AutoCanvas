@@ -23,7 +23,49 @@ PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 BACKEND_DIR="${PROJECT_ROOT}/backend"
 
 PHP_BIN="${PHP_BIN:-$(which ea-php83 2>/dev/null || which php83 2>/dev/null || which php 2>/dev/null || echo "php")}"
-COMPOSER_BIN="${COMPOSER_BIN:-$(which composer 2>/dev/null || echo "composer")}"
+
+echo -e "${CYAN}Directory:${NC}   ${PROJECT_ROOT}"
+echo -e "${CYAN}PHP Binary:${NC}  $(${PHP_BIN} -v 2>/dev/null | head -n 1 || echo "${PHP_BIN}")"
+
+# --- Intelligent Composer Detection & Auto-Download ---
+resolve_composer() {
+    # 1. Check known cPanel binary locations
+    for candidate in "composer" \
+                     "/opt/cpanel/composer/bin/composer" \
+                     "/usr/local/cpanel/3rdparty/bin/composer" \
+                     "${HOME}/bin/composer" \
+                     "${PROJECT_ROOT}/composer.phar" \
+                     "${BACKEND_DIR}/composer.phar"; do
+        if command -v "${candidate}" >/dev/null 2>&1 || [ -f "${candidate}" ]; then
+            if [[ "${candidate}" == *.phar ]]; then
+                echo "${PHP_BIN} ${candidate}"
+            else
+                echo "${candidate}"
+            fi
+            return 0
+        fi
+    done
+
+    # 2. If not found anywhere, download local composer.phar automatically
+    echo -e "${YELLOW}Notice: Composer not found in PATH. Downloading local composer.phar...${NC}" >&2
+    if command -v curl >/dev/null 2>&1; then
+        curl -sS https://getcomposer.org/installer | ${PHP_BIN} -- --install-dir="${PROJECT_ROOT}" --filename=composer.phar >&2
+    elif command -v wget >/dev/null 2>&1; then
+        wget -q -O - https://getcomposer.org/installer | ${PHP_BIN} -- --install-dir="${PROJECT_ROOT}" --filename=composer.phar >&2
+    fi
+
+    if [ -f "${PROJECT_ROOT}/composer.phar" ]; then
+        echo -e "${GREEN}✓ Local composer.phar installed successfully.${NC}" >&2
+        echo "${PHP_BIN} ${PROJECT_ROOT}/composer.phar"
+        return 0
+    fi
+
+    echo -e "${RED}Error: Failed to locate or download Composer. Please run 'curl -sS https://getcomposer.org/installer | php' manually.${NC}" >&2
+    return 1
+}
+
+COMPOSER_CMD="$(resolve_composer)"
+echo -e "${CYAN}Composer:${NC}    ${COMPOSER_CMD}"
 
 cd "${BACKEND_DIR}"
 
@@ -42,7 +84,7 @@ chmod -R 775 storage bootstrap/cache 2>/dev/null || true
 echo -e "${GREEN}✓ Storage permissions set to 775.${NC}"
 
 echo -e "\n${BLUE}▶ [3/6] Installing backend dependencies...${NC}"
-${COMPOSER_BIN} install --no-dev --prefer-dist --optimize-autoloader --no-interaction
+${COMPOSER_CMD} install --no-dev --prefer-dist --optimize-autoloader --no-interaction
 echo -e "${GREEN}✓ Composer dependencies installed.${NC}"
 
 echo -e "\n${BLUE}▶ [4/6] Generating encryption key & migrating database...${NC}"
@@ -76,4 +118,3 @@ echo -e "${GREEN}✅ AutoCanvas Initial Setup Complete!                         
 echo -e "${GREEN}   Superadmin Email: ${ADMIN_EMAIL}                              ${NC}"
 echo -e "${GREEN}   Next deployments: simply run ./deploy.sh or click Deploy in Git${NC}"
 echo -e "${GREEN}================================================================${NC}"
-

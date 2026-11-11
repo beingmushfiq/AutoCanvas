@@ -31,12 +31,48 @@ FRONTEND_DIR="${PROJECT_ROOT}/frontend"
 # Configurable web root - default cPanel public_html subfolder or direct document root
 PUBLIC_HTML_TARGET="${CPANEL_PUBLIC_HTML:-/home/devcente/public_html/autocanvas}"
 PHP_BIN="${PHP_BIN:-$(which ea-php83 2>/dev/null || which php83 2>/dev/null || which php 2>/dev/null || echo "php")}"
-COMPOSER_BIN="${COMPOSER_BIN:-$(which composer 2>/dev/null || echo "composer")}"
 NPM_BIN="${NPM_BIN:-$(which npm 2>/dev/null || echo "npm")}"
+
+# --- Intelligent Composer Detection & Auto-Download ---
+resolve_composer() {
+    for candidate in "composer" \
+                     "/opt/cpanel/composer/bin/composer" \
+                     "/usr/local/cpanel/3rdparty/bin/composer" \
+                     "${HOME}/bin/composer" \
+                     "${PROJECT_ROOT}/composer.phar" \
+                     "${BACKEND_DIR}/composer.phar"; do
+        if command -v "${candidate}" >/dev/null 2>&1 || [ -f "${candidate}" ]; then
+            if [[ "${candidate}" == *.phar ]]; then
+                echo "${PHP_BIN} ${candidate}"
+            else
+                echo "${candidate}"
+            fi
+            return 0
+        fi
+    done
+
+    echo -e "${YELLOW}Notice: Composer not found in PATH. Downloading local composer.phar...${NC}" >&2
+    if command -v curl >/dev/null 2>&1; then
+        curl -sS https://getcomposer.org/installer | ${PHP_BIN} -- --install-dir="${PROJECT_ROOT}" --filename=composer.phar >&2
+    elif command -v wget >/dev/null 2>&1; then
+        wget -q -O - https://getcomposer.org/installer | ${PHP_BIN} -- --install-dir="${PROJECT_ROOT}" --filename=composer.phar >&2
+    fi
+
+    if [ -f "${PROJECT_ROOT}/composer.phar" ]; then
+        echo -e "${GREEN}✓ Local composer.phar installed successfully.${NC}" >&2
+        echo "${PHP_BIN} ${PROJECT_ROOT}/composer.phar"
+        return 0
+    fi
+
+    echo -e "${RED}Error: Failed to locate or download Composer.${NC}" >&2
+    return 1
+}
+
+COMPOSER_CMD="$(resolve_composer)"
 
 echo -e "${CYAN}Directory:${NC}   ${PROJECT_ROOT}"
 echo -e "${CYAN}PHP Binary:${NC}  $(${PHP_BIN} -v 2>/dev/null | head -n 1 || echo "${PHP_BIN}")"
-echo -e "${CYAN}Composer:${NC}    $(${COMPOSER_BIN} --version 2>/dev/null | head -n 1 || echo "Not detected")"
+echo -e "${CYAN}Composer:${NC}    ${COMPOSER_CMD}"
 
 # --- Step 0: Git Synchronization (If executed within a Git repository) ---
 if [ "${AUTO_GIT_PULL:-1}" = "1" ] && [ -d "${PROJECT_ROOT}/.git" ]; then
@@ -84,7 +120,7 @@ ${PHP_BIN} artisan down --retry=60 || true
 
 # --- Step 3: Install/Update Composer Dependencies ---
 echo -e "\n${BLUE}▶ [4/8] Installing production PHP dependencies...${NC}"
-${COMPOSER_BIN} install --no-dev --prefer-dist --optimize-autoloader --no-interaction --quiet || {
+${COMPOSER_CMD} install --no-dev --prefer-dist --optimize-autoloader --no-interaction --quiet || {
     echo -e "${YELLOW}Warning: Composer install encountered a warning, continuing with existing vendor...${NC}"
 }
 

@@ -5,6 +5,8 @@
 backend/vendor/
 renderer/node_modules/
 frontend/node_modules/
+composer.phar
+*.phar
 
 # Environment files
 .env
