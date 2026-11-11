@@ -35,6 +35,11 @@ class Plan extends Model
         return $this->hasMany(Subscription::class);
     }
 
+    public function invoices(): HasMany
+    {
+        return $this->hasMany(Invoice::class);
+    }
+
     public function getFeature(string $key, mixed $default = null): mixed
     {
         return $this->features[$key] ?? $default;
