@@ -8,6 +8,24 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property string $id
+ * @property string $brand_id
+ * @property string $organization_id
+ * @property string|null $primary_logo_url
+ * @property string|null $secondary_logo_url
+ * @property string|null $monochrome_logo_url
+ * @property string|null $mark_url
+ * @property string|null $primary_color
+ * @property string|null $secondary_color
+ * @property array|null $accent_colors
+ * @property array|null $background_colors
+ * @property string|null $primary_font
+ * @property string|null $secondary_font
+ * @property array|null $typography_hierarchy
+ * @property array|null $layout_preferences
+ * @property array|null $visual_exclusions
+ */
 class BrandVisualIdentity extends Model
 {
     use HasFactory, HasTenantScope, HasUlid;

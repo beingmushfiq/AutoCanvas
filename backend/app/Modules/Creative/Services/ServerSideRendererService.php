@@ -85,7 +85,9 @@ SVG;
         /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
         $disk = Storage::disk('public');
         $renderedSlides = [];
-        $dir = "brands/{$brand->id}/carousels/" . Str::ulid();
+        $brandId = (string) ($brand->getKey() ?? $brand->id);
+        $brandName = (string) ($brand->name ?? 'AutoCanvas');
+        $dir = "brands/{$brandId}/carousels/" . Str::ulid();
 
         foreach ($slides as $index => $slide) {
             $slideDoc = [
@@ -93,7 +95,7 @@ SVG;
                 'height' => 1080,
                 'backgroundColor' => '#0f172a',
                 'brand' => [
-                    'name' => $brand->name,
+                    'name' => $brandName,
                     'primaryColor' => $brand->visualIdentity?->secondary_color ?? '#6366f1',
                     'secondaryColor' => $brand->visualIdentity?->accent_colors[0] ?? '#f59e0b',
                 ],
