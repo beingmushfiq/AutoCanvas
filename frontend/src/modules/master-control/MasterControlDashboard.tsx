@@ -19,7 +19,9 @@ import {
   Lock,
   Search,
   Radio,
+  SplitSquareVertical,
 } from 'lucide-react'
+import { PromptSandboxModal } from './PromptSandboxModal'
 import {
   apiClient,
   type CmsBlockItem,
@@ -47,6 +49,7 @@ export const MasterControlDashboard: React.FC<MasterControlDashboardProps> = ({ 
 
   // Circuit Breaker State
   const [isCircuitPaused, setIsCircuitPaused] = useState(false)
+  const [isSandboxOpen, setIsSandboxOpen] = useState(false)
 
   // 1. White-Label & Theme State
   const [themeData, setThemeData] = useState<CustomThemeData>({
@@ -913,14 +916,24 @@ export const MasterControlDashboard: React.FC<MasterControlDashboardProps> = ({ 
                   System prompt templates with creativity tuning, model choice, and 1-click version history.
                 </p>
               </div>
-              <button
-                onClick={handleSavePrompt}
-                disabled={isSaving}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-interactive-primary text-interactive-primary-fg text-xs font-semibold hover:opacity-90 active:scale-98 transition-all shadow-md disabled:opacity-50"
-              >
-                <Save className="w-4 h-4" />
-                <span>{isSaving ? 'Deploying...' : `Deploy Version ${((activePromptGroup?.active_version?.version || 1) + 1)}`}</span>
-              </button>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsSandboxOpen(true)}
+                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-border bg-surface hover:bg-surface-raised text-xs font-semibold text-brand-accent transition-all shadow-xs"
+                >
+                  <SplitSquareVertical className="w-4 h-4" />
+                  <span>Prompt Sandbox Playground</span>
+                </button>
+                <button
+                  onClick={handleSavePrompt}
+                  disabled={isSaving}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-interactive-primary text-interactive-primary-fg text-xs font-semibold hover:opacity-90 active:scale-98 transition-all shadow-md disabled:opacity-50"
+                >
+                  <Save className="w-4 h-4" />
+                  <span>{isSaving ? 'Deploying...' : `Deploy Version ${((activePromptGroup?.active_version?.version || 1) + 1)}`}</span>
+                </button>
+              </div>
             </div>
 
             {/* Task Type Switcher */}
@@ -1494,6 +1507,14 @@ export const MasterControlDashboard: React.FC<MasterControlDashboardProps> = ({ 
           </div>
         )}
       </main>
+
+      {/* Prompt Sandbox & Side-by-Side Playground */}
+      <PromptSandboxModal
+        isOpen={isSandboxOpen}
+        onClose={() => setIsSandboxOpen(false)}
+        taskType={selectedTaskType}
+        initialPrompt={promptTemplateEdit}
+      />
     </div>
   )
 }

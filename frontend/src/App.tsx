@@ -6,6 +6,7 @@ import { LandingPage } from './modules/marketing/LandingPage'
 import { AuthModal } from './modules/auth/AuthModal'
 import { OnboardingWizard } from './modules/onboarding/OnboardingWizard'
 import { MasterControlDashboard } from './modules/master-control/MasterControlDashboard'
+import { ClientReviewView } from './modules/publishing/ClientReviewView'
 import { usePwaManifest } from './components/pwa/usePwaManifest'
 import { SmoothScrollProvider, useSmoothScroll } from './lib/scroll/SmoothScrollProvider'
 import { Toaster } from 'sonner'
@@ -13,7 +14,8 @@ import { Toaster } from 'sonner'
 const AppContent: React.FC = () => {
   const { isAuthenticated, isLoading } = useAuth()
   const { start, stop } = useSmoothScroll()
-  const [view, setView] = useState<'marketing' | 'app' | 'master-control'>('marketing')
+  const [view, setView] = useState<'marketing' | 'app' | 'master-control' | 'review'>('marketing')
+  const [reviewToken, setReviewToken] = useState<string | null>(null)
   const [authModalOpen, setAuthModalOpen] = useState(false)
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login')
   const [showOnboarding, setShowOnboarding] = useState(false)
@@ -23,30 +25,54 @@ const AppContent: React.FC = () => {
 
   // Control Lenis smooth scrolling lifecycle based on active view
   useEffect(() => {
-    if (view === 'marketing') {
+    if (view === 'marketing' || view === 'review') {
       start()
     } else {
       stop()
     }
   }, [view, start, stop])
 
-  // Check URL query parameters on load
+  // Check URL path and query parameters on load (W3C Scope Partitioning)
   useEffect(() => {
+    const path = window.location.pathname
     const params = new URLSearchParams(window.location.search)
     const urlView = params.get('view')
-    if (urlView === 'master-control') {
+
+    // 1. Magic Review Link Route (/review/:token)
+    if (path.startsWith('/review/')) {
+      const token = path.replace('/review/', '').split('/')[0]
+      if (token) {
+        setReviewToken(token)
+        setView('review')
+        return
+      }
+    }
+
+    // 2. Master Control Route (/master-control)
+    if (path.startsWith('/master-control') || urlView === 'master-control') {
       setView('master-control')
-    } else if (urlView === 'workspace' && isAuthenticated) {
+      return
+    }
+
+    // 3. Workspace Command App Route (/workspace)
+    if (path.startsWith('/workspace') || (urlView === 'workspace' && isAuthenticated)) {
       setView('app')
     }
   }, [isAuthenticated])
 
-  // Automatically transition authenticated users to the Command Center
+  // Automatically transition authenticated users to the Command Center if not on special views
   useEffect(() => {
     if (isAuthenticated && view === 'marketing') {
       setView('app')
     }
   }, [isAuthenticated, view])
+
+  // Purge service worker cache on logout
+  useEffect(() => {
+    if (!isAuthenticated && navigator.serviceWorker?.controller) {
+      navigator.serviceWorker.controller.postMessage({ type: 'PURGE_SESSION_CACHE' })
+    }
+  }, [isAuthenticated])
 
   if (isLoading) {
     return (
@@ -80,7 +106,9 @@ const AppContent: React.FC = () => {
         }}
       />
 
-      {view === 'master-control' ? (
+      {view === 'review' && reviewToken ? (
+        <ClientReviewView token={reviewToken} />
+      ) : view === 'master-control' ? (
         <MasterControlDashboard onExitToWorkspace={() => setView('app')} />
       ) : view === 'marketing' ? (
         <LandingPage

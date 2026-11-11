@@ -13,12 +13,13 @@
 #### *The Autonomous Social Media Intelligence, Studio Graphic Design & Publishing Operations Platform*
 
 [![PHP 8.3](https://img.shields.io/badge/PHP-8.3%2B-777BB4?style=for-the-badge&logo=php&logoColor=white)](https://php.net)
-[![Laravel 11](https://img.shields.io/badge/Laravel-11%2F12-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)](https://laravel.com)
-[![React 19](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
-[![Tailwind CSS v4](https://img.shields.io/badge/Tailwind_CSS-v4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
+[![Laravel 13](https://img.shields.io/badge/Laravel-13.x-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)](https://laravel.com)
+[![React 19](https://img.shields.io/badge/React-19.3-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev)
+[![TypeScript 7](https://img.shields.io/badge/TypeScript-7.x-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![Vite 8](https://img.shields.io/badge/Vite-8.3-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev)
+[![Tailwind CSS v4](https://img.shields.io/badge/Tailwind_CSS-v4.3-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
 [![WCAG 2.2 AA](https://img.shields.io/badge/WCAG_2.2-Level_AA-059669?style=for-the-badge&logo=w3c&logoColor=white)](https://www.w3.org/WAI/standards-guidelines/wcag/)
-[![Tests Passing](https://img.shields.io/badge/Tests-134%2F134_Passing-10B981?style=for-the-badge&logo=checkmarx&logoColor=white)](https://phpunit.de)
+[![Tests Passing](https://img.shields.io/badge/Tests-139%2F139_Passing-10B981?style=for-the-badge&logo=checkmarx&logoColor=white)](https://phpunit.de)
 [![Engineered By](https://img.shields.io/badge/Engineered_By-DevCenterPoint-D97706?style=for-the-badge&logo=googlecloud&logoColor=white)](https://devcenterpoint.com)
 
 ---
@@ -147,17 +148,17 @@ flowchart TD
 
 ---
 
-## 📱 Triple-PWA Architecture
+## 📱 Triple-PWA Architecture (W3C Scope Isolated)
 
-AutoCanvas delivers three isolated, purpose-built Progressive Web App (PWA) experiences:
+AutoCanvas delivers three isolated, purpose-built Progressive Web App (PWA) experiences partitioned by explicit W3C path scopes:
 
 | PWA Application | Manifest Config | Scope URL | Primary Focus | Capabilities |
 | :--- | :--- | :--- | :--- | :--- |
-| **Marketing Landing PWA** | [`manifest-landing.json`](frontend/public/manifest-landing.json) | `/?source=pwa` | Prospective Clients & Public | Instant offline support, live CMS content, DevCenterPoint showcase, transparent pricing. |
-| **Workspace Command PWA** | [`manifest-app.json`](frontend/public/manifest-app.json) | `/?view=workspace&source=pwa` | Brand Teams & Agencies | Trend Radar, Content Studio, Brand Graphic Editor, Bespoke Calendar, Social Inbox, Analytics. |
-| **Platform Admin PWA** | [`manifest-master.json`](frontend/public/manifest-master.json) | `/master-control?source=pwa` | Superadmin Platform Owner | Live CMS editor, AI prompt version control, duplicate threshold sliders, tenant workspace sign-in. |
+| **Marketing Landing PWA** | [`manifest-landing.json`](frontend/public/manifest-landing.json) | `/` | Prospective Clients & Public | Instant offline support, live CMS content, DevCenterPoint showcase, transparent pricing. |
+| **Workspace Command PWA** | [`manifest-workspace.json`](frontend/public/manifest-workspace.json) | `/workspace/` | Brand Teams & Agencies | Trend Radar, Content Studio, Brand Graphic Editor, Bespoke Calendar, Social Inbox, Analytics. |
+| **Platform Admin PWA** | [`manifest-master.json`](frontend/public/manifest-master.json) | `/master-control/` | Superadmin Platform Owner | Live CMS editor, AI prompt version control, duplicate threshold sliders, tenant workspace sign-in. |
 
-Supported by an offline service worker ([`sw.js`](frontend/public/sw.js)) and an obsidian-styled offline fallback page ([`offline.html`](frontend/public/offline.html)).
+Supported by a partitioned offline service worker ([`sw.js`](frontend/public/sw.js)) that implements `NetworkOnly` for authenticated `/api/v1/*` routes and evicts session caches on logout or 401 Unauthorized.
 
 ---
 
@@ -202,7 +203,7 @@ This script checks prerequisites, configures `.env` files, runs database migrati
 
 ### Manual Setup Step-by-Step
 
-#### 1. Backend Setup (Laravel 11)
+#### 1. Backend Setup (Laravel 13)
 ```bash
 cd backend
 composer install
@@ -212,7 +213,7 @@ php artisan migrate --seed
 php artisan serve --port=8000
 ```
 
-#### 2. Frontend Setup (React 19 + TypeScript)
+#### 2. Frontend Setup (React 19 + TypeScript 7)
 ```bash
 cd frontend
 npm install
@@ -226,15 +227,15 @@ Open **[http://localhost:5173](http://localhost:5173)** in your browser.
 
 AutoCanvas enforces a rigorous quality and security verification standard:
 
-### 1. Backend Test Suite (134 Tests / 901 Assertions — 100% Passing)
+### 1. Backend Test Suite (139 Tests / 930 Assertions — 100% Passing)
 ```bash
 cd backend
 php artisan test
 ```
 ```
-Tests:    134 passed (901 assertions)
-Duration: ~22s
-Coverage: Authentication, Multi-Tenancy Scopes, Publishing Queue, News Radar, Local Billing, Admin CMS
+Tests:    139 passed (930 assertions)
+Duration: ~16s
+Coverage: Authentication, Multi-Tenancy Scopes, Bounded Deduplication Loop, Atomic CAS Publishing, Local Billing, Admin CMS, Telemetry
 ```
 
 ### 2. Frontend Accessibility Audit (WCAG 2.2 Level AA)
@@ -301,12 +302,21 @@ Generates encrypted timestamped SQL dumps, rotates archives older than 30 days, 
 | `/api/v1/control-plane/cms/prompts/{task}/rollback` | `POST` | Platform Admin | Revert a template to a previous version. |
 | `/api/v1/control-plane/crawler-tuning` | `POST` | Platform Admin | Adjust duplicate filters, similarity limits, and scan intervals. |
 | `/api/v1/control-plane/circuit-breaker/toggle` | `POST` | Platform Admin | Platform-wide publishing pause toggle. |
+| `/api/v1/control-plane/prompt-sandbox/test` | `POST` | Platform Admin | Side-by-side prompt diffing against historical news. |
+| `/api/v1/control-plane/impersonate/{organization}` | `POST` | Platform Admin | Ephemeral 15-minute tenant impersonation with audit ledger. |
+| `/api/v1/review/{token}` | `GET` | Agency Client (Magic Link) | Zero-login post preview and multi-channel review. |
+| `/api/v1/review/{token}/approve` | `POST` | Agency Client (Magic Link) | One-click approval to schedule publishing. |
+| `/api/v1/review/{token}/changes` | `POST` | Agency Client (Magic Link) | Editorial feedback and change request submission. |
 | `/api/v1/autopilot/radar` | `GET` | Authenticated Tenant | Retrieve live news radar, trending topics, and post memory. |
-| `/api/v1/autopilot/trigger` | `POST` | Authenticated Tenant | Run an on-demand news scan and content draft cycle. |
+| `/api/v1/autopilot/trigger` | `POST` | Authenticated Tenant | Run bounded news scan and content draft cycle (max 3 reframes). |
 | `/api/v1/creative/documents` | `GET/POST`| Authenticated Tenant | Creative studio graphics, layouts, and SVG templates. |
 | `/api/v1/publishing/dispatches` | `GET` | Authenticated Tenant | Scheduled posts calendar and dispatch queue. |
-| `/api/v1/publishing/dispatches/{id}/now` | `POST` | Authenticated Tenant | Immediately publish a scheduled post. |
-| `/api/v1/billing/checkout/offline` | `POST` | Authenticated Tenant | Submit bKash, Nagad, or Bank Wire transaction details. |
+| `/api/v1/publishing/dispatches/{id}/now` | `POST` | Authenticated Tenant | Atomic CAS immediate publish with multi-channel fan-out. |
+| `/api/v1/publishing/dispatches/{id}/first-comment` | `POST` | Authenticated Tenant | Configure auto-first-comment (60s delay + UTM tracking). |
+| `/api/v1/publishing/telemetry/winning-patterns` | `GET` | Authenticated Tenant | Closed-loop top 15% high-engagement pattern analysis. |
+| `/api/v1/billing/checkout/offline` | `POST` | Authenticated Tenant | Submit bKash, Nagad, or Bank Wire transaction details with unique normalization. |
+| `/api/v1/webhooks/bkash` | `POST` | Gateway Webhook | Idempotent tokenized bKash transaction verification. |
+| `/api/v1/webhooks/sslcommerz` | `POST` | Gateway Webhook | Idempotent SSLCommerz payment callback verification. |
 
 ---
 

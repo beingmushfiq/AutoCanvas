@@ -1,6 +1,8 @@
-import React from 'react'
+import React, { useState } from 'react'
 import type { CalendarPostItem } from './CalendarMonthView'
 import { formatTime12h, parseYMD, formatYMD } from '../../../lib/date/calendarUtils'
+import { FirstCommentConfigModal } from './FirstCommentConfigModal'
+import { toast } from 'sonner'
 import {
   X,
   Send,
@@ -9,6 +11,8 @@ import {
   Trash2,
   CheckCircle2,
   ArrowRight,
+  MessageSquare,
+  Share2,
 } from 'lucide-react'
 
 interface PostDetailModalProps {
@@ -26,7 +30,38 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
   onReschedule,
   onDelete,
 }) => {
+  const [showFirstCommentModal, setShowFirstCommentModal] = useState(false)
+  const [isGeneratingMagicLink, setIsGeneratingMagicLink] = useState(false)
+
   if (!post) return null
+
+  const handleCopyMagicLink = async () => {
+    setIsGeneratingMagicLink(true)
+    try {
+      const res = await fetch('/api/v1/publishing/dispatches/magic-link', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('auth_token') || ''}`,
+        },
+        body: JSON.stringify({
+          dispatch_id: post.id,
+          client_name: post.brandName || 'Brand Client',
+        }),
+      })
+      const json = await res.json()
+      if (res.ok && json.success) {
+        await navigator.clipboard.writeText(json.data.review_url)
+        toast.success('Magic Review Link copied to clipboard!')
+      } else {
+        toast.error(json.error?.message || 'Failed to generate review link.')
+      }
+    } catch {
+      toast.error('Network error generating review link.')
+    } finally {
+      setIsGeneratingMagicLink(false)
+    }
+  }
 
   const handleMoveTomorrow = () => {
     const current = parseYMD(post.scheduledAt)
@@ -103,11 +138,32 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
           </div>
         </div>
 
-        {/* Quick Reschedule Pill Actions */}
+        {/* Quick Reschedule & Agency Actions */}
         {post.status !== 'published' && (
-          <div className="pt-2">
-            <div className="text-[11px] font-mono text-foreground-muted mb-2">
-              QUICK RESCHEDULE ACTIONS
+          <div className="pt-2 space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-mono text-foreground-muted">
+                QUICK RESCHEDULE ACTIONS
+              </span>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowFirstCommentModal(true)}
+                  className="px-2.5 py-1 rounded-lg border border-border bg-background hover:bg-surface-raised text-[11px] font-semibold text-brand-accent flex items-center gap-1 transition-all"
+                >
+                  <MessageSquare className="w-3 h-3" />
+                  <span>First Comment</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={handleCopyMagicLink}
+                  disabled={isGeneratingMagicLink}
+                  className="px-2.5 py-1 rounded-lg border border-border bg-background hover:bg-surface-raised text-[11px] font-semibold text-emerald-400 flex items-center gap-1 transition-all"
+                >
+                  <Share2 className="w-3 h-3" />
+                  <span>{isGeneratingMagicLink ? 'Generating...' : 'Magic Review Link'}</span>
+                </button>
+              </div>
             </div>
             <div className="flex items-center gap-2">
               <button
@@ -163,6 +219,16 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Auto-First-Comment Configuration Modal */}
+      <FirstCommentConfigModal
+        isOpen={showFirstCommentModal}
+        onClose={() => setShowFirstCommentModal(false)}
+        dispatchId={post.id}
+        onSaved={(_comment) => {
+          toast.success('Auto-first-comment saved.')
+        }}
+      />
     </div>
   )
 }

@@ -83,11 +83,43 @@ self.addEventListener('fetch', (event) => {
     return
   }
 
-  // API endpoints: Network-first
+  // API endpoints: Strict NetworkOnly — never cache tenant or authenticated data in CacheStorage
+  if (url.pathname.startsWith('/api/')) {
+    event.respondWith(
+      fetch(event.request).catch((err) => {
+        return new Response(JSON.stringify({
+          success: false,
+          error: {
+            code: 'NETWORK_OFFLINE',
+            message: 'You are currently offline. Live cloud requests cannot be processed.'
+          }
+        }), {
+          status: 503,
+          headers: { 'Content-Type': 'application/json' }
+        })
+      })
+    )
+    return
+  }
+
+  // Other dynamic GET requests
   event.respondWith(
-    fetch(event.request).catch(() => {
-      return caches.match(event.request)
-    })
+    fetch(event.request).catch(() => caches.match(event.request))
   )
+})
+
+// Listen for session logout/eviction messages to immediately clear cached data
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'PURGE_SESSION_CACHE') {
+    caches.keys().then((keys) => {
+      return Promise.all(
+        keys.map((key) => {
+          if (key.includes('session') || key === CACHE_NAME) {
+            return caches.delete(key)
+          }
+        })
+      )
+    })
+  }
 })
 
