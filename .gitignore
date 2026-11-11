@@ -16,8 +16,7 @@ backend/.env
 backend/.env.*
 !backend/.env.example
 
-# Build outputs
-frontend/dist/
+# Build outputs (frontend/dist is tracked for zero-node cPanel deployment)
 backend/public/build/
 backend/public/hot/
 backend/storage/*.key

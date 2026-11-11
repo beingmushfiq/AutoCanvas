@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <!-- Outer Frame -->
+  <rect x="4" y="4" width="19" height="19" rx="3" stroke="currentColor" stroke-width="1.75" />
+  <!-- Inner Frame -->
+  <rect x="9" y="9" width="19" height="19" rx="3" stroke="currentColor" stroke-width="1.5" />
+  <!-- Focal Anchor (Monochrome solid) -->
+  <circle cx="9" cy="9" r="2.5" fill="currentColor" />
+</svg>
+

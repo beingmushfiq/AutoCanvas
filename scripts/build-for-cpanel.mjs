@@ -21,6 +21,11 @@ if (!fs.existsSync(frontendDist)) {
 
 console.log('📦 Merging compiled frontend assets into backend/public/ for cPanel unified deployment...')
 
+const backendAssets = path.join(backendPublic, 'assets')
+if (fs.existsSync(backendAssets)) {
+  fs.rmSync(backendAssets, { recursive: true, force: true })
+}
+
 function copyDirRecursive(src, dest) {
   if (!fs.existsSync(dest)) {
     fs.mkdirSync(dest, { recursive: true })

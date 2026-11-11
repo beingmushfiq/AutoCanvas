@@ -1,0 +1,30 @@
+{
+  "name": "AutoCanvas — Brand Communication & Social Platform",
+  "short_name": "AutoCanvas",
+  "description": "Brand communication, news discovery, and social media publishing platform by DevCenterPoint.",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0b0d11",
+  "theme_color": "#0b0d11",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/brand/symbol-dark.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "32x32 48x48 64x64",
+      "type": "image/svg+xml"
+    }
+  ],
+  "categories": ["business", "productivity", "social"],
+  "developer": {
+    "name": "DevCenterPoint",
+    "url": "https://devcenterpoint.com"
+  }
+}
+

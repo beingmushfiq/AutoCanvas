@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 36" fill="none">
+  <!-- Symbol -->
+  <g transform="translate(2, 2)">
+    <rect x="2" y="2" width="19" height="19" rx="3" stroke="#0f172a" stroke-width="1.75" />
+    <rect x="7" y="7" width="19" height="19" rx="3" stroke="#0f172a" stroke-width="1.5" />
+    <circle cx="7" cy="7" r="2.5" fill="#d97706" />
+  </g>
+  <!-- Wordmark -->
+  <text x="38" y="23" font-family="'Geist', -apple-system, sans-serif" font-size="17" letter-spacing="-0.02em">
+    <tspan fill="#0f172a" font-weight="700">Auto</tspan>
+    <tspan fill="#475569" font-weight="400">Canvas</tspan>
+  </text>
+</svg>
+

@@ -143,9 +143,12 @@ if [ -d "${FRONTEND_DIR}" ] && command -v "${NPM_BIN}" >/dev/null 2>&1; then
         echo -e "${GREEN}✓ Frontend synced to ${BACKEND_DIR}/public${NC}"
     fi
 else
-    echo -e "${YELLOW}Notice: Node.js/NPM not active in shell. Using pre-built assets in backend/public.${NC}"
+    echo -e "${YELLOW}Notice: Node.js/NPM not active in shell. Using pre-built assets from frontend/dist.${NC}"
     if [ -d "${FRONTEND_DIR}/dist" ]; then
         cp -r "${FRONTEND_DIR}/dist/"* "${BACKEND_DIR}/public/" 2>/dev/null || true
+        echo -e "${GREEN}✓ Pre-built frontend/dist successfully synced to backend/public.${NC}"
+    elif [ -f "${BACKEND_DIR}/public/index.html" ]; then
+        echo -e "${GREEN}✓ Frontend assets already present in backend/public.${NC}"
     fi
 fi
 

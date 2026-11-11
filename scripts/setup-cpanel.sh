@@ -97,7 +97,7 @@ ${PHP_BIN} artisan db:seed --force
 ${PHP_BIN} artisan storage:link || true
 echo -e "${GREEN}✓ Database schema and seeds initialized.${NC}"
 
-echo -e "\n${BLUE}▶ [5/6] Provisioning Sovereign Platform Superadmin...${NC}"
+echo -e "\n${BLUE}▶ [5/7] Provisioning Sovereign Platform Superadmin...${NC}"
 ADMIN_EMAIL="${ADMIN_EMAIL:-admin@devcenterpoint.com}"
 ADMIN_NAME="${ADMIN_NAME:-Platform Superadmin}"
 ADMIN_PASS="${ADMIN_PASS:-SuperAdminPassword123!}"
@@ -109,7 +109,18 @@ ${PHP_BIN} artisan control-plane:create-admin \
     echo -e "${YELLOW}Notice: Superadmin provisioned or already exists.${NC}"
 }
 
-echo -e "\n${BLUE}▶ [6/6] Warming production caches...${NC}"
+echo -e "\n${BLUE}▶ [6/7] Synchronizing compiled frontend assets...${NC}"
+if [ -d "${PROJECT_ROOT}/frontend/dist" ]; then
+    echo -e "Deploying pre-built assets from frontend/dist to backend/public..."
+    cp -r "${PROJECT_ROOT}/frontend/dist/"* "${BACKEND_DIR}/public/" 2>/dev/null || true
+    echo -e "${GREEN}✓ Frontend assets synchronized to backend/public.${NC}"
+elif [ -f "${BACKEND_DIR}/public/index.html" ]; then
+    echo -e "${GREEN}✓ Frontend assets already active in backend/public.${NC}"
+else
+    echo -e "${YELLOW}Warning: Neither frontend/dist nor backend/public/index.html found.${NC}"
+fi
+
+echo -e "\n${BLUE}▶ [7/7] Warming production caches...${NC}"
 ${PHP_BIN} artisan config:clear
 ${PHP_BIN} artisan config:cache
 ${PHP_BIN} artisan route:cache
