@@ -21,6 +21,8 @@ import {
   Radio,
   SplitSquareVertical,
 } from 'lucide-react'
+import { useParams, useNavigate } from 'react-router-dom'
+import { BreadcrumbBar } from '../../components/navigation/BreadcrumbBar'
 import { PromptSandboxModal } from './PromptSandboxModal'
 import {
   apiClient,
@@ -33,6 +35,34 @@ import { usePwaManifest } from '../../components/pwa/usePwaManifest'
 
 type MasterTab = 'white_label' | 'landing_cms' | 'prompt_foundry' | 'crawler_tuning' | 'tenant_ledger' | 'audit_ledger'
 
+const MC_SLUG_TO_TAB: Record<string, MasterTab> = {
+  'white-label': 'white_label',
+  'white_label': 'white_label',
+  'cms': 'landing_cms',
+  'landing_cms': 'landing_cms',
+  'landing-cms': 'landing_cms',
+  'prompts': 'prompt_foundry',
+  'prompt_foundry': 'prompt_foundry',
+  'radar': 'crawler_tuning',
+  'crawler-tuning': 'crawler_tuning',
+  'crawler_tuning': 'crawler_tuning',
+  'organizations': 'tenant_ledger',
+  'tenants': 'tenant_ledger',
+  'tenant_ledger': 'tenant_ledger',
+  'security': 'audit_ledger',
+  'audit': 'audit_ledger',
+  'audit_ledger': 'audit_ledger',
+}
+
+const MC_TAB_TO_SLUG: Record<MasterTab, string> = {
+  white_label: 'white-label',
+  landing_cms: 'cms',
+  prompt_foundry: 'prompts',
+  crawler_tuning: 'radar',
+  tenant_ledger: 'organizations',
+  audit_ledger: 'security',
+}
+
 interface MasterControlDashboardProps {
   onExitToWorkspace: () => void
 }
@@ -41,7 +71,16 @@ export const MasterControlDashboard: React.FC<MasterControlDashboardProps> = ({ 
   // Activate Master PWA Manifest for the Sovereign Cockpit
   usePwaManifest('master')
 
-  const [activeTab, setActiveTab] = useState<MasterTab>('white_label')
+  const { tab: routeTab, subtab: routeSubtab } = useParams<{ tab?: string; subtab?: string }>()
+  const navigate = useNavigate()
+
+  const activeTab: MasterTab = (routeTab && MC_SLUG_TO_TAB[routeTab]) || 'white_label'
+
+  const handleSelectTab = (tab: MasterTab) => {
+    const slug = MC_TAB_TO_SLUG[tab] || tab
+    navigate(`/master-control/${slug}`)
+  }
+
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
   const [saveSuccessMsg, setSaveSuccessMsg] = useState<string | null>(null)
@@ -79,6 +118,17 @@ export const MasterControlDashboard: React.FC<MasterControlDashboardProps> = ({ 
   // 3. AI Prompt Foundry State
   const [promptGroups, setPromptGroups] = useState<AiPromptGroup[]>([])
   const [selectedTaskType, setSelectedTaskType] = useState<string>('headline_hook')
+
+  // Synchronize subtab slug with active CMS block or Prompt task type
+  useEffect(() => {
+    if (routeSubtab) {
+      if (activeTab === 'landing_cms' && cmsBlocks[routeSubtab]) {
+        setActiveCmsBlockKey(routeSubtab)
+      } else if (activeTab === 'prompt_foundry') {
+        setSelectedTaskType(routeSubtab)
+      }
+    }
+  }, [routeSubtab, activeTab, cmsBlocks])
   const [promptTemplateEdit, setPromptTemplateEdit] = useState<string>('')
   const [promptModelEdit, setPromptModelEdit] = useState<string>('gpt-4o')
   const [promptTempEdit, setPromptTempEdit] = useState<number>(0.7)
@@ -346,13 +396,13 @@ export const MasterControlDashboard: React.FC<MasterControlDashboardProps> = ({ 
     <div className="min-h-screen bg-background text-foreground flex flex-col font-sans antialiased selection:bg-brand-accent selection:text-black" data-lenis-prevent>
       {/* Sovereign Cockpit Header */}
       <header className="border-b border-border bg-surface/90 backdrop-blur-md sticky top-0 z-50 transition-colors">
-        <div className="max-w-7xl mx-auto px-6 h-18 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-brand-accent/10 border border-brand-accent/30 text-brand-accent">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-center gap-3 sm:gap-4">
+            <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-brand-accent/10 border border-brand-accent/30 text-brand-accent shrink-0">
               <Crown className="w-5 h-5" aria-hidden="true" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <span className="text-sm font-bold tracking-tight text-foreground">
                   PLATFORM ADMIN CENTER
                 </span>
@@ -360,17 +410,35 @@ export const MasterControlDashboard: React.FC<MasterControlDashboardProps> = ({ 
                   DEV-CENTER-POINT
                 </span>
               </div>
-              <p className="text-xs text-foreground-secondary">
-                Complete platform oversight, CMS, AI templates, and news radar settings.
-              </p>
+              <BreadcrumbBar
+                items={[
+                  { label: 'Admin Center', onClick: () => handleSelectTab('white_label') },
+                  {
+                    label:
+                      activeTab === 'white_label'
+                        ? 'White-Label & Theme'
+                        : activeTab === 'landing_cms'
+                        ? 'Landing CMS'
+                        : activeTab === 'prompt_foundry'
+                        ? 'AI Writing Templates'
+                        : activeTab === 'crawler_tuning'
+                        ? 'News Radar Settings'
+                        : activeTab === 'tenant_ledger'
+                        ? 'Organizations & Workspaces'
+                        : 'Publishing & Security',
+                    current: true,
+                  },
+                ]}
+                className="mt-1"
+              />
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5 sm:gap-3 flex-wrap">
             {/* Global Emergency Circuit Breaker */}
             <button
               onClick={handleToggleCircuitBreaker}
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold shadow-2xs transition-all border ${
+              className={`flex items-center gap-2 px-3 sm:px-3.5 py-2 rounded-xl text-xs font-semibold shadow-2xs transition-all border ${
                 isCircuitPaused
                   ? 'bg-status-danger text-white border-status-danger animate-pulse'
                   : 'bg-surface border-border hover:border-status-danger/60 text-foreground-secondary hover:text-status-danger'
@@ -383,9 +451,9 @@ export const MasterControlDashboard: React.FC<MasterControlDashboardProps> = ({ 
             {/* Exit to User Workspace */}
             <button
               onClick={onExitToWorkspace}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-surface border border-border text-foreground hover:bg-surface-raised text-xs font-semibold transition-all shadow-2xs"
+              className="inline-flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl bg-surface border border-border text-foreground hover:bg-surface-raised text-xs font-semibold transition-all shadow-2xs"
             >
-              <span>Return to Workspace</span>
+              <span>Workspace</span>
               <LogOut className="w-3.5 h-3.5" aria-hidden="true" />
             </button>
           </div>
@@ -393,7 +461,7 @@ export const MasterControlDashboard: React.FC<MasterControlDashboardProps> = ({ 
 
         {/* Global Feedback Banners */}
         {saveSuccessMsg && (
-          <div className="bg-brand-accent/10 border-t border-b border-brand-accent/30 px-6 py-2.5 flex items-center justify-between">
+          <div className="bg-brand-accent/10 border-t border-b border-brand-accent/30 px-4 sm:px-6 py-2.5 flex items-center justify-between">
             <div className="max-w-7xl mx-auto flex items-center gap-2 text-xs font-medium text-brand-accent">
               <CheckCircle2 className="w-4 h-4 shrink-0" />
               <span>{saveSuccessMsg}</span>
@@ -401,7 +469,7 @@ export const MasterControlDashboard: React.FC<MasterControlDashboardProps> = ({ 
           </div>
         )}
         {errorMsg && (
-          <div className="bg-status-danger/10 border-t border-b border-status-danger/30 px-6 py-2.5 flex items-center justify-between">
+          <div className="bg-status-danger/10 border-t border-b border-status-danger/30 px-4 sm:px-6 py-2.5 flex items-center justify-between">
             <div className="max-w-7xl mx-auto flex items-center gap-2 text-xs font-medium text-status-danger">
               <AlertTriangle className="w-4 h-4 shrink-0" />
               <span>{errorMsg}</span>
@@ -409,8 +477,8 @@ export const MasterControlDashboard: React.FC<MasterControlDashboardProps> = ({ 
           </div>
         )}
 
-        {/* Navigation Tabs Bar */}
-        <div className="max-w-7xl mx-auto px-6 flex items-center gap-2 overflow-x-auto scrollbar-none pt-2">
+        {/* Navigation Tabs Bar with Touch-Momentum Horizontal Scroll */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center gap-2 overflow-x-auto scrollbar-none pt-1">
           {[
             { id: 'white_label', label: 'Platform White-Label', icon: Palette },
             { id: 'landing_cms', label: 'Landing Page CMS', icon: Globe },
@@ -424,10 +492,10 @@ export const MasterControlDashboard: React.FC<MasterControlDashboardProps> = ({ 
             return (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id as MasterTab)}
-                className={`flex items-center gap-2 px-4 py-2.5 text-xs font-semibold border-b-2 whitespace-nowrap transition-all ${
+                onClick={() => handleSelectTab(tab.id as MasterTab)}
+                className={`flex items-center gap-2 px-3.5 sm:px-4 py-2.5 text-xs font-semibold border-b-2 whitespace-nowrap transition-all ${
                   isActive
-                    ? 'border-brand-accent text-brand-accent'
+                    ? 'border-brand-accent text-brand-accent font-bold'
                     : 'border-transparent text-foreground-secondary hover:text-foreground hover:border-border'
                 }`}
               >
@@ -440,7 +508,7 @@ export const MasterControlDashboard: React.FC<MasterControlDashboardProps> = ({ 
       </header>
 
       {/* Main Control Surface */}
-      <main className="flex-1 max-w-7xl mx-auto w-full px-6 py-8">
+      <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 py-6 sm:py-8">
         {/* ========================================================================= */}
         {/* TAB 1: WHITE-LABEL & THEME OVERRIDES                                      */}
         {/* ========================================================================= */}

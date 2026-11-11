@@ -1,4 +1,13 @@
 import React, { useState, useEffect } from 'react'
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+  useNavigate,
+  useParams,
+} from 'react-router-dom'
 import { AuthProvider, useAuth } from './modules/auth/AuthContext'
 import { PreferencesProvider } from './lib/theme/PreferencesContext'
 import { AppShell } from './app/AppShell'
@@ -11,61 +20,39 @@ import { usePwaManifest } from './components/pwa/usePwaManifest'
 import { SmoothScrollProvider, useSmoothScroll } from './lib/scroll/SmoothScrollProvider'
 import { Toaster } from 'sonner'
 
+// Review route wrapper to extract token from params
+const ReviewRoute: React.FC = () => {
+  const { token } = useParams<{ token: string }>()
+  if (!token) return <Navigate to="/" replace />
+  return <ClientReviewView token={token} />
+}
+
 const AppContent: React.FC = () => {
   const { isAuthenticated, isLoading } = useAuth()
   const { start, stop } = useSmoothScroll()
-  const [view, setView] = useState<'marketing' | 'app' | 'master-control' | 'review'>('marketing')
-  const [reviewToken, setReviewToken] = useState<string | null>(null)
+  const location = useLocation()
+  const navigate = useNavigate()
+
   const [authModalOpen, setAuthModalOpen] = useState(false)
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login')
   const [showOnboarding, setShowOnboarding] = useState(false)
 
   // Dynamic PWA Triple-Manifest Switcher (Landing, App Workspace, Sovereign Master Control)
-  usePwaManifest(view === 'master-control' ? 'master' : view === 'app' ? 'app' : 'landing')
+  const pwaType = location.pathname.startsWith('/master-control')
+    ? 'master'
+    : location.pathname.startsWith('/workspace')
+    ? 'app'
+    : 'landing'
+  usePwaManifest(pwaType)
 
-  // Control Lenis smooth scrolling lifecycle based on active view
+  // Control Lenis smooth scrolling lifecycle based on active route
   useEffect(() => {
-    if (view === 'marketing' || view === 'review') {
+    if (location.pathname === '/' || location.pathname.startsWith('/review')) {
       start()
     } else {
       stop()
     }
-  }, [view, start, stop])
-
-  // Check URL path and query parameters on load (W3C Scope Partitioning)
-  useEffect(() => {
-    const path = window.location.pathname
-    const params = new URLSearchParams(window.location.search)
-    const urlView = params.get('view')
-
-    // 1. Magic Review Link Route (/review/:token)
-    if (path.startsWith('/review/')) {
-      const token = path.replace('/review/', '').split('/')[0]
-      if (token) {
-        setReviewToken(token)
-        setView('review')
-        return
-      }
-    }
-
-    // 2. Master Control Route (/master-control)
-    if (path.startsWith('/master-control') || urlView === 'master-control') {
-      setView('master-control')
-      return
-    }
-
-    // 3. Workspace Command App Route (/workspace)
-    if (path.startsWith('/workspace') || (urlView === 'workspace' && isAuthenticated)) {
-      setView('app')
-    }
-  }, [isAuthenticated])
-
-  // Automatically transition authenticated users to the Command Center if not on special views
-  useEffect(() => {
-    if (isAuthenticated && view === 'marketing') {
-      setView('app')
-    }
-  }, [isAuthenticated, view])
+  }, [location.pathname, start, stop])
 
   // Purge service worker cache on logout
   useEffect(() => {
@@ -102,44 +89,82 @@ const AppContent: React.FC = () => {
         isOpen={showOnboarding}
         onComplete={() => {
           setShowOnboarding(false)
-          setView('app')
+          navigate('/workspace/overview')
         }}
       />
 
-      {view === 'review' && reviewToken ? (
-        <ClientReviewView token={reviewToken} />
-      ) : view === 'master-control' ? (
-        <MasterControlDashboard onExitToWorkspace={() => setView('app')} />
-      ) : view === 'marketing' ? (
-        <LandingPage
-          isAuthenticated={isAuthenticated}
-          onOpenAuth={(mode) => {
-            setAuthMode(mode)
-            setAuthModalOpen(true)
-          }}
-          onEnterApp={() => setView('app')}
+      <Routes>
+        {/* 1. Public Marketing Website */}
+        <Route
+          path="/"
+          element={
+            <LandingPage
+              isAuthenticated={isAuthenticated}
+              onOpenAuth={(mode) => {
+                setAuthMode(mode)
+                setAuthModalOpen(true)
+              }}
+              onEnterApp={() => navigate('/workspace/overview')}
+            />
+          }
         />
-      ) : (
-        <AppShell
-          onNavigateToMarketing={() => setView('marketing')}
-          onLaunchOnboarding={() => setShowOnboarding(true)}
-          onOpenMasterControl={() => setView('master-control')}
+
+        {/* 2. Client Magic Review (No workspace auth required) */}
+        <Route path="/review/:token" element={<ReviewRoute />} />
+
+        {/* 3. Workspace Operations Platform */}
+        <Route path="/workspace" element={<Navigate to="/workspace/overview" replace />} />
+        <Route
+          path="/workspace/:tab"
+          element={
+            <AppShell
+              onNavigateToMarketing={() => navigate('/')}
+              onLaunchOnboarding={() => setShowOnboarding(true)}
+              onOpenMasterControl={() => navigate('/master-control/white-label')}
+            />
+          }
         />
-      )}
+        <Route
+          path="/workspace/:tab/:subtab"
+          element={
+            <AppShell
+              onNavigateToMarketing={() => navigate('/')}
+              onLaunchOnboarding={() => setShowOnboarding(true)}
+              onOpenMasterControl={() => navigate('/master-control/white-label')}
+            />
+          }
+        />
+
+        {/* 4. Sovereign Platform Admin (Master Control Center) */}
+        <Route path="/master-control" element={<Navigate to="/master-control/white-label" replace />} />
+        <Route
+          path="/master-control/:tab"
+          element={<MasterControlDashboard onExitToWorkspace={() => navigate('/workspace/overview')} />}
+        />
+        <Route
+          path="/master-control/:tab/:subtab"
+          element={<MasterControlDashboard onExitToWorkspace={() => navigate('/workspace/overview')} />}
+        />
+
+        {/* Catch-all fallback */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
     </>
   )
 }
 
 export const App: React.FC = () => {
   return (
-    <PreferencesProvider>
-      <SmoothScrollProvider>
-        <AuthProvider>
-          <AppContent />
-          <Toaster position="bottom-right" richColors />
-        </AuthProvider>
-      </SmoothScrollProvider>
-    </PreferencesProvider>
+    <BrowserRouter>
+      <PreferencesProvider>
+        <SmoothScrollProvider>
+          <AuthProvider>
+            <AppContent />
+            <Toaster position="bottom-right" richColors />
+          </AuthProvider>
+        </SmoothScrollProvider>
+      </PreferencesProvider>
+    </BrowserRouter>
   )
 }
 

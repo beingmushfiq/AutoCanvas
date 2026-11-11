@@ -615,7 +615,7 @@ export const InteractiveCanvasStudio: React.FC = () => {
         </div>
 
         {/* Center Column: Live Interactive Konva Stage Canvas (6 Cols) */}
-        <div className="xl:col-span-6 flex flex-col items-center">
+        <div className="xl:col-span-6 flex flex-col items-center w-full min-w-0">
           <div className="w-full flex items-center justify-between text-xs text-foreground-secondary mb-2 px-1">
             <span className="flex items-center gap-1">
               <Move className="w-3.5 h-3.5 text-brand-accent" />
@@ -626,14 +626,15 @@ export const InteractiveCanvasStudio: React.FC = () => {
             </span>
           </div>
 
-          {/* Konva Stage Container with tactical border & drop-shadow */}
-          <div
-            tabIndex={0}
-            role="application"
-            aria-label="Interactive Graphic Canvas. Use Arrow keys to nudge the active layer."
-            className="rounded-2xl overflow-hidden shadow-2xl border border-border bg-black flex items-center justify-center outline-hidden focus-visible:ring-2 focus-visible:ring-focus-ring"
-            style={{ width: canvasWidth, height: canvasHeight }}
-          >
+          {/* Konva Stage Container with responsive horizontal scroll wrapper & drop-shadow */}
+          <div className="w-full max-w-full overflow-x-auto flex justify-center py-2 scrollbar-none">
+            <div
+              tabIndex={0}
+              role="application"
+              aria-label="Interactive Graphic Canvas. Use Arrow keys to nudge the active layer."
+              className="rounded-2xl overflow-hidden shadow-2xl border border-border bg-black flex items-center justify-center outline-hidden focus-visible:ring-2 focus-visible:ring-focus-ring shrink-0"
+              style={{ width: canvasWidth, height: canvasHeight }}
+            >
             <Stage ref={stageRef} width={canvasWidth} height={canvasHeight}>
               <Layer>
                 {/* Canvas Background Fill & Gradient */}
@@ -802,6 +803,7 @@ export const InteractiveCanvasStudio: React.FC = () => {
                 />
               </Layer>
             </Stage>
+          </div>
           </div>
 
           <div className="mt-4 flex items-center justify-between w-full max-w-[480px] text-[11px] text-foreground-muted">

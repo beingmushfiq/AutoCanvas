@@ -27,6 +27,7 @@ import {
   Play,
   AlertOctagon,
   Sparkles,
+  ArrowRight,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { apiClient } from '../../lib/api/client'
@@ -90,13 +91,34 @@ const INITIAL_POSTS: CalendarPostItem[] = [
   },
 ]
 
-export const PublishingCalendar: React.FC<{ onNavigateToContent?: () => void }> = () => {
+interface PublishingCalendarProps {
+  initialView?: 'month' | 'week' | 'agenda'
+  onViewChange?: (view: 'month' | 'week' | 'agenda') => void
+  onNavigateToContent?: () => void
+}
+
+export const PublishingCalendar: React.FC<PublishingCalendarProps> = ({
+  initialView = 'month',
+  onViewChange,
+  onNavigateToContent,
+}) => {
   const [currentDate, setCurrentDate] = useState<Date>(new Date())
-  const [viewMode, setViewMode] = useState<'month' | 'week' | 'agenda'>('month')
+  const [viewMode, setViewMode] = useState<'month' | 'week' | 'agenda'>(initialView)
   const [platformFilter, setPlatformFilter] = useState<string>('all')
   const [showPeakTimes, setShowPeakTimes] = useState<boolean>(true)
   const [timezone, setTimezone] = useState<string>('UTC')
   const [posts, setPosts] = useState<CalendarPostItem[]>(INITIAL_POSTS)
+
+  useEffect(() => {
+    if (initialView && ['month', 'week', 'agenda'].includes(initialView) && initialView !== viewMode) {
+      setViewMode(initialView)
+    }
+  }, [initialView])
+
+  const handleViewChange = (mode: 'month' | 'week' | 'agenda') => {
+    setViewMode(mode)
+    onViewChange?.(mode)
+  }
 
   // Drawer & Modal States
   const [selectedPost, setSelectedPost] = useState<CalendarPostItem | null>(null)
@@ -438,6 +460,18 @@ export const PublishingCalendar: React.FC<{ onNavigateToContent?: () => void }> 
             )}
           </button>
 
+          {/* Create in Content Studio */}
+          {onNavigateToContent && (
+            <button
+              onClick={onNavigateToContent}
+              className="hidden sm:flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-border bg-background hover:bg-surface-raised text-foreground-secondary hover:text-foreground text-xs font-semibold transition-all shadow-2xs"
+              title="Open Content Studio to draft and repurpose posts"
+            >
+              <span>Content Studio</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          )}
+
           {/* New Post Button */}
           <button
             onClick={() => handleOpenScheduleForDate(formatYMD(new Date()))}
@@ -503,7 +537,7 @@ export const PublishingCalendar: React.FC<{ onNavigateToContent?: () => void }> 
           {/* View Mode Switcher: Month / Week / Agenda */}
           <div className="flex items-center p-1 rounded-xl border border-border bg-surface">
             <button
-              onClick={() => setViewMode('month')}
+              onClick={() => handleViewChange('month')}
               className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
                 viewMode === 'month'
                   ? 'bg-background text-foreground shadow-2xs'
@@ -514,7 +548,7 @@ export const PublishingCalendar: React.FC<{ onNavigateToContent?: () => void }> 
               <span>Month</span>
             </button>
             <button
-              onClick={() => setViewMode('week')}
+              onClick={() => handleViewChange('week')}
               className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
                 viewMode === 'week'
                   ? 'bg-background text-foreground shadow-2xs'
@@ -525,7 +559,7 @@ export const PublishingCalendar: React.FC<{ onNavigateToContent?: () => void }> 
               <span>Week</span>
             </button>
             <button
-              onClick={() => setViewMode('agenda')}
+              onClick={() => handleViewChange('agenda')}
               className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
                 viewMode === 'agenda'
                   ? 'bg-background text-foreground shadow-2xs'

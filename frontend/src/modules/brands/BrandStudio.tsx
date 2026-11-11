@@ -26,15 +26,27 @@ import { Badge } from '../../components/ui/badge'
 
 interface BrandStudioProps {
   initialTab?: 'profile' | 'visual' | 'voice' | 'knowledge' | 'memory'
+  onTabChange?: (tab: 'profile' | 'visual' | 'voice' | 'knowledge' | 'memory') => void
 }
 
-export const BrandStudio: React.FC<BrandStudioProps> = ({ initialTab = 'profile' }) => {
+export const BrandStudio: React.FC<BrandStudioProps> = ({ initialTab = 'profile', onTabChange }) => {
   const [brands, setBrands] = useState<BrandSummary[]>([])
   const [activeBrandId, setActiveBrandId] = useState<string | null>(null)
   const [activeBrand, setActiveBrand] = useState<BrandDetail | null>(null)
   const [selectedTab, setSelectedTab] = useState(initialTab)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (initialTab && ['profile', 'visual', 'voice', 'knowledge', 'memory'].includes(initialTab)) {
+      setSelectedTab(initialTab)
+    }
+  }, [initialTab])
+
+  const handleTabSelect = (tab: 'profile' | 'visual' | 'voice' | 'knowledge' | 'memory') => {
+    setSelectedTab(tab)
+    onTabChange?.(tab)
+  }
 
   // Modals
   const [showWizard, setShowWizard] = useState(false)
@@ -271,11 +283,11 @@ export const BrandStudio: React.FC<BrandStudioProps> = ({ initialTab = 'profile'
       </div>
 
       {/* Tabs Navigation */}
-      <div className="flex border-b border-border gap-6 text-xs font-semibold">
+      <div className="flex border-b border-border gap-6 text-xs font-semibold overflow-x-auto scrollbar-none">
         <button
           type="button"
-          onClick={() => setSelectedTab('profile')}
-          className={`flex items-center gap-2 py-3 border-b-2 transition-all outline-hidden focus-visible:ring-2 focus-visible:ring-focus-ring ${
+          onClick={() => handleTabSelect('profile')}
+          className={`flex items-center gap-2 py-3 border-b-2 whitespace-nowrap transition-all outline-hidden focus-visible:ring-2 focus-visible:ring-focus-ring ${
             selectedTab === 'profile'
               ? 'border-brand-accent text-foreground'
               : 'border-transparent text-foreground-secondary hover:text-foreground'
@@ -287,8 +299,8 @@ export const BrandStudio: React.FC<BrandStudioProps> = ({ initialTab = 'profile'
 
         <button
           type="button"
-          onClick={() => setSelectedTab('visual')}
-          className={`flex items-center gap-2 py-3 border-b-2 transition-all outline-hidden focus-visible:ring-2 focus-visible:ring-focus-ring ${
+          onClick={() => handleTabSelect('visual')}
+          className={`flex items-center gap-2 py-3 border-b-2 whitespace-nowrap transition-all outline-hidden focus-visible:ring-2 focus-visible:ring-focus-ring ${
             selectedTab === 'visual'
               ? 'border-brand-accent text-foreground'
               : 'border-transparent text-foreground-secondary hover:text-foreground'
@@ -300,8 +312,8 @@ export const BrandStudio: React.FC<BrandStudioProps> = ({ initialTab = 'profile'
 
         <button
           type="button"
-          onClick={() => setSelectedTab('voice')}
-          className={`flex items-center gap-2 py-3 border-b-2 transition-all outline-hidden focus-visible:ring-2 focus-visible:ring-focus-ring ${
+          onClick={() => handleTabSelect('voice')}
+          className={`flex items-center gap-2 py-3 border-b-2 whitespace-nowrap transition-all outline-hidden focus-visible:ring-2 focus-visible:ring-focus-ring ${
             selectedTab === 'voice'
               ? 'border-brand-accent text-foreground'
               : 'border-transparent text-foreground-secondary hover:text-foreground'
@@ -313,8 +325,8 @@ export const BrandStudio: React.FC<BrandStudioProps> = ({ initialTab = 'profile'
 
         <button
           type="button"
-          onClick={() => setSelectedTab('knowledge')}
-          className={`flex items-center gap-2 py-3 border-b-2 transition-all outline-hidden focus-visible:ring-2 focus-visible:ring-focus-ring ${
+          onClick={() => handleTabSelect('knowledge')}
+          className={`flex items-center gap-2 py-3 border-b-2 whitespace-nowrap transition-all outline-hidden focus-visible:ring-2 focus-visible:ring-focus-ring ${
             selectedTab === 'knowledge'
               ? 'border-brand-accent text-foreground'
               : 'border-transparent text-foreground-secondary hover:text-foreground'
@@ -331,8 +343,8 @@ export const BrandStudio: React.FC<BrandStudioProps> = ({ initialTab = 'profile'
 
         <button
           type="button"
-          onClick={() => setSelectedTab('memory')}
-          className={`flex items-center gap-2 py-3 border-b-2 transition-all outline-hidden focus-visible:ring-2 focus-visible:ring-focus-ring ${
+          onClick={() => handleTabSelect('memory')}
+          className={`flex items-center gap-2 py-3 border-b-2 whitespace-nowrap transition-all outline-hidden focus-visible:ring-2 focus-visible:ring-focus-ring ${
             selectedTab === 'memory'
               ? 'border-brand-accent text-foreground'
               : 'border-transparent text-foreground-secondary hover:text-foreground'
