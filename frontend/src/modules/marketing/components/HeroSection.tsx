@@ -29,7 +29,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
     cmsHero?.subtitle ||
     'The complete brand publishing and social media operations platform. Discovers fresh industry news every hour, ensures your content is always original, and keeps every channel active.'
   const primaryCta = cmsHero?.primary_cta_text || 'Start Free 14-Day Trial'
-  const secondaryCta = cmsHero?.secondary_cta_text || 'Explore Interactive Demo'
+  const secondaryCta = cmsHero?.secondary_cta_text || 'Try Live Demo'
   return (
     <section id="hero" className="relative pt-20 pb-28 overflow-hidden">
       {/* Subtle Background Structural Grid Pattern */}

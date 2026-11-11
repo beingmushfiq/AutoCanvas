@@ -948,7 +948,7 @@ export const MasterControlDashboard: React.FC<MasterControlDashboardProps> = ({ 
                           {cmsBlockForm.primary_cta_text || 'Start Free Trial'}
                         </span>
                         <span className="px-4 py-2 rounded-xl border border-border bg-surface text-foreground text-xs font-semibold">
-                          {cmsBlockForm.secondary_cta_text || 'Explore DevCenterPoint'}
+                          {cmsBlockForm.secondary_cta_text || 'Try Live Demo'}
                         </span>
                       </div>
                     </div>

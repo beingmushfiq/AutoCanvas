@@ -398,8 +398,8 @@ class MasterCmsService
             'subtitle' => 'The all-in-one social media and brand publishing engine. Discovers breaking news, detects trending topics, guarantees original content, and schedules posts automatically.',
             'primary_cta_text' => 'Launch AutoCanvas Workspace',
             'primary_cta_link' => '#auth',
-            'secondary_cta_text' => 'Explore DevCenterPoint',
-            'secondary_cta_link' => 'https://devcenterpoint.com',
+            'secondary_cta_text' => 'Try Live Demo',
+            'secondary_cta_link' => '/workspace/overview',
             'metrics_banner' => [
                 ['label' => 'Real-Time News Monitoring', 'value' => '24/7/365'],
                 ['label' => 'Guaranteed Duplicate Prevention', 'value' => '100%'],

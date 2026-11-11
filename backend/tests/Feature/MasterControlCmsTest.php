@@ -99,8 +99,8 @@ class MasterControlCmsTest extends TestCase
             'subtitle' => 'Customized live via Master Control CMS',
             'primary_cta_text' => 'Get Started Now',
             'primary_cta_link' => '#auth',
-            'secondary_cta_text' => 'Explore DevCenterPoint',
-            'secondary_cta_link' => 'https://devcenterpoint.com',
+            'secondary_cta_text' => 'Try Live Demo',
+            'secondary_cta_link' => '/workspace/overview',
             'metrics_banner' => [
                 ['label' => 'Continuous Scouring', 'value' => 'Every 60m'],
             ],
