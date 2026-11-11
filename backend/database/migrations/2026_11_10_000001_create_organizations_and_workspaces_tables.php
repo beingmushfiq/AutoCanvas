@@ -52,6 +52,7 @@ return new class extends Migration
                 'analyst',
                 'community_manager',
                 'viewer',
+                'member',
             ])->default('member');
             $table->timestamps();
 
@@ -73,6 +74,7 @@ return new class extends Migration
                 'analyst',
                 'community_manager',
                 'viewer',
+                'member',
             ])->default('member');
             $table->timestamps();
 
@@ -95,6 +97,7 @@ return new class extends Migration
                 'analyst',
                 'community_manager',
                 'viewer',
+                'member',
             ])->default('member');
             $table->string('token', 64)->unique();
             $table->timestamp('expires_at');
