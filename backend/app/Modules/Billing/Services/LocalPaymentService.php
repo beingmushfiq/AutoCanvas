@@ -90,20 +90,35 @@ class LocalPaymentService
         $trxRef = strtoupper(trim($data['transaction_reference']));
         $idempotencyKey = hash('sha256', "{$organization->id}:{$invoice->id}:{$trxRef}");
 
-        // Assert idempotency
-        if (PaymentTransaction::withoutGlobalScopes()->where('idempotency_key', $idempotencyKey)->exists()) {
-            abort(409, 'A payment with this Transaction ID has already been submitted for this invoice.');
+        // Check global gateway deduplication across all organizations
+        $duplicateTrx = PaymentTransaction::withoutGlobalScopes()
+            ->where('gateway', $data['gateway'])
+            ->where('normalized_trx_id', $trxRef)
+            ->first();
+
+        if ($duplicateTrx) {
+            abort(409, "Transaction ID '{$trxRef}' has already been registered on gateway '{$data['gateway']}'.");
         }
 
-        return DB::transaction(function () use ($invoice, $organization, $data, $trxRef, $idempotencyKey) {
+        $exchangeRate = (float) $this->settingsService->get('usd_to_bdt_rate', 120.00);
+        $amount = (float) ($data['amount'] ?? $invoice->amount);
+        $currency = $data['currency'] ?? $invoice->currency;
+        $amountBdt = $currency === 'BDT' ? $amount : round($amount * $exchangeRate, 2);
+        $amountUsd = $currency === 'USD' ? $amount : round($amount / $exchangeRate, 2);
+
+        return DB::transaction(function () use ($invoice, $organization, $data, $trxRef, $idempotencyKey, $exchangeRate, $amount, $amountBdt, $amountUsd, $currency) {
             $transaction = PaymentTransaction::create([
                 'invoice_id' => $invoice->id,
                 'organization_id' => $organization->id,
                 'gateway' => $data['gateway'],
                 'transaction_reference' => $trxRef,
+                'normalized_trx_id' => $trxRef,
                 'sender_number' => $data['sender_number'] ?? null,
-                'amount' => $data['amount'] ?? $invoice->amount,
-                'currency' => $data['currency'] ?? $invoice->currency,
+                'amount' => $amount,
+                'exchange_rate_snapshot' => $exchangeRate,
+                'amount_bdt' => $amountBdt,
+                'amount_usd' => $amountUsd,
+                'currency' => $currency,
                 'idempotency_key' => $idempotencyKey,
                 'status' => 'pending',
                 'notes' => $data['notes'] ?? null,

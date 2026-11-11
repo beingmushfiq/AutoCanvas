@@ -91,7 +91,30 @@ class MasterCmsController extends Controller
             'favicon_url' => 'nullable|string|max:500',
             'primary_color_hex' => ['nullable', 'regex:/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/'],
             'accent_color_hex' => ['nullable', 'regex:/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/'],
-            'custom_css' => 'nullable|string|max:50000',
+            'custom_css' => [
+                'nullable',
+                'string',
+                'max:50000',
+                function ($attribute, $value, $fail) {
+                    // Disallow hazardous CSS constructs that could enable exfiltration or XSS
+                    $dangerousPatterns = [
+                        '/url\s*\(/i',
+                        '/@import/i',
+                        '/javascript\s*:/i',
+                        '/expression\s*\(/i',
+                        '/behavior\s*:/i',
+                        '/<\/style/i',
+                        '/<script/i',
+                        '/document\./i',
+                    ];
+                    foreach ($dangerousPatterns as $pattern) {
+                        if (preg_match($pattern, $value)) {
+                            $fail("The {$attribute} contains unauthorized directives (e.g. url(), @import, or script expressions).");
+                            return;
+                        }
+                    }
+                },
+            ],
             'custom_head_scripts' => 'nullable|string|max:50000',
             'announcement_banner' => 'nullable|array',
             'announcement_banner.enabled' => 'nullable|boolean',

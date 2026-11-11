@@ -19,9 +19,13 @@ class PaymentTransaction extends Model
         'organization_id',
         'gateway',
         'transaction_reference',
+        'normalized_trx_id',
         'sender_number',
         'gateway_payment_id',
         'amount',
+        'exchange_rate_snapshot',
+        'amount_bdt',
+        'amount_usd',
         'currency',
         'idempotency_key',
         'status',
@@ -35,6 +39,9 @@ class PaymentTransaction extends Model
     {
         return [
             'amount' => 'decimal:2',
+            'exchange_rate_snapshot' => 'decimal:4',
+            'amount_bdt' => 'decimal:2',
+            'amount_usd' => 'decimal:2',
             'verified_at' => 'datetime',
             'gateway_response' => 'json',
         ];
