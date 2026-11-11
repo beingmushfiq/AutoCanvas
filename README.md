@@ -31,6 +31,13 @@
 
 ---
 
+<p align="center">
+  <img src="docs/screenshots/landing-hero-dark.png" alt="AutoCanvas Landing Page Hero" width="100%" style="border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1);" />
+</p>
+<p align="center">
+  <em>AutoCanvas Studio Landing Page — Autonomous hourly brand intelligence, original copy generation, and deterministic vector rendering.</em>
+</p>
+
 </div>
 
 ## 🌟 Executive Overview
@@ -38,6 +45,13 @@
 **AutoCanvas** is an enterprise-grade social media and brand communication operating system created by **[DevCenterPoint](https://devcenterpoint.com)**. It replaces fragmented social schedulers, repetitive AI copy-paste cycles, and garbled generative images with a unified, high-reliability platform.
 
 Built with a commitment to **authentic brand craftsmanship and zero technical friction**, AutoCanvas empowers teams to manage multiple brands across major social networks while ensuring every post is fresh, visually stunning, and perfectly aligned with their brand voice.
+
+<p align="center">
+  <img src="docs/screenshots/workspace-command-center-dark.jpg" alt="AutoCanvas Workspace Command Center" width="100%" style="border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1);" />
+</p>
+<p align="center">
+  <em>AutoCanvas Workspace Command Center — Multi-channel velocity telemetry, autonomous publishing queue, and executive studio action dock.</em>
+</p>
 
 ```
 +--------------------------------------------------------------------------------------------------+
