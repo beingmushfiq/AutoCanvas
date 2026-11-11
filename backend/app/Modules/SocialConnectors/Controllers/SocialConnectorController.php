@@ -1,0 +1,215 @@
+<?php
+
+namespace App\Modules\SocialConnectors\Controllers;
+
+use App\Http\Controllers\Controller;
+use App\Modules\SocialConnectors\Models\SocialAccount;
+use App\Modules\SocialConnectors\Services\OAuthManager;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use RuntimeException;
+
+class SocialConnectorController extends Controller
+{
+    public function __construct(
+        protected OAuthManager $oauthManager
+    ) {}
+
+    /**
+     * List all connected social accounts for the current tenant.
+     */
+    public function index(Request $request): JsonResponse
+    {
+        $orgId = $request->user()->current_organization_id;
+        $brandId = $request->query('brand_id');
+
+        $query = SocialAccount::where('organization_id', $orgId);
+
+        if ($brandId) {
+            $query->where('brand_id', $brandId);
+        }
+
+        $accounts = $query->orderBy('platform')->get()->map(function (SocialAccount $account) {
+            return [
+                'id' => $account->id,
+                'organization_id' => $account->organization_id,
+                'workspace_id' => $account->workspace_id,
+                'brand_id' => $account->brand_id,
+                'platform' => $account->platform,
+                'provider_id' => $account->provider_id,
+                'account_name' => $account->account_name,
+                'account_type' => $account->account_type,
+                'avatar_url' => $account->avatar_url,
+                'connection_status' => $account->connection_status,
+                'is_active' => $account->is_active,
+                'expires_at' => $account->expires_at?->toIso8601String(),
+                'is_expired' => $account->isExpired(),
+                'is_expiring_soon' => $account->isExpiringSoon(7),
+                'scopes' => $account->scopes,
+                'last_synced_at' => $account->last_synced_at?->toIso8601String(),
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'data' => $accounts,
+        ]);
+    }
+
+    /**
+     * Generate OAuth authorization URL with signed CSRF state.
+     */
+    public function oauthUrl(Request $request, string $platform): JsonResponse
+    {
+        if (!in_array(strtolower($platform), ['facebook', 'instagram', 'linkedin'], true)) {
+            return response()->json([
+                'success' => false,
+                'message' => "Unsupported social platform: {$platform}",
+            ], 422);
+        }
+
+        $orgId = $request->user()->current_organization_id;
+        $workspaceId = $request->query('workspace_id');
+        $brandId = $request->query('brand_id');
+        $redirectUri = $request->query('redirect_uri');
+
+        $state = $this->oauthManager->generateState($orgId, $workspaceId, $brandId, $platform);
+        $options = $redirectUri ? ['redirect_uri' => $redirectUri] : [];
+        $url = $this->oauthManager->getAuthorizationUrl($platform, $state, $options);
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'platform' => $platform,
+                'authorization_url' => $url,
+                'state' => $state,
+            ],
+        ]);
+    }
+
+    /**
+     * Process OAuth callback, exchange code, and persist encrypted credentials.
+     */
+    public function callback(Request $request, string $platform): JsonResponse
+    {
+        $validated = $request->validate([
+            'code' => 'required|string',
+            'state' => 'required|string',
+            'redirect_uri' => 'nullable|string',
+        ]);
+
+        $stateData = $this->oauthManager->verifyState($validated['state']);
+        if (!$stateData) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid, expired, or tampered OAuth state parameter.',
+            ], 403);
+        }
+
+        // Verify the authenticated user belongs to the state's organization
+        if ($request->user()->current_organization_id !== $stateData['org_id'] && !$request->user()->is_platform_admin) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized organization mismatch.',
+            ], 403);
+        }
+
+        $redirectUri = $validated['redirect_uri'] ?? url("/api/v1/social/connectors/{$platform}/callback");
+
+        try {
+            $account = $this->oauthManager->handleCallback(
+                $platform,
+                $validated['code'],
+                $redirectUri,
+                $stateData
+            );
+
+            return response()->json([
+                'success' => true,
+                'message' => "Successfully connected {$platform} account: {$account->account_name}",
+                'data' => [
+                    'id' => $account->id,
+                    'platform' => $account->platform,
+                    'account_name' => $account->account_name,
+                    'account_type' => $account->account_type,
+                    'avatar_url' => $account->avatar_url,
+                    'connection_status' => $account->connection_status,
+                    'expires_at' => $account->expires_at?->toIso8601String(),
+                ],
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'OAuth token exchange failed: ' . $e->getMessage(),
+            ], 502);
+        }
+    }
+
+    /**
+     * Force refresh/validation of account tokens.
+     */
+    public function refresh(Request $request, string $accountId): JsonResponse
+    {
+        $orgId = $request->user()->current_organization_id;
+        $account = SocialAccount::where('organization_id', $orgId)->findOrFail($accountId);
+
+        try {
+            $refreshed = $this->oauthManager->refreshAccountToken($account);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Token refreshed successfully.',
+                'data' => [
+                    'id' => $refreshed->id,
+                    'connection_status' => $refreshed->connection_status,
+                    'expires_at' => $refreshed->expires_at?->toIso8601String(),
+                    'last_synced_at' => $refreshed->last_synced_at?->toIso8601String(),
+                ],
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 400);
+        }
+    }
+
+    /**
+     * Test connection validity on remote platform API.
+     */
+    public function testConnection(Request $request, string $accountId): JsonResponse
+    {
+        $orgId = $request->user()->current_organization_id;
+        $account = SocialAccount::where('organization_id', $orgId)->findOrFail($accountId);
+
+        $isValid = $this->oauthManager->testConnection($account);
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'id' => $account->id,
+                'platform' => $account->platform,
+                'account_name' => $account->account_name,
+                'is_valid' => $isValid,
+                'connection_status' => $account->connection_status,
+            ],
+        ]);
+    }
+
+    /**
+     * Disconnect and remove a social account.
+     */
+    public function destroy(Request $request, string $accountId): JsonResponse
+    {
+        $orgId = $request->user()->current_organization_id;
+        $account = SocialAccount::where('organization_id', $orgId)->findOrFail($accountId);
+
+        $account->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Social account disconnected successfully.',
+        ]);
+    }
+}
+
