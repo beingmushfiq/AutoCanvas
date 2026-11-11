@@ -66,8 +66,16 @@ class ApiClient {
     const data = await response.json()
 
     if (!response.ok) {
+      if (response.status === 401 && token) {
+        // If an expired or invalidated token was sent, purge it so app reflects unauthenticated state cleanly
+        localStorage.removeItem('autocanvas_token')
+        window.dispatchEvent(new CustomEvent('autocanvas:session-expired'))
+      }
       const errorMessage = data?.error?.message || data?.message || `Request failed with status ${response.status}`
-      throw new Error(errorMessage)
+      const error = new Error(errorMessage)
+      ;(error as any).status = response.status
+      ;(error as any).code = data?.error?.code
+      throw error
     }
 
     return data

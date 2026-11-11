@@ -1,15 +1,18 @@
 import React from 'react'
 import type { LucideIcon } from 'lucide-react'
 
-interface EmptyStateProps {
+export interface EmptyStateAction {
+  label: string
+  onClick: () => void
+  icon?: LucideIcon
+}
+
+export interface EmptyStateProps {
   icon: LucideIcon
   title: string
   description: string
-  action?: {
-    label: string
-    onClick: () => void
-    icon?: LucideIcon
-  }
+  action?: EmptyStateAction
+  secondaryAction?: EmptyStateAction
   className?: string
 }
 
@@ -18,9 +21,11 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   title,
   description,
   action,
+  secondaryAction,
   className = '',
 }) => {
   const ActionIcon = action?.icon
+  const SecondaryActionIcon = secondaryAction?.icon
 
   return (
     <div
@@ -37,16 +42,30 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
       <p className="text-xs text-foreground-secondary max-w-sm mt-1.5 leading-relaxed">
         {description}
       </p>
-      {action && (
-        <button
-          onClick={action.onClick}
-          className="mt-5 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-interactive-primary text-interactive-primary-fg text-xs font-semibold hover:opacity-90 active:scale-98 transition-all focus:outline-hidden focus:ring-2 focus:ring-focus-ring focus:ring-offset-2"
-        >
-          {ActionIcon && <ActionIcon className="w-4 h-4" aria-hidden="true" />}
-          <span>{action.label}</span>
-        </button>
+      {(action || secondaryAction) && (
+        <div className="mt-5 flex items-center justify-center gap-2.5 flex-wrap">
+          {action && (
+            <button
+              type="button"
+              onClick={action.onClick}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-interactive-primary text-interactive-primary-fg text-xs font-semibold hover:opacity-90 active:scale-98 transition-all focus:outline-hidden focus:ring-2 focus:ring-focus-ring focus:ring-offset-2 cursor-pointer"
+            >
+              {ActionIcon && <ActionIcon className="w-4 h-4" aria-hidden="true" />}
+              <span>{action.label}</span>
+            </button>
+          )}
+          {secondaryAction && (
+            <button
+              type="button"
+              onClick={secondaryAction.onClick}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-border bg-surface text-foreground text-xs font-semibold hover:bg-surface-raised active:scale-98 transition-all focus:outline-hidden focus:ring-2 focus:ring-focus-ring cursor-pointer"
+            >
+              {SecondaryActionIcon && <SecondaryActionIcon className="w-4 h-4" aria-hidden="true" />}
+              <span>{secondaryAction.label}</span>
+            </button>
+          )}
+        </div>
       )}
     </div>
   )
 }
-

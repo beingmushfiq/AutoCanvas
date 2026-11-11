@@ -87,6 +87,30 @@ class CreatePlatformAdminCommand extends Command
             $user->assignRole('superadmin');
         }
 
+        // Ensure administrator has an active organization and workspace association for workspace operations
+        if (! $user->current_organization_id || ! $user->current_workspace_id) {
+            $defaultOrg = \App\Modules\Organization\Models\Organization::withoutGlobalScopes()->where('status', 'active')->first();
+            if ($defaultOrg) {
+                $defaultWs = $defaultOrg->defaultWorkspace ?? $defaultOrg->workspaces()->first();
+                if ($defaultWs) {
+                    $user->current_organization_id = $defaultOrg->id;
+                    $user->current_workspace_id = $defaultWs->id;
+                    $user->save();
+
+                    \Illuminate\Support\Facades\DB::table('organization_members')->updateOrInsert(
+                        ['organization_id' => $defaultOrg->id, 'user_id' => $user->id],
+                        ['id' => (string) Str::ulid(), 'role' => 'owner', 'created_at' => now(), 'updated_at' => now()]
+                    );
+
+                    \Illuminate\Support\Facades\DB::table('workspace_members')->updateOrInsert(
+                        ['workspace_id' => $defaultWs->id, 'user_id' => $user->id],
+                        ['id' => (string) Str::ulid(), 'role' => 'owner', 'created_at' => now(), 'updated_at' => now()]
+                    );
+                    $this->info("Linked platform admin to default organization [{$defaultOrg->name}] and workspace [{$defaultWs->name}].");
+                }
+            }
+        }
+
         // Record audit change log
         SystemChangeLog::create([
             'user_id' => $user->id,

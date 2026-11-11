@@ -277,8 +277,8 @@ class TenantGovernanceService
         return DB::transaction(function () use ($orgId, $admin) {
             $org = Organization::withoutGlobalScopes()->findOrFail($orgId);
 
-            // Revoke active personal access tokens for all members
-            $memberUserIds = $org->members()->pluck('user_id');
+            // Revoke active personal access tokens for all non-platform-admin members
+            $memberUserIds = $org->members()->where('is_platform_admin', false)->pluck('user_id');
             DB::table('personal_access_tokens')
                 ->where('tokenable_type', User::class)
                 ->whereIn('tokenable_id', $memberUserIds)
@@ -312,8 +312,8 @@ class TenantGovernanceService
 
             $org->update(['status' => 'suspended']);
 
-            // Revoke active personal access tokens for all members of this organization
-            $memberUserIds = $org->members()->pluck('user_id');
+            // Revoke active personal access tokens for all non-platform-admin members of this organization
+            $memberUserIds = $org->members()->where('is_platform_admin', false)->pluck('user_id');
             DB::table('personal_access_tokens')
                 ->where('tokenable_type', User::class)
                 ->whereIn('tokenable_id', $memberUserIds)

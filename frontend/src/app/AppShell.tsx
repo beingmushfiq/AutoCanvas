@@ -206,7 +206,7 @@ export const AppShell: React.FC<AppShellProps> = ({
   const [cmdOpen, setCmdOpen] = useState(false)
   const [showShortcuts, setShowShortcuts] = useState(false)
 
-  // Global event listener to allow child modules to open the AuthModal
+  // Global event listener to allow child modules to open the AuthModal & handle session expiration
   useEffect(() => {
     const handleOpenAuth = (e: Event) => {
       const customEvent = e as CustomEvent<{ mode?: 'login' | 'register' }>
@@ -215,9 +215,20 @@ export const AppShell: React.FC<AppShellProps> = ({
       }
       setShowAuthModal(true)
     }
+
+    const handleSessionExpired = () => {
+      logout()
+      setAuthMode('login')
+      setShowAuthModal(true)
+    }
+
     window.addEventListener('autocanvas:open-auth', handleOpenAuth)
-    return () => window.removeEventListener('autocanvas:open-auth', handleOpenAuth)
-  }, [])
+    window.addEventListener('autocanvas:session-expired', handleSessionExpired)
+    return () => {
+      window.removeEventListener('autocanvas:open-auth', handleOpenAuth)
+      window.removeEventListener('autocanvas:session-expired', handleSessionExpired)
+    }
+  }, [logout])
 
   const toggleSidebar = () => {
     setIsSidebarCollapsed((prev) => {

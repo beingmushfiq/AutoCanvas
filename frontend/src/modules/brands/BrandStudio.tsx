@@ -24,6 +24,7 @@ import { MemoryTab } from './tabs/MemoryTab'
 import { EmptyState } from '../../components/ui/empty-state'
 import { Badge } from '../../components/ui/badge'
 import { appToast } from '../../lib/toast'
+import { useAuth } from '../auth/AuthContext'
 
 interface BrandStudioProps {
   initialTab?: 'profile' | 'visual' | 'voice' | 'knowledge' | 'memory'
@@ -31,6 +32,7 @@ interface BrandStudioProps {
 }
 
 export const BrandStudio: React.FC<BrandStudioProps> = ({ initialTab = 'profile', onTabChange }) => {
+  const { isAuthenticated } = useAuth()
   const [brands, setBrands] = useState<BrandSummary[]>([])
   const [activeBrandId, setActiveBrandId] = useState<string | null>(null)
   const [activeBrand, setActiveBrand] = useState<BrandDetail | null>(null)
@@ -55,8 +57,17 @@ export const BrandStudio: React.FC<BrandStudioProps> = ({ initialTab = 'profile'
   const [showBrandDropdown, setShowBrandDropdown] = useState(false)
 
   const fetchBrands = async (selectId?: string) => {
+    if (!isAuthenticated) {
+      setBrands([])
+      setActiveBrandId(null)
+      setActiveBrand(null)
+      setLoading(false)
+      return
+    }
+
     try {
       setLoading(true)
+      setError(null)
       const res = await apiClient.get<ApiResponse<BrandSummary[]>>('/brands')
       const brandList = res.data || []
       setBrands(brandList)
@@ -73,8 +84,12 @@ export const BrandStudio: React.FC<BrandStudioProps> = ({ initialTab = 'profile'
         setActiveBrandId(null)
         setActiveBrand(null)
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load brands')
+    } catch (err: any) {
+      const isUnauth = err?.status === 401 || err?.message?.toLowerCase().includes('unauthenticated')
+      if (!isUnauth) {
+        setError(err instanceof Error ? err.message : 'Failed to load brands')
+      }
+      setBrands([])
     } finally {
       setLoading(false)
     }
@@ -93,7 +108,7 @@ export const BrandStudio: React.FC<BrandStudioProps> = ({ initialTab = 'profile'
 
   useEffect(() => {
     fetchBrands()
-  }, [])
+  }, [isAuthenticated])
 
   const handleBrandSelect = (id: string) => {
     setActiveBrandId(id)
@@ -129,12 +144,34 @@ export const BrandStudio: React.FC<BrandStudioProps> = ({ initialTab = 'profile'
       <div className="max-w-xl mx-auto mt-8">
         <EmptyState
           icon={Layers}
-          title="No Brands Registered Yet"
-          description="Create your brand identity to configure autonomous content generation, visual guidelines, tone of voice, and verified knowledge bases."
-          action={{
-            label: 'Create First Brand',
-            onClick: () => setShowWizard(true),
-          }}
+          title={isAuthenticated ? 'No Brands Registered Yet' : 'Guest Preview: Brand Studio'}
+          description={
+            isAuthenticated
+              ? 'Create your brand identity to configure autonomous content generation, visual guidelines, tone of voice, and verified knowledge bases.'
+              : 'You are exploring AutoCanvas in Guest Demo mode. Sign in to register custom brands, or open the brand wizard to preview setup.'
+          }
+          action={
+            isAuthenticated
+              ? {
+                  label: 'Create First Brand',
+                  onClick: () => setShowWizard(true),
+                }
+              : {
+                  label: 'Sign In to Create Brand',
+                  onClick: () =>
+                    window.dispatchEvent(
+                      new CustomEvent('autocanvas:open-auth', { detail: { mode: 'login' } })
+                    ),
+                }
+          }
+          secondaryAction={
+            !isAuthenticated
+              ? {
+                  label: 'Preview Brand Wizard',
+                  onClick: () => setShowWizard(true),
+                }
+              : undefined
+          }
         />
 
         <BrandWizardModal

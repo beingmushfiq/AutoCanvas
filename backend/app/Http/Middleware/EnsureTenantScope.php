@@ -42,6 +42,12 @@ class EnsureTenantScope
             $workspace = $user->workspaces()->first();
         }
 
+        // Platform Admin Fallback: If user is platform admin and has no workspace assigned, bind to first active workspace
+        if (! $workspace && $user->is_platform_admin) {
+            $workspace = Workspace::withoutGlobalScopes()->where('is_default', true)->first()
+                ?? Workspace::withoutGlobalScopes()->first();
+        }
+
         if (! $workspace) {
             return response()->json([
                 'success' => false,
