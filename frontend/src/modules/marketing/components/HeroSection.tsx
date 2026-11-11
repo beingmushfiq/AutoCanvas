@@ -105,7 +105,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           </span>
         </div>
 
-        {/* Interactive 3D Brand Core & Multi-Channel Orbital System */}
+        {/* Interactive 3D Mascot & Social Media Management System */}
         <Hero3DCanvas onExplore={onExploreDemo} />
       </div>
     </section>
