@@ -10,6 +10,28 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property string $id
+ * @property string $invoice_id
+ * @property string $organization_id
+ * @property string $gateway
+ * @property string|null $transaction_reference
+ * @property string $normalized_trx_id
+ * @property string|null $sender_number
+ * @property string|null $gateway_payment_id
+ * @property float $amount
+ * @property float|null $exchange_rate_snapshot
+ * @property float|null $amount_bdt
+ * @property float|null $amount_usd
+ * @property string $currency
+ * @property string|null $idempotency_key
+ * @property string $status
+ * @property string|null $verified_by
+ * @property \Carbon\Carbon|null $verified_at
+ * @property string|null $notes
+ * @property array|null $gateway_response
+ * @property-read \App\Modules\Billing\Models\Invoice|null $invoice
+ */
 class PaymentTransaction extends Model
 {
     use HasFactory, HasTenantScope, HasUlid;

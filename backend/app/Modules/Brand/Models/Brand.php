@@ -22,6 +22,19 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * @property string $id
+ * @property string $organization_id
+ * @property string|null $workspace_id
+ * @property string $name
+ * @property string $slug
+ * @property string|null $industry
+ * @property string|null $sub_industry
+ * @property string|null $website_url
+ * @property string $status
+ * @property array|null $automation_policy
+ * @property-read \App\Modules\Brand\Models\BrandVisualIdentity|null $visualIdentity
+ */
 class Brand extends Model
 {
     use HasFactory, HasTenantScope, HasUlid, SoftDeletes;

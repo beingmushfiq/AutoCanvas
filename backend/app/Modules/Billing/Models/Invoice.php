@@ -10,6 +10,20 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property string $id
+ * @property string $organization_id
+ * @property string $invoice_number
+ * @property string $plan_id
+ * @property string $billing_cycle
+ * @property float $amount
+ * @property string $currency
+ * @property \Carbon\Carbon|null $billing_period_start
+ * @property \Carbon\Carbon|null $billing_period_end
+ * @property \Carbon\Carbon|null $due_date
+ * @property string $status
+ * @property array|null $metadata
+ */
 class Invoice extends Model
 {
     use HasFactory, HasTenantScope, HasUlid;

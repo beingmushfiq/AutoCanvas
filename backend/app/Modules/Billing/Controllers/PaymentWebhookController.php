@@ -3,6 +3,7 @@
 namespace App\Modules\Billing\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Modules\Billing\Models\Invoice;
 use App\Modules\Billing\Models\PaymentTransaction;
 use App\Modules\Billing\Services\LocalPaymentService;
 use App\Modules\Organization\Services\AuditLogger;
@@ -36,6 +37,7 @@ class PaymentWebhookController extends Controller
             return response()->json(['message' => 'Status not completed, acknowledged.'], 200);
         }
 
+        /** @var PaymentTransaction|null $transaction */
         $transaction = PaymentTransaction::withoutGlobalScopes()
             ->where('gateway', 'bkash')
             ->where('normalized_trx_id', $trxRef)
@@ -53,6 +55,7 @@ class PaymentWebhookController extends Controller
                 'gateway_response' => $validated,
             ]);
 
+            /** @var Invoice|null $invoice */
             $invoice = $transaction->invoice;
             if ($invoice) {
                 $invoice->update(['status' => 'paid']);
@@ -86,6 +89,7 @@ class PaymentWebhookController extends Controller
             return response()->json(['message' => 'SSLCommerz payment not valid, acknowledged.'], 200);
         }
 
+        /** @var PaymentTransaction|null $transaction */
         $transaction = PaymentTransaction::withoutGlobalScopes()
             ->where('gateway', 'manual') // or sslcommerz
             ->where('normalized_trx_id', $trxRef)
@@ -99,6 +103,7 @@ class PaymentWebhookController extends Controller
                 'gateway_response' => $validated,
             ]);
 
+            /** @var Invoice|null $invoice */
             $invoice = $transaction->invoice;
             if ($invoice) {
                 $invoice->update(['status' => 'paid']);
