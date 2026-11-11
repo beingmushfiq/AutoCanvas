@@ -112,30 +112,58 @@ class AutonomousAutopilotEngine
             $variant = $contentItem->variants()->where('channel', $channel)->first();
             $hook = $variant?->caption ? Str::limit($variant->caption, 80) : $topic;
 
-            // Run 3-Layer Novelty & Deduplication Gate
-            $noveltyReport = $this->noveltyEngine->evaluateNovelty(
-                $brand,
-                $channel,
-                $hook,
-                $topic,
-                $templateId
-            );
+            // Run 3-Layer Novelty & Deduplication Gate with Bounded Circuit Breaker
+            $accumulatedRejections = [];
+            $attempt = 1;
+            $noveltyReport = null;
 
-            if (!$noveltyReport['is_novel']) {
+            while ($attempt <= NoveltyVerificationEngine::MAX_REFRAME_ATTEMPTS) {
+                $noveltyReport = $this->noveltyEngine->evaluateNovelty(
+                    $brand,
+                    $channel,
+                    $hook,
+                    $topic,
+                    $templateId,
+                    null,
+                    $accumulatedRejections,
+                    $attempt
+                );
+
+                if ($noveltyReport['is_novel']) {
+                    break;
+                }
+
                 $rejectedDuplicates++;
+                $accumulatedRejections = $noveltyReport['accumulated_rejections'] ?? array_merge($accumulatedRejections, [$hook]);
 
-                // Apply Angle Mutation
+                if (!empty($noveltyReport['escalate_to_human'])) {
+                    break;
+                }
+
+                // Apply Angle Mutation and Template Rotation for next attempt
                 if (!empty($noveltyReport['mutated_angle'])) {
+                    $topic = $noveltyReport['mutated_angle'];
+                    $hook = Str::limit($topic, 80);
                     $contentItem->update([
-                        'topic' => $noveltyReport['mutated_angle'],
-                        'concept' => $noveltyReport['mutated_angle'],
+                        'topic' => $topic,
+                        'concept' => $topic,
                     ]);
                 }
 
-                // Apply Template Rotation
                 if (!empty($noveltyReport['recommended_template'])) {
                     $templateId = $noveltyReport['recommended_template'];
                 }
+
+                $attempt++;
+            }
+
+            // If circuit breaker tripped or maximum attempts reached without novel certification
+            if (!$noveltyReport || !$noveltyReport['is_novel']) {
+                $contentItem->update([
+                    'status' => 'needs_human_angle',
+                    'notes' => 'Novelty gate escalated to human review after ' . ($attempt - 1) . ' failed angle mutations.',
+                ]);
+                continue; // Do not schedule or dispatch unverified item
             }
 
             // Register Certified Novelty Fingerprint

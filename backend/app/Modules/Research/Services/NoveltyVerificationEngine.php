@@ -121,10 +121,17 @@ class NoveltyVerificationEngine
     }
 
     /**
+     * Maximum allowed angle mutations before escalating to human review.
+     */
+    public const MAX_REFRAME_ATTEMPTS = 3;
+
+    /**
      * Evaluate a candidate post against the brand's temporal memory across 3 layers:
-     * 1. Lexical SimHash (Hamming > 4)
-     * 2. Dense Vector Cosine Similarity (< 0.72)
+     * 1. Lexical SimHash (Hamming <= 4)
+     * 2. Dense Vector Cosine Similarity (>= 0.72) within 180-day archive
      * 3. Template Layout Fatigue (Cooldown on consecutive uses)
+     * 
+     * Supports strict circuit-breaking (max 3 attempts) and negative prompt accumulation.
      */
     public function evaluateNovelty(
         Brand $brand,
@@ -132,21 +139,42 @@ class NoveltyVerificationEngine
         string $hook,
         string $concept,
         string $templateId,
-        ?array $conceptVector = null
+        ?array $conceptVector = null,
+        array $accumulatedRejections = [],
+        int $attempt = 1
     ): array {
+        // Enforce strict circuit breaker ceiling
+        if ($attempt > self::MAX_REFRAME_ATTEMPTS || count($accumulatedRejections) >= self::MAX_REFRAME_ATTEMPTS) {
+            return [
+                'is_novel' => false,
+                'rejection_reason' => 'max_reframe_attempts_exceeded',
+                'escalate_to_human' => true,
+                'status' => 'needs_human_angle',
+                'attempt' => $attempt,
+                'min_hamming_distance' => 0,
+                'max_cosine_similarity' => 1.0,
+                'candidate_simhash' => $this->calculateSimHash64($hook . ' ' . $concept),
+                'mutated_angle' => null,
+                'recommended_template' => $templateId,
+                'accumulated_rejections' => $accumulatedRejections,
+                'negative_prompt' => $this->buildNegativePrompt($accumulatedRejections),
+            ];
+        }
+
         $candidateSimHash = $this->calculateSimHash64($hook . ' ' . $concept);
 
-        // Fetch recent fingerprints for this brand and channel
+        // Fetch fingerprints for this brand and channel within 180-day window
         $pastFingerprints = ContentFingerprint::where('brand_id', $brand->id)
             ->where('channel', $channel)
+            ->where('published_or_scheduled_at', '>=', now()->subDays(180))
             ->latest('published_or_scheduled_at')
-            ->take(60)
+            ->take(120)
             ->get();
 
         $minHamming = 64;
         $maxCosine = 0.0;
 
-        // 1. SimHash Lexical Check
+        // 1. SimHash Lexical Check (Tier 1)
         foreach ($pastFingerprints as $past) {
             $dist = $this->hammingDistance($candidateSimHash, (int) $past->simhash_64);
             if ($dist < $minHamming) {
@@ -154,19 +182,25 @@ class NoveltyVerificationEngine
             }
 
             if ($dist <= 4) {
+                $newRejections = array_values(array_unique(array_merge($accumulatedRejections, [$hook])));
                 return [
                     'is_novel' => false,
                     'rejection_reason' => 'lexical_duplicate_simhash',
+                    'escalate_to_human' => false,
+                    'status' => 'retry_mutation',
+                    'attempt' => $attempt,
                     'min_hamming_distance' => $dist,
                     'max_cosine_similarity' => 1.0,
                     'candidate_simhash' => $candidateSimHash,
-                    'mutated_angle' => $this->mutateAngle($concept, 'lexical_overlap'),
+                    'mutated_angle' => $this->mutateAngleWithExclusions($concept, $newRejections),
                     'recommended_template' => $this->rotateTemplate($templateId, $pastFingerprints->pluck('creative_template_id')->toArray()),
+                    'accumulated_rejections' => $newRejections,
+                    'negative_prompt' => $this->buildNegativePrompt($newRejections),
                 ];
             }
         }
 
-        // 2. Vector Cosine Semantic Check
+        // 2. Vector Cosine Semantic Check (Tier 2 - 180 Days)
         if (!empty($conceptVector)) {
             foreach ($pastFingerprints as $past) {
                 if (!empty($past->embedding_vector)) {
@@ -176,14 +210,20 @@ class NoveltyVerificationEngine
                     }
 
                     if ($cos >= 0.72) {
+                        $newRejections = array_values(array_unique(array_merge($accumulatedRejections, [$hook])));
                         return [
                             'is_novel' => false,
                             'rejection_reason' => 'conceptual_duplicate_vector',
+                            'escalate_to_human' => false,
+                            'status' => 'retry_mutation',
+                            'attempt' => $attempt,
                             'min_hamming_distance' => $minHamming,
                             'max_cosine_similarity' => round($cos, 4),
                             'candidate_simhash' => $candidateSimHash,
-                            'mutated_angle' => $this->mutateAngle($concept, 'semantic_similarity'),
+                            'mutated_angle' => $this->mutateAngleWithExclusions($concept, $newRejections),
                             'recommended_template' => $this->rotateTemplate($templateId, $pastFingerprints->pluck('creative_template_id')->toArray()),
+                            'accumulated_rejections' => $newRejections,
+                            'negative_prompt' => $this->buildNegativePrompt($newRejections),
                         ];
                     }
                 }
@@ -197,23 +237,83 @@ class NoveltyVerificationEngine
             return [
                 'is_novel' => false,
                 'rejection_reason' => 'template_fatigue',
+                'escalate_to_human' => false,
+                'status' => 'rotate_template_only',
+                'attempt' => $attempt,
                 'min_hamming_distance' => $minHamming,
                 'max_cosine_similarity' => round($maxCosine, 4),
                 'candidate_simhash' => $candidateSimHash,
                 'mutated_angle' => null,
                 'recommended_template' => $rotated,
+                'accumulated_rejections' => $accumulatedRejections,
+                'negative_prompt' => $this->buildNegativePrompt($accumulatedRejections),
             ];
         }
 
         return [
             'is_novel' => true,
             'rejection_reason' => null,
+            'escalate_to_human' => false,
+            'status' => 'approved',
+            'attempt' => $attempt,
             'min_hamming_distance' => $minHamming,
             'max_cosine_similarity' => round($maxCosine, 4),
             'candidate_simhash' => $candidateSimHash,
             'mutated_angle' => null,
             'recommended_template' => $templateId,
+            'accumulated_rejections' => $accumulatedRejections,
+            'negative_prompt' => '',
         ];
+    }
+
+    /**
+     * Build negative prompt injection string for LLM refinement.
+     */
+    public function buildNegativePrompt(array $rejections): string
+    {
+        if (empty($rejections)) {
+            return '';
+        }
+
+        $lines = [];
+        foreach ($rejections as $idx => $rej) {
+            $num = $idx + 1;
+            $lines[] = "  {$num}. \"{$rej}\"";
+        }
+
+        return "CRITICAL NEGATIVE PROMPT CONSTRAINT:\nYou have already tested the following angles/hooks which collided with past 180-day posts:\n" 
+            . implode("\n", $lines) 
+            . "\nYou MUST adopt a completely orthogonal perspective. Do NOT reuse these hooks.";
+    }
+
+    /**
+     * Mutate an angle while explicitly excluding already rejected angles.
+     */
+    public function mutateAngleWithExclusions(string $originalConcept, array $rejections = []): string
+    {
+        $mutations = [
+            "Contrarian Inversion: Why the popular industry consensus regarding '{$originalConcept}' overlooks critical hidden failure modes.",
+            "Tactical Playbook: 5 non-obvious operational implementation steps to capitalize on '{$originalConcept}'.",
+            "Second-Order Macro Impact: Analyzing what '{$originalConcept}' means for market dynamics 24 months from now.",
+            "Case Study & Data Analysis: Examining real-world benchmark metrics and ROI surrounding '{$originalConcept}'.",
+            "Executive Risk Assessment: The hidden regulatory, compliance, and governance vulnerabilities of '{$originalConcept}'.",
+        ];
+
+        // Filter out mutations that might be in rejections
+        $available = array_filter($mutations, function ($m) use ($rejections) {
+            foreach ($rejections as $r) {
+                if (stripos($m, $r) !== false || stripos($r, $m) !== false) {
+                    return false;
+                }
+            }
+            return true;
+        });
+
+        if (empty($available)) {
+            $available = $mutations;
+        }
+
+        return $available[array_rand($available)];
     }
 
     /**
