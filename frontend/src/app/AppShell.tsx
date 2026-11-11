@@ -42,7 +42,7 @@ import { KeyboardShortcutsModal } from '../components/KeyboardShortcutsModal'
 import { Logo } from '../components/brand/Logo'
 import { StatusIndicator } from '../components/ui/status-indicator'
 import { EmptyState } from '../components/ui/empty-state'
-import { Tooltip, TooltipTrigger, TooltipContent } from '../components/ui/tooltip'
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '../components/ui/tooltip'
 import { NavItem } from './NavItem'
 import { BreadcrumbBar } from '../components/navigation/BreadcrumbBar'
 import { MobileBottomDock } from '../components/navigation/MobileBottomDock'
@@ -244,7 +244,8 @@ export const AppShell: React.FC<AppShellProps> = ({
   const activeTitle = activeNavItem ? activeNavItem.label : 'Operations'
 
   return (
-    <div className="flex h-screen bg-background text-foreground font-sans antialiased overflow-hidden" data-lenis-prevent>
+    <TooltipProvider delayDuration={150}>
+      <div className="flex h-screen bg-background text-foreground font-sans antialiased overflow-hidden" data-lenis-prevent>
       {/* Skip to Main Content Link for WCAG Accessibility */}
       <a
         href="#main-content"
@@ -751,12 +752,13 @@ export const AppShell: React.FC<AppShellProps> = ({
         </div>
       </main>
 
-      {/* Mobile Bottom Dock (Thumb-friendly Navigation for Mobiles & Tablets) */}
-      <MobileBottomDock
-        activeTab={activeTab}
-        onSelectTab={handleSelectTab}
-        onOpenDrawer={() => setIsDrawerOpen(true)}
-      />
-    </div>
+        {/* Mobile Bottom Dock (Thumb-friendly Navigation for Mobiles & Tablets) */}
+        <MobileBottomDock
+          activeTab={activeTab}
+          onSelectTab={handleSelectTab}
+          onOpenDrawer={() => setIsDrawerOpen(true)}
+        />
+      </div>
+    </TooltipProvider>
   )
 }

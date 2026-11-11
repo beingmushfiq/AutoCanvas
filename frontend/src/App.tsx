@@ -18,6 +18,7 @@ import { MasterControlDashboard } from './modules/master-control/MasterControlDa
 import { ClientReviewView } from './modules/publishing/ClientReviewView'
 import { usePwaManifest } from './components/pwa/usePwaManifest'
 import { SmoothScrollProvider, useSmoothScroll } from './lib/scroll/SmoothScrollProvider'
+import { TooltipProvider } from './components/ui/tooltip'
 import { Toaster } from 'sonner'
 
 // Review route wrapper to extract token from params
@@ -159,8 +160,10 @@ export const App: React.FC = () => {
       <PreferencesProvider>
         <SmoothScrollProvider>
           <AuthProvider>
-            <AppContent />
-            <Toaster position="bottom-right" richColors />
+            <TooltipProvider delayDuration={150}>
+              <AppContent />
+              <Toaster position="bottom-right" richColors />
+            </TooltipProvider>
           </AuthProvider>
         </SmoothScrollProvider>
       </PreferencesProvider>
