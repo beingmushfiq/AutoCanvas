@@ -14,11 +14,11 @@ class TenantManagementController extends Controller
     ) {}
 
     /**
-     * List all organizations with search and status filtering.
+     * List all organizations with search, plan, and status filtering.
      */
     public function index(Request $request): JsonResponse
     {
-        $filters = $request->only(['search', 'status']);
+        $filters = $request->only(['search', 'status', 'plan_id']);
         $perPage = (int) $request->get('per_page', 20);
 
         $paginator = $this->governanceService->listOrganizations($filters, $perPage);
@@ -47,6 +47,70 @@ class TenantManagementController extends Controller
         return response()->json([
             'success' => true,
             'data' => $org,
+        ]);
+    }
+
+    /**
+     * Register a new tenant organization.
+     */
+    public function store(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'slug' => ['nullable', 'string', 'max:255'],
+            'billing_email' => ['nullable', 'email', 'max:255'],
+            'timezone' => ['nullable', 'string', 'max:100'],
+            'plan_id' => ['nullable', 'string', 'exists:plans,id'],
+            'owner_name' => ['required', 'string', 'max:255'],
+            'owner_email' => ['required', 'email', 'max:255'],
+            'owner_password' => ['nullable', 'string', 'min:8'],
+            'send_invite' => ['nullable', 'boolean'],
+        ]);
+
+        $admin = $request->user();
+        $result = $this->governanceService->registerTenant($validated, $admin);
+
+        return response()->json([
+            'success' => true,
+            'data' => $result,
+            'message' => "Tenant organization '{$result['organization']->name}' registered successfully.",
+        ], 201);
+    }
+
+    /**
+     * Update tenant metadata or subscription tier.
+     */
+    public function update(Request $request, string $id): JsonResponse
+    {
+        $validated = $request->validate([
+            'name' => ['nullable', 'string', 'max:255'],
+            'slug' => ['nullable', 'string', 'max:255'],
+            'billing_email' => ['nullable', 'email', 'max:255'],
+            'timezone' => ['nullable', 'string', 'max:100'],
+            'plan_id' => ['nullable', 'string', 'exists:plans,id'],
+        ]);
+
+        $admin = $request->user();
+        $org = $this->governanceService->updateTenant($id, $validated, $admin);
+
+        return response()->json([
+            'success' => true,
+            'data' => $org,
+            'message' => "Tenant organization '{$org->name}' updated successfully.",
+        ]);
+    }
+
+    /**
+     * Delete / offboard an organization.
+     */
+    public function destroy(Request $request, string $id): JsonResponse
+    {
+        $admin = $request->user();
+        $this->governanceService->deleteTenant($id, $admin);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Tenant organization offboarded and soft-deleted successfully.',
         ]);
     }
 
@@ -95,5 +159,50 @@ class TenantManagementController extends Controller
             'message' => 'Scoped impersonation session generated (valid 15 minutes).',
         ]);
     }
-}
 
+    /**
+     * List all subscription plans available for tenant assignment.
+     */
+    public function plans(): JsonResponse
+    {
+        $plans = $this->governanceService->listPlans();
+
+        return response()->json([
+            'success' => true,
+            'data' => $plans,
+        ]);
+    }
+
+    /**
+     * List workspaces belonging to an organization.
+     */
+    public function workspaces(string $id): JsonResponse
+    {
+        $workspaces = $this->governanceService->listWorkspaces($id);
+
+        return response()->json([
+            'success' => true,
+            'data' => $workspaces,
+        ]);
+    }
+
+    /**
+     * Provision an additional workspace for an organization.
+     */
+    public function createWorkspace(Request $request, string $id): JsonResponse
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'slug' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        $admin = $request->user();
+        $workspace = $this->governanceService->createWorkspace($id, $validated, $admin);
+
+        return response()->json([
+            'success' => true,
+            'data' => $workspace,
+            'message' => "Workspace '{$workspace->name}' created successfully.",
+        ], 201);
+    }
+}

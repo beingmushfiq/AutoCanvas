@@ -19,6 +19,7 @@ use App\Modules\ContentStrategy\Controllers\CampaignController;
 use App\Modules\ContentStrategy\Controllers\ContentPillarController;
 use App\Modules\ControlPlane\Controllers\AIOrchestrationController;
 use App\Modules\ControlPlane\Controllers\CircuitBreakerController;
+use App\Modules\ControlPlane\Controllers\MasterAssetUploadController;
 use App\Modules\ControlPlane\Controllers\MasterCmsController;
 use App\Modules\ControlPlane\Controllers\MasterCommandController;
 use App\Modules\ControlPlane\Controllers\PaymentVerificationController;
@@ -85,9 +86,15 @@ Route::prefix('v1')->group(function () {
             // Tenant Governance & Oversight
             Route::prefix('organizations')->middleware('permission:system.organizations.manage')->group(function () {
                 Route::get('/', [TenantManagementController::class, 'index']);
+                Route::post('/', [TenantManagementController::class, 'store']);
+                Route::get('/plans', [TenantManagementController::class, 'plans']);
                 Route::get('/{id}', [TenantManagementController::class, 'show']);
+                Route::put('/{id}', [TenantManagementController::class, 'update']);
+                Route::delete('/{id}', [TenantManagementController::class, 'destroy']);
                 Route::put('/{id}/status', [TenantManagementController::class, 'updateStatus']);
                 Route::post('/{id}/impersonate', [TenantManagementController::class, 'impersonate']);
+                Route::get('/{id}/workspaces', [TenantManagementController::class, 'workspaces']);
+                Route::post('/{id}/workspaces', [TenantManagementController::class, 'createWorkspace']);
             });
 
             // Global System Settings & Change Logs
@@ -135,6 +142,7 @@ Route::prefix('v1')->group(function () {
                 Route::post('/blocks/{key}', [MasterCmsController::class, 'updateBlock']);
                 Route::get('/theme', [MasterCmsController::class, 'getTheme']);
                 Route::post('/theme', [MasterCmsController::class, 'updateTheme']);
+                Route::post('/assets/upload', [MasterAssetUploadController::class, 'upload']);
                 Route::get('/prompts', [MasterCmsController::class, 'getPrompts']);
                 Route::post('/prompts/{taskType}', [MasterCmsController::class, 'savePrompt']);
                 Route::post('/prompts/{taskType}/rollback', [MasterCmsController::class, 'rollbackPrompt']);

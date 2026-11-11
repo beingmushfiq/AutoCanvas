@@ -73,26 +73,28 @@ class ApiClient {
     return data
   }
 
-  public async get<T>(endpoint: string): Promise<T> {
-    return this.request<T>(endpoint, { method: 'GET' })
+  public async get<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+    return this.request<T>(endpoint, { ...options, method: 'GET' })
   }
 
-  public async post<T>(endpoint: string, body?: unknown): Promise<T> {
+  public async post<T>(endpoint: string, body?: unknown, options: RequestInit = {}): Promise<T> {
     return this.request<T>(endpoint, {
+      ...options,
       method: 'POST',
       body: body instanceof FormData ? body : (body ? JSON.stringify(body) : undefined),
     })
   }
 
-  public async put<T>(endpoint: string, body?: unknown): Promise<T> {
+  public async put<T>(endpoint: string, body?: unknown, options: RequestInit = {}): Promise<T> {
     return this.request<T>(endpoint, {
+      ...options,
       method: 'PUT',
       body: body ? JSON.stringify(body) : undefined,
     })
   }
 
-  public async delete<T>(endpoint: string): Promise<T> {
-    return this.request<T>(endpoint, { method: 'DELETE' })
+  public async delete<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+    return this.request<T>(endpoint, { ...options, method: 'DELETE' })
   }
 
   public async checkHealth(): Promise<HealthCheckData> {
@@ -381,13 +383,18 @@ class ApiClient {
     return this.post<ApiResponse<CrawlerTuningData>>('/control-plane/crawler-tuning', data)
   }
 
-  public async getMasterTenants(params?: { search?: string; status?: string; page?: number }): Promise<ApiResponse<any>> {
+  public async getMasterTenants(params?: { search?: string; status?: string; plan_id?: string; page?: number }): Promise<ApiResponse<any>> {
     const query = new URLSearchParams()
     if (params?.search) query.set('search', params.search)
-    if (params?.status) query.set('status', params.status)
+    if (params?.status && params.status !== 'all') query.set('status', params.status)
+    if (params?.plan_id && params.plan_id !== 'all') query.set('plan_id', params.plan_id)
     if (params?.page) query.set('page', params.page.toString())
     const qs = query.toString() ? `?${query.toString()}` : ''
     return this.get<ApiResponse<any>>(`/control-plane/organizations${qs}`)
+  }
+
+  public async getMasterPlans(): Promise<ApiResponse<any[]>> {
+    return this.get<ApiResponse<any[]>>('/control-plane/organizations/plans')
   }
 
   public async impersonateTenant(orgId: string): Promise<ApiResponse<{ token: string; organization: any }>> {

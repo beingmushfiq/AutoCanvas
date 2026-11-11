@@ -29,6 +29,8 @@ import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClient } from './lib/query/queryClient'
 import { OfflineIndicator } from './lib/state/OfflineIndicator'
 import { DashboardSkeleton, MasterControlSkeleton } from './components/ui/skeleton'
+import { MasterControlGuard } from './modules/master-control/MasterControlGuard'
+import { MasterControlLoginPage } from './modules/master-control/MasterControlLoginPage'
 
 // Route-level code-splitting & lazy evaluation
 const LandingPage = lazy(() =>
@@ -171,21 +173,26 @@ const AppContent: React.FC = () => {
         />
 
         {/* 4. Sovereign Platform Admin (Master Control Center) */}
+        <Route path="/master-control/login" element={<MasterControlLoginPage />} />
         <Route path="/master-control" element={<Navigate to="/master-control/white-label" replace />} />
         <Route
           path="/master-control/:tab"
           element={
-            <Suspense fallback={<MasterControlSkeleton />}>
-              <MasterControlDashboard onExitToWorkspace={() => navigate('/workspace/overview')} />
-            </Suspense>
+            <MasterControlGuard>
+              <Suspense fallback={<MasterControlSkeleton />}>
+                <MasterControlDashboard onExitToWorkspace={() => navigate('/workspace/overview')} />
+              </Suspense>
+            </MasterControlGuard>
           }
         />
         <Route
           path="/master-control/:tab/:subtab"
           element={
-            <Suspense fallback={<MasterControlSkeleton />}>
-              <MasterControlDashboard onExitToWorkspace={() => navigate('/workspace/overview')} />
-            </Suspense>
+            <MasterControlGuard>
+              <Suspense fallback={<MasterControlSkeleton />}>
+                <MasterControlDashboard onExitToWorkspace={() => navigate('/workspace/overview')} />
+              </Suspense>
+            </MasterControlGuard>
           }
         />
 

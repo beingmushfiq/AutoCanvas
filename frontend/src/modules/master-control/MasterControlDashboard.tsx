@@ -20,11 +20,18 @@ import {
   Search,
   Radio,
   SplitSquareVertical,
+  Plus,
+  Settings,
 } from 'lucide-react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { BreadcrumbBar } from '../../components/navigation/BreadcrumbBar'
 import { Logo } from '../../components/brand/Logo'
 import { PromptSandboxModal } from './PromptSandboxModal'
+import { useAuth } from '../auth/AuthContext'
+import { BrandAssetUploader } from './components/BrandAssetUploader'
+import { RegisterTenantModal, type PlanItem } from './components/RegisterTenantModal'
+import { TenantDetailDrawer } from './components/TenantDetailDrawer'
+import { SuspendTenantModal } from './components/SuspendTenantModal'
 import {
   apiClient,
   type CmsBlockItem,
@@ -74,6 +81,7 @@ export const MasterControlDashboard: React.FC<MasterControlDashboardProps> = ({ 
 
   const { tab: routeTab, subtab: routeSubtab } = useParams<{ tab?: string; subtab?: string }>()
   const navigate = useNavigate()
+  const { logout } = useAuth()
 
   const activeTab: MasterTab = (routeTab && MC_SLUG_TO_TAB[routeTab]) || 'white_label'
 
@@ -90,6 +98,14 @@ export const MasterControlDashboard: React.FC<MasterControlDashboardProps> = ({ 
   // Circuit Breaker State
   const [isCircuitPaused, setIsCircuitPaused] = useState(false)
   const [isSandboxOpen, setIsSandboxOpen] = useState(false)
+
+  // Tenant Governance & Modal State
+  const [plans, setPlans] = useState<PlanItem[]>([])
+  const [tenantStatusFilter, setTenantStatusFilter] = useState<'all' | 'active' | 'suspended'>('all')
+  const [tenantPlanFilter, setTenantPlanFilter] = useState<string>('all')
+  const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false)
+  const [selectedTenantForDetail, setSelectedTenantForDetail] = useState<string | null>(null)
+  const [tenantToSuspend, setTenantToSuspend] = useState<any | null>(null)
 
   // 1. White-Label & Theme State
   const [themeData, setThemeData] = useState<CustomThemeData>({
@@ -163,12 +179,13 @@ export const MasterControlDashboard: React.FC<MasterControlDashboardProps> = ({ 
     setIsLoading(true)
     setErrorMsg(null)
     try {
-      const [themeRes, blocksRes, promptsRes, crawlerRes, cbRes] = await Promise.all([
+      const [themeRes, blocksRes, promptsRes, crawlerRes, cbRes, plansRes] = await Promise.all([
         apiClient.getMasterTheme(),
         apiClient.getMasterCmsBlocks(),
         apiClient.getMasterPrompts(),
         apiClient.getCrawlerTuning(),
         apiClient.getCircuitBreakerStatus().catch(() => ({ success: true, data: { paused: false } })),
+        apiClient.getMasterPlans().catch(() => ({ success: true, data: [] })),
       ])
 
       if (themeRes.data) setThemeData(themeRes.data)
@@ -190,6 +207,7 @@ export const MasterControlDashboard: React.FC<MasterControlDashboardProps> = ({ 
       }
       if (crawlerRes.data) setCrawlerTuning(crawlerRes.data)
       if (cbRes.data) setIsCircuitPaused(cbRes.data.paused)
+      if (plansRes.data) setPlans(plansRes.data)
 
       // Fetch tenants
       fetchTenants()
@@ -201,10 +219,18 @@ export const MasterControlDashboard: React.FC<MasterControlDashboardProps> = ({ 
     }
   }
 
-  const fetchTenants = async (search = '') => {
+  const fetchTenants = async (
+    search = tenantSearch,
+    status = tenantStatusFilter,
+    planId = tenantPlanFilter
+  ) => {
     setTenantLoading(true)
     try {
-      const res = await apiClient.getMasterTenants({ search })
+      const res = await apiClient.getMasterTenants({
+        search,
+        status: status !== 'all' ? status : undefined,
+        plan_id: planId !== 'all' ? planId : undefined,
+      })
       if (res.data) {
         setTenants(Array.isArray(res.data) ? res.data : (res.data.data || []))
       }
@@ -459,10 +485,23 @@ export const MasterControlDashboard: React.FC<MasterControlDashboardProps> = ({ 
             {/* Exit to User Workspace */}
             <button
               onClick={onExitToWorkspace}
-              className="inline-flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl bg-surface border border-border text-foreground hover:bg-surface-raised text-xs font-semibold transition-all shadow-2xs"
+              className="inline-flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl bg-surface border border-border text-foreground hover:bg-surface-raised text-xs font-semibold transition-all shadow-2xs cursor-pointer"
             >
               <span>Workspace</span>
+              <ExternalLink className="w-3.5 h-3.5" aria-hidden="true" />
+            </button>
+
+            {/* Sovereign Sign Out */}
+            <button
+              onClick={() => {
+                logout()
+                navigate('/master-control/login')
+              }}
+              title="Terminate Sovereign Session"
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-status-danger/10 border border-status-danger/30 text-status-danger hover:bg-status-danger/20 text-xs font-semibold transition-all shadow-2xs cursor-pointer"
+            >
               <LogOut className="w-3.5 h-3.5" aria-hidden="true" />
+              <span className="hidden sm:inline">Sign Out</span>
             </button>
           </div>
         </div>
@@ -602,40 +641,30 @@ export const MasterControlDashboard: React.FC<MasterControlDashboardProps> = ({ 
                 <h3 className="text-xs font-mono font-semibold uppercase text-brand-accent tracking-wider">
                   Logo Marks & Favicon Assets
                 </h3>
-                <div className="space-y-3">
-                  <div>
-                    <label className="block text-xs font-medium text-foreground-secondary mb-1">
-                      Primary Logo URL
-                    </label>
-                    <input
-                      type="text"
-                      value={themeData.primary_logo_url}
-                      onChange={(e) => setThemeData({ ...themeData, primary_logo_url: e.target.value })}
-                      className="w-full px-3.5 py-2 rounded-xl border border-border bg-background text-foreground text-xs font-mono focus:ring-1 focus:ring-brand-accent outline-hidden"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-foreground-secondary mb-1">
-                      Dark / Obsidian Logo URL
-                    </label>
-                    <input
-                      type="text"
-                      value={themeData.dark_logo_url}
-                      onChange={(e) => setThemeData({ ...themeData, dark_logo_url: e.target.value })}
-                      className="w-full px-3.5 py-2 rounded-xl border border-border bg-background text-foreground text-xs font-mono focus:ring-1 focus:ring-brand-accent outline-hidden"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-foreground-secondary mb-1">
-                      Browser Favicon SVG URL
-                    </label>
-                    <input
-                      type="text"
-                      value={themeData.favicon_url}
-                      onChange={(e) => setThemeData({ ...themeData, favicon_url: e.target.value })}
-                      className="w-full px-3.5 py-2 rounded-xl border border-border bg-background text-foreground text-xs font-mono focus:ring-1 focus:ring-brand-accent outline-hidden"
-                    />
-                  </div>
+                <div className="space-y-4">
+                  <BrandAssetUploader
+                    label="Primary Logo Mark (Light / Global)"
+                    description="SVG or PNG asset rendered across light themes and public landing navigation."
+                    value={themeData.primary_logo_url}
+                    onChange={(url) => setThemeData({ ...themeData, primary_logo_url: url })}
+                    assetType="primary_logo"
+                  />
+                  <BrandAssetUploader
+                    label="Dark / Obsidian Logo Mark"
+                    description="SVG or PNG asset rendered on obsidian dark backgrounds and workspace sidebar."
+                    value={themeData.dark_logo_url}
+                    onChange={(url) => setThemeData({ ...themeData, dark_logo_url: url })}
+                    assetType="dark_logo"
+                  />
+                  <BrandAssetUploader
+                    label="Browser Favicon SVG / ICO"
+                    description="Vector SVG or ICO mark displayed in the browser tab and web shortcuts."
+                    value={themeData.favicon_url}
+                    onChange={(url) => setThemeData({ ...themeData, favicon_url: url })}
+                    assetType="favicon"
+                    previewAspect="square"
+                    accept=".svg,.ico,.png"
+                  />
                 </div>
               </div>
 
@@ -1402,32 +1431,85 @@ export const MasterControlDashboard: React.FC<MasterControlDashboardProps> = ({ 
         {/* ========================================================================= */}
         {activeTab === 'tenant_ledger' && (
           <div className="space-y-6">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <h2 className="text-xl font-bold tracking-tight text-foreground">
-                  Organization Management & Workspace Access
+                  Organization Management & Workspace Governance
                 </h2>
                 <p className="text-xs text-foreground-secondary mt-1">
-                  Inspect organizations, monitor brand usage, and sign in to tenant workspaces.
+                  Provision new client tenants, configure subscription plans, inspect workspaces, and manage operational status.
                 </p>
               </div>
-              <div className="flex items-center gap-3">
-                <div className="relative">
-                  <Search className="w-3.5 h-3.5 absolute left-3 top-3 text-foreground-muted" />
-                  <input
-                    type="text"
-                    placeholder="Search organizations..."
-                    value={tenantSearch}
-                    onChange={(e) => {
-                      setTenantSearch(e.target.value)
-                      fetchTenants(e.target.value)
-                    }}
-                    className="pl-8 pr-4 py-2 rounded-xl border border-border bg-surface text-foreground text-xs focus:ring-1 focus:ring-brand-accent outline-hidden w-64"
-                  />
-                </div>
+              <div className="flex items-center gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => setIsRegisterModalOpen(true)}
+                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-interactive-primary text-interactive-primary-fg text-xs font-semibold hover:opacity-90 active:scale-98 transition-all shadow-md cursor-pointer"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Register Organization</span>
+                </button>
               </div>
             </div>
 
+            {/* Filter Bar */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3 rounded-2xl border border-border bg-surface shadow-2xs">
+              <div className="relative flex-1 max-w-sm">
+                <Search className="w-3.5 h-3.5 absolute left-3 top-3 text-foreground-muted" />
+                <input
+                  type="text"
+                  placeholder="Search by name, slug, or email..."
+                  value={tenantSearch}
+                  onChange={(e) => {
+                    setTenantSearch(e.target.value)
+                    fetchTenants(e.target.value, tenantStatusFilter, tenantPlanFilter)
+                  }}
+                  className="w-full pl-8 pr-4 py-2 rounded-xl border border-border bg-background text-foreground text-xs focus:ring-1 focus:ring-brand-accent outline-hidden"
+                />
+              </div>
+
+              <div className="flex items-center gap-2 flex-wrap">
+                {/* Status Filter Pills */}
+                <div className="inline-flex items-center p-1 rounded-xl bg-background border border-border text-xs">
+                  {(['all', 'active', 'suspended'] as const).map((st) => (
+                    <button
+                      key={st}
+                      type="button"
+                      onClick={() => {
+                        setTenantStatusFilter(st)
+                        fetchTenants(tenantSearch, st, tenantPlanFilter)
+                      }}
+                      className={`px-3 py-1 rounded-lg text-xs font-semibold capitalize transition-all cursor-pointer ${
+                        tenantStatusFilter === st
+                          ? 'bg-surface text-foreground shadow-2xs'
+                          : 'text-foreground-muted hover:text-foreground'
+                      }`}
+                    >
+                      {st}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Plan Filter */}
+                <select
+                  value={tenantPlanFilter}
+                  onChange={(e) => {
+                    setTenantPlanFilter(e.target.value)
+                    fetchTenants(tenantSearch, tenantStatusFilter, e.target.value)
+                  }}
+                  className="px-3 py-2 rounded-xl border border-border bg-background text-foreground text-xs focus:ring-1 focus:ring-brand-accent outline-hidden cursor-pointer"
+                >
+                  <option value="all">All Plans</option>
+                  {plans.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Organizations Table */}
             <div className="rounded-2xl border border-border bg-surface overflow-hidden shadow-sm">
               <table className="w-full text-left text-xs">
                 <thead className="border-b border-border bg-background-subtle text-foreground-muted font-mono uppercase text-[10px]">
@@ -1435,9 +1517,10 @@ export const MasterControlDashboard: React.FC<MasterControlDashboardProps> = ({ 
                     <th className="px-6 py-3.5">Organization</th>
                     <th className="px-4 py-3.5">Status</th>
                     <th className="px-4 py-3.5">Plan</th>
+                    <th className="px-4 py-3.5">Workspaces</th>
                     <th className="px-4 py-3.5">Brands</th>
                     <th className="px-4 py-3.5">Members</th>
-                    <th className="px-6 py-3.5 text-right">Actions</th>
+                    <th className="px-6 py-3.5 text-right">Governance Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
@@ -1459,31 +1542,62 @@ export const MasterControlDashboard: React.FC<MasterControlDashboardProps> = ({ 
                         </span>
                       </td>
                       <td className="px-4 py-4">
-                        <span className="font-mono text-foreground-secondary">
+                        <span className="font-mono text-foreground font-semibold">
                           {org.subscription?.plan?.name || 'Pro Tier'}
                         </span>
                       </td>
                       <td className="px-4 py-4 font-mono text-foreground">
-                        {org.brands_count ?? 1}
+                        {org.workspaces_count ?? 1}
+                      </td>
+                      <td className="px-4 py-4 font-mono text-foreground">
+                        {org.brands_count ?? 0}
                       </td>
                       <td className="px-4 py-4 font-mono text-foreground">
                         {org.members_count ?? 1}
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <button
-                          onClick={() => handleImpersonateTenant(org.id, org.name)}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-brand-accent/40 bg-brand-accent/10 text-brand-accent hover:bg-brand-accent/20 text-xs font-semibold transition-all"
-                        >
-                          <Lock className="w-3 h-3" />
-                          <span>Sign In as Tenant</span>
-                        </button>
+                        <div className="inline-flex items-center gap-1.5 justify-end">
+                          <button
+                            type="button"
+                            onClick={() => setSelectedTenantForDetail(org.id)}
+                            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-border bg-surface text-foreground hover:bg-surface-raised text-xs font-semibold transition-all cursor-pointer"
+                            title="Inspect workspaces, team members, and subscription"
+                          >
+                            <Settings className="w-3.5 h-3.5 text-brand-accent" />
+                            <span>Manage</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => setTenantToSuspend(org)}
+                            className={`inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border text-xs font-semibold transition-all cursor-pointer ${
+                              org.status === 'active'
+                                ? 'border-status-danger/30 text-status-danger hover:bg-status-danger/10'
+                                : 'border-status-success/30 text-status-success hover:bg-status-success/10'
+                            }`}
+                            title={org.status === 'active' ? 'Suspend organization' : 'Reactivate organization'}
+                          >
+                            <ShieldAlert className="w-3.5 h-3.5" />
+                            <span>{org.status === 'active' ? 'Suspend' : 'Activate'}</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => handleImpersonateTenant(org.id, org.name)}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-brand-accent/40 bg-brand-accent/10 text-brand-accent hover:bg-brand-accent/20 text-xs font-semibold transition-all cursor-pointer"
+                            title="Sign in to tenant workspace (15 min audit session)"
+                          >
+                            <Lock className="w-3 h-3" />
+                            <span>Sign In</span>
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
                   {tenants.length === 0 && (
                     <tr>
-                      <td colSpan={6} className="px-6 py-8 text-center text-foreground-muted text-xs">
-                        {tenantLoading ? 'Loading organizations...' : 'No organizations found matching search.'}
+                      <td colSpan={7} className="px-6 py-10 text-center text-foreground-muted text-xs">
+                        {tenantLoading ? 'Loading organizations...' : 'No organizations found matching current filters.'}
                       </td>
                     </tr>
                   )}
@@ -1590,6 +1704,37 @@ export const MasterControlDashboard: React.FC<MasterControlDashboardProps> = ({ 
         onClose={() => setIsSandboxOpen(false)}
         taskType={selectedTaskType}
         initialPrompt={promptTemplateEdit}
+      />
+
+      {/* Tenant Registration Wizard */}
+      <RegisterTenantModal
+        isOpen={isRegisterModalOpen}
+        onClose={() => setIsRegisterModalOpen(false)}
+        onSuccess={() => fetchTenants()}
+        plans={plans}
+      />
+
+      {/* Tenant Detail Drawer */}
+      <TenantDetailDrawer
+        isOpen={Boolean(selectedTenantForDetail)}
+        onClose={() => setSelectedTenantForDetail(null)}
+        tenantId={selectedTenantForDetail}
+        onRefreshList={() => fetchTenants()}
+        onOpenSuspendModal={(org) => setTenantToSuspend(org)}
+        plans={plans}
+      />
+
+      {/* Tenant Suspend / Reactivate Modal */}
+      <SuspendTenantModal
+        isOpen={Boolean(tenantToSuspend)}
+        onClose={() => setTenantToSuspend(null)}
+        onSuccess={() => {
+          fetchTenants()
+          if (selectedTenantForDetail) {
+            setSelectedTenantForDetail(null)
+          }
+        }}
+        organization={tenantToSuspend}
       />
     </div>
   )
