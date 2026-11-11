@@ -305,15 +305,22 @@ export const AppShell: React.FC<AppShellProps> = ({
           <div className={`p-4 border-b border-border ${isSidebarCollapsed ? 'px-2 flex flex-col items-center' : ''}`}>
             {isSidebarCollapsed ? (
               <div className="flex flex-col items-center gap-3">
-                <button
-                  type="button"
-                  onClick={toggleSidebar}
-                  title="Expand Sidebar ([)"
-                  aria-label="Expand Sidebar"
-                  className="p-2 rounded-xl text-brand-accent hover:bg-background-subtle transition-colors"
-                >
-                  <Logo size="sm" />
-                </button>
+                <Tooltip delayDuration={150}>
+                  <TooltipTrigger asChild>
+                    <button
+                      type="button"
+                      onClick={toggleSidebar}
+                      title="Expand Sidebar ([)"
+                      aria-label="Expand Sidebar"
+                      className="p-1.5 rounded-xl text-brand-accent hover:bg-background-subtle transition-colors flex items-center justify-center outline-hidden focus-visible:ring-2 focus-visible:ring-focus-ring"
+                    >
+                      <Logo size="md" showWordmark={false} />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent side="right">
+                    <span>AutoCanvas (Expand Sidebar)</span>
+                  </TooltipContent>
+                </Tooltip>
               </div>
             ) : (
               <div className="flex items-center justify-between">
