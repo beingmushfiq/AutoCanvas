@@ -5,7 +5,6 @@ import {
   CheckCircle2,
   ExternalLink,
 } from 'lucide-react'
-import { Hero3DCanvas } from './Hero3DCanvas'
 import type { PublicCmsData } from '../../../lib/api/client'
 
 interface HeroSectionProps {
@@ -104,9 +103,6 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             Real Social Engagement Data
           </span>
         </div>
-
-        {/* Interactive 3D Mascot & Social Media Management System */}
-        <Hero3DCanvas onExplore={onExploreDemo} />
       </div>
     </section>
   )
