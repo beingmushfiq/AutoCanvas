@@ -89,7 +89,10 @@ echo -e "${GREEN}✓ Composer dependencies installed.${NC}"
 
 echo -e "\n${BLUE}▶ [4/6] Generating encryption key & migrating database...${NC}"
 ${PHP_BIN} artisan key:generate --force
-${PHP_BIN} artisan migrate --force
+${PHP_BIN} artisan migrate --force || {
+    echo -e "${YELLOW}Notice: Standard migrate encountered partially created tables from previous attempt. Retrying with migrate:fresh...${NC}"
+    ${PHP_BIN} artisan migrate:fresh --force
+}
 ${PHP_BIN} artisan db:seed --force
 ${PHP_BIN} artisan storage:link || true
 echo -e "${GREEN}✓ Database schema and seeds initialized.${NC}"
