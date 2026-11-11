@@ -33,6 +33,7 @@ renderer/dist/
 Thumbs.db
 .idea/
 .vscode/
+.cursor/
 *.suo
 *.ntvs*
 *.njsproj
