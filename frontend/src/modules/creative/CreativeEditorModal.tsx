@@ -15,6 +15,8 @@ import {
   type CreativeTemplateInfo,
   type CreativeRenderResult,
 } from '../../lib/api/client'
+import { Button } from '../../components/ui/button'
+import { Input } from '../../components/ui/input'
 
 interface CreativeEditorModalProps {
   isOpen: boolean
@@ -126,43 +128,44 @@ export const CreativeEditorModal: React.FC<CreativeEditorModalProps> = ({
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 animate-in fade-in duration-150">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-4xl border border-[#EAECF0] overflow-hidden flex flex-col max-h-[92vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-150">
+      <div className="bg-surface rounded-2xl shadow-xl w-full max-w-4xl border border-border overflow-hidden flex flex-col max-h-[92vh]">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#EAECF0] bg-[#F9FAFB]">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-background-subtle">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-[#6257E8]/10 text-[#6257E8] flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-surface border border-border text-brand-accent flex items-center justify-center shadow-2xs">
               <Palette className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-[#101828]">Creative Studio — Deterministic Renderer</h3>
-              <p className="text-xs text-[#667085]">
+              <h3 className="text-base font-bold text-foreground">Creative Studio — Deterministic Renderer</h3>
+              <p className="text-xs text-foreground-secondary">
                 Chromium pixel-perfect brand rendering with verified typography & colors
               </p>
             </div>
           </div>
           <button
+            type="button"
             onClick={onClose}
-            className="p-1 rounded-lg text-[#98A2B3] hover:text-[#344054] hover:bg-[#F2F4F7]"
+            className="p-1 rounded-lg text-foreground-muted hover:text-foreground hover:bg-surface-raised transition-colors outline-hidden focus-visible:ring-2 focus-visible:ring-focus-ring"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Studio Workspace */}
-        <div className="grid grid-cols-2 divide-x divide-[#EAECF0] flex-1 overflow-hidden">
+        <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-border flex-1 overflow-hidden">
           {/* Controls Column */}
           <div className="p-6 overflow-y-auto space-y-4">
             {error && (
-              <div className="p-3 text-xs bg-rose-50 text-rose-700 rounded-lg border border-rose-200">
+              <div className="p-3 text-xs bg-status-danger-bg text-status-danger rounded-xl border border-status-danger font-semibold">
                 {error}
               </div>
             )}
 
             {/* Template Selector */}
             <div>
-              <label className="block text-xs font-semibold text-[#344054] mb-1.5 flex items-center gap-1.5">
-                <Layout className="w-3.5 h-3.5 text-[#6257E8]" />
+              <label className="block text-xs font-semibold text-foreground mb-1.5 flex items-center gap-1.5">
+                <Layout className="w-3.5 h-3.5 text-brand-accent" />
                 <span>Layout Template</span>
               </label>
               <div className="grid grid-cols-2 gap-2">
@@ -171,14 +174,14 @@ export const CreativeEditorModal: React.FC<CreativeEditorModalProps> = ({
                     key={tpl.id}
                     type="button"
                     onClick={() => setSelectedTemplate(tpl.id)}
-                    className={`p-3 text-left rounded-xl border transition-all ${
+                    className={`p-3 text-left rounded-xl border transition-all outline-hidden focus-visible:ring-2 focus-visible:ring-focus-ring ${
                       selectedTemplate === tpl.id
-                        ? 'border-[#6257E8] bg-[#6257E8]/5 ring-1 ring-[#6257E8]'
-                        : 'border-[#EAECF0] hover:border-[#D0D5DD]'
+                        ? 'border-brand-accent bg-background-subtle font-semibold shadow-2xs'
+                        : 'border-border hover:border-border-strong bg-surface text-foreground-secondary'
                     }`}
                   >
-                    <div className="text-xs font-bold text-[#101828]">{tpl.name}</div>
-                    <div className="text-[10px] text-[#667085] mt-0.5">{tpl.category}</div>
+                    <div className="text-xs font-bold text-foreground">{tpl.name}</div>
+                    <div className="text-[10px] text-foreground-muted mt-0.5">{tpl.category}</div>
                   </button>
                 ))}
               </div>
@@ -186,21 +189,21 @@ export const CreativeEditorModal: React.FC<CreativeEditorModalProps> = ({
 
             {/* Aspect Ratio */}
             <div>
-              <label className="block text-xs font-semibold text-[#344054] mb-1.5">Aspect Ratio</label>
+              <label className="block text-xs font-semibold text-foreground mb-1.5">Aspect Ratio</label>
               <div className="flex gap-2">
                 {[
-                  { id: '1:1', label: 'Square (1:1 Feed)' },
-                  { id: '4:5', label: 'Portrait (4:5 IG/FB)' },
-                  { id: '16:9', label: 'Landscape (16:9 LI)' },
+                  { id: '1:1', label: 'Square (1:1)' },
+                  { id: '4:5', label: 'Portrait (4:5)' },
+                  { id: '16:9', label: 'Landscape (16:9)' },
                 ].map((ratio) => (
                   <button
                     key={ratio.id}
                     type="button"
                     onClick={() => setAspectRatio(ratio.id as any)}
-                    className={`flex-1 py-1.5 text-xs font-semibold rounded-lg border transition-colors ${
+                    className={`flex-1 py-1.5 text-xs font-semibold rounded-xl border transition-colors outline-hidden focus-visible:ring-2 focus-visible:ring-focus-ring ${
                       aspectRatio === ratio.id
-                        ? 'bg-[#101828] text-white border-[#101828]'
-                        : 'bg-white text-[#344054] border-[#D0D5DD] hover:bg-[#F2F4F7]'
+                        ? 'bg-interactive-primary text-interactive-primary-fg border-border shadow-2xs'
+                        : 'bg-surface text-foreground-secondary border-border hover:bg-surface-raised hover:text-foreground'
                     }`}
                   >
                     {ratio.label}
@@ -211,43 +214,42 @@ export const CreativeEditorModal: React.FC<CreativeEditorModalProps> = ({
 
             {/* Text Inputs */}
             <div>
-              <label className="block text-xs font-semibold text-[#344054] mb-1">Headline Text</label>
-              <input
+              <label className="block text-xs font-semibold text-foreground mb-1">Headline Text</label>
+              <Input
                 type="text"
                 value={headline}
                 onChange={(e) => setHeadline(e.target.value)}
                 placeholder="Bold attention-grabbing headline..."
-                className="w-full px-3 py-2 text-xs border border-[#D0D5DD] rounded-lg focus:ring-2 focus:ring-[#6257E8]"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-[#344054] mb-1">Supporting Text / Takeaway</label>
+              <label className="block text-xs font-semibold text-foreground mb-1">Supporting Text / Takeaway</label>
               <textarea
                 rows={2}
                 value={supportingText}
                 onChange={(e) => setSupportingText(e.target.value)}
                 placeholder="Secondary insight or description..."
-                className="w-full px-3 py-2 text-xs border border-[#D0D5DD] rounded-lg focus:ring-2 focus:ring-[#6257E8]"
+                className="w-full px-3 py-2 text-xs bg-surface border border-border rounded-xl text-foreground placeholder:text-foreground-muted outline-hidden focus:ring-2 focus:ring-focus-ring"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-[#344054] mb-1">Call to Action Tag</label>
-              <input
+              <label className="block text-xs font-semibold text-foreground mb-1">Call to Action Tag</label>
+              <Input
                 type="text"
                 value={cta}
                 onChange={(e) => setCta(e.target.value)}
                 placeholder="e.g. Read the Report"
-                className="w-full px-3 py-2 text-xs border border-[#D0D5DD] rounded-lg focus:ring-2 focus:ring-[#6257E8]"
               />
             </div>
 
-            <button
+            <Button
               type="button"
               onClick={handleRender}
               disabled={rendering}
-              className="w-full flex items-center justify-center gap-2 py-2.5 bg-[#6257E8] text-white text-xs font-semibold rounded-xl hover:bg-[#5246D6] disabled:opacity-50 shadow-xs transition-colors"
+              variant="default"
+              className="w-full py-2.5 gap-2"
             >
               {rendering ? (
                 <>
@@ -260,14 +262,14 @@ export const CreativeEditorModal: React.FC<CreativeEditorModalProps> = ({
                   <span>Render Creative Preview</span>
                 </>
               )}
-            </button>
+            </Button>
           </div>
 
           {/* Live Preview Column */}
-          <div className="p-6 bg-[#F9FAFB] flex flex-col items-center justify-center overflow-hidden">
+          <div className="p-6 bg-background-subtle flex flex-col items-center justify-center overflow-hidden">
             {renderResult ? (
               <div className="space-y-4 w-full flex flex-col items-center">
-                <div className="relative max-h-[380px] rounded-xl overflow-hidden shadow-lg border border-black/10 bg-white">
+                <div className="relative max-h-[380px] rounded-xl overflow-hidden shadow-lg border border-border bg-surface">
                   <img
                     src={renderResult.file_url}
                     alt="Creative Preview"
@@ -275,12 +277,12 @@ export const CreativeEditorModal: React.FC<CreativeEditorModalProps> = ({
                   />
                 </div>
 
-                <div className="flex items-center justify-between w-full px-2 text-xs text-[#667085]">
-                  <span className="flex items-center gap-1 font-semibold text-emerald-700">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                <div className="flex items-center justify-between w-full px-2 text-xs text-foreground-secondary">
+                  <div className="flex items-center gap-1 font-semibold text-status-success">
+                    <CheckCircle2 className="w-3.5 h-3.5" />
                     <span>Engine: {renderResult.renderer}</span>
-                  </span>
-                  <span>
+                  </div>
+                  <span className="font-mono">
                     {renderResult.width}x{renderResult.height} ({renderResult.format.toUpperCase()})
                   </span>
                   <a
@@ -288,7 +290,7 @@ export const CreativeEditorModal: React.FC<CreativeEditorModalProps> = ({
                     download="creative.png"
                     target="_blank"
                     rel="noreferrer"
-                    className="flex items-center gap-1 text-[#6257E8] hover:underline"
+                    className="flex items-center gap-1 text-brand-accent hover:underline"
                   >
                     <Download className="w-3 h-3" />
                     <span>Download</span>
@@ -296,10 +298,10 @@ export const CreativeEditorModal: React.FC<CreativeEditorModalProps> = ({
                 </div>
               </div>
             ) : (
-              <div className="text-center p-8 text-[#98A2B3]">
-                <Sparkles className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                <p className="text-xs font-medium">Click "Render Creative Preview" to composite image.</p>
-                <p className="text-[11px] text-[#98A2B3] mt-1">
+              <div className="text-center p-8 text-foreground-muted">
+                <Sparkles className="w-8 h-8 mx-auto mb-2 opacity-50 text-brand-accent" />
+                <p className="text-xs font-medium text-foreground">Click "Render Creative Preview" to composite image.</p>
+                <p className="text-[11px] text-foreground-muted mt-1">
                   Renderer uses brand colors, fonts, and clean SVG/HTML templates.
                 </p>
               </div>
@@ -308,24 +310,25 @@ export const CreativeEditorModal: React.FC<CreativeEditorModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-[#EAECF0] bg-white flex items-center justify-end gap-3">
-          <button
+        <div className="px-6 py-4 border-t border-border bg-surface flex items-center justify-end gap-3">
+          <Button
+            type="button"
+            variant="outline"
             onClick={onClose}
-            className="px-4 py-2 text-xs font-semibold text-[#344054] bg-white border border-[#D0D5DD] rounded-lg hover:bg-[#F2F4F7]"
           >
             Close
-          </button>
+          </Button>
           {renderResult && (
-            <button
+            <Button
+              type="button"
+              variant="default"
               onClick={onClose}
-              className="px-5 py-2 text-xs font-semibold text-white bg-[#6257E8] rounded-lg hover:bg-[#5246D6] shadow-xs"
             >
               Done
-            </button>
+            </Button>
           )}
         </div>
       </div>
     </div>
   )
 }
-

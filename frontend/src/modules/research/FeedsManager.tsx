@@ -13,6 +13,9 @@ import {
   AlertTriangle,
 } from 'lucide-react'
 import { apiClient, type ApiResponse, type FeedArticle, type RssFeed } from '../../lib/api/client'
+import { Button } from '../../components/ui/button'
+import { Input } from '../../components/ui/input'
+import { Badge } from '../../components/ui/badge'
 
 interface FeedsManagerProps {
   brandId: string
@@ -134,84 +137,87 @@ export const FeedsManager: React.FC<FeedsManagerProps> = ({ brandId }) => {
     <div className="space-y-6">
       {/* Alert Messages */}
       {success && (
-        <div className="p-3 rounded-lg bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 flex items-center justify-between">
+        <div className="p-3.5 rounded-xl bg-status-success-bg border border-status-success text-xs text-status-success flex items-center justify-between font-semibold">
           <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+            <CheckCircle2 className="w-4 h-4 shrink-0" />
             <span>{success}</span>
           </div>
-          <button onClick={() => setSuccess(null)} className="text-emerald-600 hover:text-emerald-800">
+          <button type="button" onClick={() => setSuccess(null)} className="hover:opacity-80">
             <X className="w-3.5 h-3.5" />
           </button>
         </div>
       )}
 
       {error && (
-        <div className="p-3 rounded-lg bg-rose-50 border border-rose-200 text-xs text-rose-700 flex items-center justify-between">
+        <div className="p-3.5 rounded-xl bg-status-danger-bg border border-status-danger text-xs text-status-danger flex items-center justify-between font-semibold">
           <div className="flex items-center gap-2">
-            <XCircle className="w-4 h-4 text-rose-500" />
+            <XCircle className="w-4 h-4 shrink-0" />
             <span>{error}</span>
           </div>
-          <button onClick={() => setError(null)} className="text-rose-600 hover:text-rose-800">
+          <button type="button" onClick={() => setError(null)} className="hover:opacity-80">
             <X className="w-3.5 h-3.5" />
           </button>
         </div>
       )}
 
       {/* Subscribed Feeds Section */}
-      <div className="bg-white rounded-xl border border-[#EAECF0] p-5 shadow-xs">
-        <div className="flex items-center justify-between mb-4">
+      <div className="bg-surface rounded-2xl border border-border p-6 shadow-2xs">
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
           <div>
-            <h3 className="text-sm font-semibold text-[#101828]">Subscribed Industry Feeds</h3>
-            <p className="text-xs text-[#667085]">
+            <h3 className="text-sm font-semibold text-foreground">Subscribed Industry Feeds</h3>
+            <p className="text-xs text-foreground-secondary">
               Real-time RSS / Atom sources automatically ingested and deduplicated.
             </p>
           </div>
 
-          <button
+          <Button
+            type="button"
             onClick={() => setShowAddModal(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#6257E8] text-white text-xs font-semibold hover:bg-[#5245db] transition-all shadow-xs"
+            variant="default"
+            size="sm"
+            className="gap-1.5"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Add RSS Feed</span>
-          </button>
+          </Button>
         </div>
 
         {feeds.length === 0 ? (
-          <div className="p-8 text-center rounded-lg border border-dashed border-[#EAECF0] bg-[#F9FAFB]">
-            <Rss className="w-8 h-8 text-[#98A2B3] mx-auto mb-2" />
-            <p className="text-xs font-medium text-[#344054]">No RSS feeds subscribed yet</p>
-            <p className="text-[11px] text-[#667085] mt-0.5 mb-3">
+          <div className="p-8 text-center rounded-xl border border-dashed border-border bg-background-subtle">
+            <Rss className="w-8 h-8 text-foreground-muted mx-auto mb-2" />
+            <p className="text-xs font-semibold text-foreground">No RSS feeds subscribed yet</p>
+            <p className="text-[11px] text-foreground-secondary mt-0.5 mb-3">
               Add your industry news sources, blogs, or competitor feeds to automatically feed the radar.
             </p>
-            <button
+            <Button
+              type="button"
               onClick={() => setShowAddModal(true)}
-              className="px-3 py-1.5 rounded-lg bg-white border border-[#D0D5DD] text-xs font-semibold text-[#344054] hover:bg-gray-50"
+              variant="outline"
+              size="sm"
             >
               Add First Feed
-            </button>
+            </Button>
           </div>
         ) : (
-          <div className="divide-y divide-[#EAECF0]">
+          <div className="divide-y divide-border">
             {feeds.map((feed) => (
               <div key={feed.id} className="py-3.5 flex items-center justify-between gap-4 first:pt-0 last:pb-0">
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-semibold text-[#101828] truncate">{feed.name}</span>
-                    <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-[#F2F4F7] text-[#344054]">
-                      {feed.category}
-                    </span>
+                    <span className="text-xs font-semibold text-foreground truncate">{feed.name}</span>
+                    <Badge variant="secondary">{feed.category}</Badge>
                     {feed.status === 'failing' && (
-                      <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-rose-50 text-rose-700 flex items-center gap-1">
-                        <AlertTriangle className="w-3 h-3 text-rose-500" /> Failing
-                      </span>
+                      <Badge variant="danger" className="gap-1">
+                        <AlertTriangle className="w-3 h-3" /> Failing
+                      </Badge>
                     )}
                   </div>
-                  <div className="flex items-center gap-3 mt-1 text-[11px] text-[#667085]">
+                  <div className="flex items-center gap-3 mt-1 text-[11px] text-foreground-secondary">
                     <span className="truncate max-w-xs">{feed.url}</span>
                     <span>•</span>
                     <span>{feed.articles_count ?? 0} articles</span>
                     <span>•</span>
-                    <span>
+                    <span className="font-mono">
                       {feed.last_fetched_at
                         ? `Last sync: ${new Date(feed.last_fetched_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
                         : 'Never synced'}
@@ -221,18 +227,22 @@ export const FeedsManager: React.FC<FeedsManagerProps> = ({ brandId }) => {
 
                 <div className="flex items-center gap-2 shrink-0">
                   <button
+                    type="button"
                     onClick={() => handleSyncFeed(feed.id)}
                     disabled={syncingId === feed.id}
                     title="Sync Now"
-                    className="p-1.5 rounded-lg border border-[#EAECF0] hover:bg-[#F2F4F7] text-[#344054] transition-colors disabled:opacity-50"
+                    aria-label="Sync Now"
+                    className="p-1.5 rounded-lg border border-border hover:bg-surface-raised text-foreground-secondary hover:text-foreground transition-colors disabled:opacity-50 outline-hidden focus-visible:ring-2 focus-visible:ring-focus-ring"
                   >
                     <RefreshCw className={`w-3.5 h-3.5 ${syncingId === feed.id ? 'animate-spin' : ''}`} />
                   </button>
 
                   <button
+                    type="button"
                     onClick={() => handleDeleteFeed(feed.id)}
                     title="Delete Feed"
-                    className="p-1.5 rounded-lg border border-[#EAECF0] hover:bg-rose-50 hover:text-rose-600 text-[#667085] transition-colors"
+                    aria-label="Delete Feed"
+                    className="p-1.5 rounded-lg border border-border hover:bg-status-danger-bg hover:text-status-danger text-foreground-muted transition-colors outline-hidden focus-visible:ring-2 focus-visible:ring-focus-ring"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
@@ -244,60 +254,61 @@ export const FeedsManager: React.FC<FeedsManagerProps> = ({ brandId }) => {
       </div>
 
       {/* Ingested Articles Stream */}
-      <div className="bg-white rounded-xl border border-[#EAECF0] p-5 shadow-xs">
-        <div className="flex items-center justify-between mb-4 gap-4">
+      <div className="bg-surface rounded-2xl border border-border p-6 shadow-2xs">
+        <div className="flex flex-wrap items-center justify-between mb-4 gap-4">
           <div>
-            <h3 className="text-sm font-semibold text-[#101828]">Ingested Article Stream</h3>
-            <p className="text-xs text-[#667085]">Recent articles extracted and sanitized from active feeds.</p>
+            <h3 className="text-sm font-semibold text-foreground">Ingested Article Stream</h3>
+            <p className="text-xs text-foreground-secondary">Recent articles extracted and sanitized from active feeds.</p>
           </div>
 
           <div className="flex items-center gap-2">
             <form onSubmit={handleSearchSubmit} className="relative">
-              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-[#98A2B3]" />
-              <input
+              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-foreground-muted" />
+              <Input
                 type="text"
                 placeholder="Search headlines..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="pl-8 pr-3 py-1.5 rounded-lg border border-[#D0D5DD] text-xs focus:outline-none focus:border-[#6257E8] w-48"
+                className="pl-8 w-48 text-xs py-1.5 h-8"
               />
             </form>
 
             <button
+              type="button"
               onClick={() => setSavedOnly(!savedOnly)}
-              className={`flex items-center gap-1 px-3 py-1.5 rounded-lg border text-xs font-medium transition-all ${
+              className={`flex items-center gap-1 px-3 py-1.5 rounded-xl border text-xs font-semibold transition-all outline-hidden focus-visible:ring-2 focus-visible:ring-focus-ring ${
                 savedOnly
-                  ? 'bg-amber-50 border-amber-200 text-amber-800'
-                  : 'border-[#D0D5DD] bg-white text-[#344054] hover:bg-gray-50'
+                  ? 'bg-brand-accent text-interactive-primary-fg border-brand-accent'
+                  : 'border-border bg-surface text-foreground-secondary hover:bg-surface-raised hover:text-foreground'
               }`}
             >
-              <Bookmark className={`w-3.5 h-3.5 ${savedOnly ? 'fill-amber-500 text-amber-500' : ''}`} />
+              <Bookmark className={`w-3.5 h-3.5 ${savedOnly ? 'fill-current' : ''}`} />
               <span>Saved Only</span>
             </button>
           </div>
         </div>
 
         {loading ? (
-          <div className="p-8 text-center text-xs text-[#667085]">
-            <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2 text-[#6257E8]" />
+          <div className="p-8 text-center text-xs text-foreground-secondary">
+            <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2 text-brand-accent" />
             Loading articles...
           </div>
         ) : articles.length === 0 ? (
-          <div className="p-8 text-center text-xs text-[#667085]">
+          <div className="p-8 text-center text-xs text-foreground-secondary">
             No articles found. Sync your feeds to ingest recent stories.
           </div>
         ) : (
-          <div className="divide-y divide-[#EAECF0]">
+          <div className="divide-y divide-border">
             {articles.map((article) => (
               <div key={article.id} className="py-3.5 flex items-start justify-between gap-4 first:pt-0 last:pb-0">
                 <div className="min-w-0 space-y-1">
                   <div className="flex items-center gap-2 flex-wrap">
                     {article.feed && (
-                      <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-[#F4F3FF] text-[#6257E8]">
+                      <Badge variant="accent">
                         {article.feed.name}
-                      </span>
+                      </Badge>
                     )}
-                    <span className="text-[11px] text-[#667085]">
+                    <span className="text-[11px] text-foreground-muted font-mono">
                       {new Date(article.published_at).toLocaleDateString([], {
                         month: 'short',
                         day: 'numeric',
@@ -305,37 +316,39 @@ export const FeedsManager: React.FC<FeedsManagerProps> = ({ brandId }) => {
                       })}
                     </span>
                     {article.relevance_score >= 80 && (
-                      <span className="px-1.5 py-0.2 rounded text-[10px] font-medium bg-emerald-50 text-emerald-700">
+                      <Badge variant="success">
                         High Match
-                      </span>
+                      </Badge>
                     )}
                   </div>
 
-                  <h4 className="text-xs font-semibold text-[#101828] leading-snug">
+                  <h4 className="text-xs font-semibold text-foreground leading-snug">
                     <a
                       href={article.url}
                       target="_blank"
                       rel="noreferrer"
-                      className="hover:text-[#6257E8] transition-colors inline-flex items-center gap-1"
+                      className="hover:text-brand-accent transition-colors inline-flex items-center gap-1"
                     >
                       {article.title}
-                      <ExternalLink className="w-3 h-3 text-[#98A2B3]" />
+                      <ExternalLink className="w-3 h-3 text-foreground-muted" />
                     </a>
                   </h4>
 
                   {article.summary && (
-                    <p className="text-[11px] text-[#475467] line-clamp-2 leading-relaxed">{article.summary}</p>
+                    <p className="text-[11px] text-foreground-secondary line-clamp-2 leading-relaxed">{article.summary}</p>
                   )}
                 </div>
 
                 <div className="shrink-0 flex items-center gap-2">
                   <button
+                    type="button"
                     onClick={() => handleToggleSave(article.id)}
                     title={article.is_saved ? 'Remove bookmark' : 'Bookmark article'}
-                    className="p-1.5 rounded-lg border border-[#EAECF0] hover:bg-[#F2F4F7] text-[#667085] transition-colors"
+                    aria-label={article.is_saved ? 'Remove bookmark' : 'Bookmark article'}
+                    className="p-1.5 rounded-lg border border-border hover:bg-surface-raised text-foreground-muted hover:text-foreground transition-colors outline-hidden focus-visible:ring-2 focus-visible:ring-focus-ring"
                   >
                     <Bookmark
-                      className={`w-3.5 h-3.5 ${article.is_saved ? 'fill-amber-500 text-amber-500' : ''}`}
+                      className={`w-3.5 h-3.5 ${article.is_saved ? 'fill-brand-accent text-brand-accent' : ''}`}
                     />
                   </button>
                 </div>
@@ -347,13 +360,14 @@ export const FeedsManager: React.FC<FeedsManagerProps> = ({ brandId }) => {
 
       {/* Add Feed Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4">
-          <div className="bg-white rounded-2xl w-full max-w-md border border-[#EAECF0] shadow-xl p-6">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
+          <div className="bg-surface rounded-2xl w-full max-w-md border border-border shadow-xl p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-base font-bold text-[#101828]">Subscribe to RSS Feed</h3>
+              <h3 className="text-base font-bold text-foreground">Subscribe to RSS Feed</h3>
               <button
+                type="button"
                 onClick={() => setShowAddModal(false)}
-                className="text-[#667085] hover:text-[#101828] p-1 rounded-lg"
+                className="text-foreground-muted hover:text-foreground p-1 rounded-lg outline-hidden focus-visible:ring-2 focus-visible:ring-focus-ring"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -361,39 +375,37 @@ export const FeedsManager: React.FC<FeedsManagerProps> = ({ brandId }) => {
 
             <form onSubmit={handleAddFeedSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-[#344054] mb-1">Feed Name</label>
-                <input
+                <label className="block text-xs font-semibold text-foreground mb-1">Feed Name</label>
+                <Input
                   type="text"
                   required
                   placeholder="e.g. TechCrunch Enterprise"
                   value={feedName}
                   onChange={(e) => setFeedName(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border border-[#D0D5DD] text-xs focus:outline-none focus:border-[#6257E8]"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-[#344054] mb-1">Feed URL (RSS or Atom)</label>
-                <input
+                <label className="block text-xs font-semibold text-foreground mb-1">Feed URL (RSS or Atom)</label>
+                <Input
                   type="url"
                   required
                   placeholder="https://example.com/feed.xml"
                   value={feedUrl}
                   onChange={(e) => setFeedUrl(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border border-[#D0D5DD] text-xs focus:outline-none focus:border-[#6257E8]"
                 />
-                <span className="text-[10px] text-[#667085] mt-1 block">
+                <span className="text-[10px] text-foreground-muted mt-1 block">
                   Strict SSRF protection active. Private and internal network addresses are blocked.
                 </span>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-[#344054] mb-1">Category</label>
+                  <label className="block text-xs font-semibold text-foreground mb-1">Category</label>
                   <select
                     value={feedCategory}
                     onChange={(e) => setFeedCategory(e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg border border-[#D0D5DD] text-xs focus:outline-none focus:border-[#6257E8]"
+                    className="w-full px-3 py-2 rounded-xl bg-surface text-foreground border border-border text-xs outline-hidden focus:ring-2 focus:ring-focus-ring"
                   >
                     <option value="industry_news">Industry News</option>
                     <option value="technology">Technology & AI</option>
@@ -404,11 +416,11 @@ export const FeedsManager: React.FC<FeedsManagerProps> = ({ brandId }) => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-[#344054] mb-1">Fetch Cadence</label>
+                  <label className="block text-xs font-semibold text-foreground mb-1">Fetch Cadence</label>
                   <select
                     value={fetchFrequency}
                     onChange={(e) => setFetchFrequency(Number(e.target.value))}
-                    className="w-full px-3 py-2 rounded-lg border border-[#D0D5DD] text-xs focus:outline-none focus:border-[#6257E8]"
+                    className="w-full px-3 py-2 rounded-xl bg-surface text-foreground border border-border text-xs outline-hidden focus:ring-2 focus:ring-focus-ring"
                   >
                     <option value={30}>Every 30 mins</option>
                     <option value={60}>Every 1 hour</option>
@@ -419,20 +431,20 @@ export const FeedsManager: React.FC<FeedsManagerProps> = ({ brandId }) => {
               </div>
 
               <div className="pt-2 flex items-center justify-end gap-2">
-                <button
+                <Button
                   type="button"
+                  variant="outline"
                   onClick={() => setShowAddModal(false)}
-                  className="px-4 py-2 rounded-lg border border-[#D0D5DD] text-xs font-semibold text-[#344054] hover:bg-gray-50"
                 >
                   Cancel
-                </button>
-                <button
+                </Button>
+                <Button
                   type="submit"
                   disabled={submitting}
-                  className="px-4 py-2 rounded-lg bg-[#6257E8] text-white text-xs font-semibold hover:bg-[#5245db] disabled:opacity-50"
+                  variant="default"
                 >
                   {submitting ? 'Subscribing...' : 'Add Feed'}
-                </button>
+                </Button>
               </div>
             </form>
           </div>

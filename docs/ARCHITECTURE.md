@@ -88,3 +88,46 @@ Every domain module under `backend/app/Modules/` is strictly encapsulated:
 - **Event-Driven Workflows:** Asynchronous transitions (e.g. `ContentApproved`, `PublishingSucceeded`) fire Laravel Events listened to by Queued Listeners.
 - **Micro-Daemon Rendering:** The rendering engine operates as a separate Node.js service communicating over a local HTTP interface to protect PHP worker memory.
 
+---
+
+## 4. Frontend Design Architecture & UI/UX Stack
+
+AutoCanvas avoids generic "AI UI" templates by adhering to an **Industrial Kinetic / Editorial Studio Operations** design stance supported by verified design intelligence:
+
+```mermaid
+graph LR
+    User["User Interface\nReact 19 + Tailwind v4"] --> CmdK["Global Command Palette\n(cmdk + motion)"]
+    User --> Canvas["Interactive Creative Studio\n(React Konva MIT Core)"]
+    User --> Calendar["Publishing Calendar\n(FullCalendar MIT Core)"]
+    User --> Telemetry["Command Center Telemetry\n(Recharts Operational)"]
+    
+    subgraph DesignTokens["Design Tokens & Typography"]
+        Geist["Geist Sans (Latin UI)"]
+        GeistMono["Geist Mono (Telemetry & Codes)"]
+        NotoBN["Noto Sans Bengali (Bilingual Fallback)"]
+        ThemeTokens["CSS Variables (Dark/Light + Density)"]
+    end
+    
+    subgraph Complexity["Progressive Complexity"]
+        OwnerMode["Business Owner Mode\n(Streamlined Core)"]
+        AgencyMode["Agency Pro Mode\n(Full Orchestration Suite)"]
+    end
+```
+
+### Permissive Component & Toolkit Stack:
+- **Primitives**: `shadcn/ui` + `Radix UI` accessible headless components (Dialog, Tooltip, Dropdown Menu).
+- **Styling**: `Tailwind CSS v4` with theme CSS variables (`data-theme="dark|light"`, `data-density="comfortable|compact"`).
+- **Iconography**: `Lucide React` for restrained, consistent operational iconography.
+- **Motion**: `Motion for React` (`motion`) for purposeful entrance sequences and modal transitions.
+- **Creative Canvas**: `React Konva` (MIT Core), strictly avoiding `tldraw` commercial licensing fees.
+- **Publishing Calendar**: `FullCalendar` MIT Core (`dayGridMonth`), avoiding proprietary premium scheduler modules.
+- **Data Grids**: `TanStack Table` for information-dense publishing queues and audit trails.
+- **Telemetry**: `Recharts` for live publishing cadence and channel engagement visualization.
+- **Command Interface**: `cmdk` mounted globally with `⌘K` / `Ctrl+K`.
+
+### Typography Standard:
+- **Primary Latin**: `Geist Sans` (SIL Open Font License)
+- **Technical Metadata**: `Geist Mono` (SIL Open Font License)
+- **Multilingual Support**: `Noto Sans Bengali` (SIL Open Font License)
+
+

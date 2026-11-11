@@ -10,14 +10,19 @@ import {
   XCircle,
   CheckCircle2,
   RefreshCw,
+  Compass,
 } from 'lucide-react'
 import {
   apiClient,
   type ApiResponse,
+  type CompetitorGapReport,
   type CompetitorInsights,
   type CompetitorPost,
   type CompetitorProfile,
 } from '../../lib/api/client'
+import { Button } from '../../components/ui/button'
+import { Input } from '../../components/ui/input'
+import { Badge } from '../../components/ui/badge'
 
 interface CompetitorManagerProps {
   brandId: string
@@ -26,6 +31,7 @@ interface CompetitorManagerProps {
 export const CompetitorManager: React.FC<CompetitorManagerProps> = ({ brandId }) => {
   const [competitors, setCompetitors] = useState<CompetitorProfile[]>([])
   const [insights, setInsights] = useState<CompetitorInsights | null>(null)
+  const [gaps, setGaps] = useState<CompetitorGapReport | null>(null)
   const [activeCompetitorId, setActiveCompetitorId] = useState<string | null>(null)
   const [posts, setPosts] = useState<CompetitorPost[]>([])
   const [loading, setLoading] = useState(true)
@@ -60,14 +66,18 @@ export const CompetitorManager: React.FC<CompetitorManagerProps> = ({ brandId })
     try {
       setLoading(true)
       setError(null)
-      const [compsRes, insightsRes] = await Promise.all([
+      const [compsRes, insightsRes, gapsRes] = await Promise.all([
         apiClient.get<ApiResponse<CompetitorProfile[]>>(`/brands/${brandId}/competitors`),
         apiClient.get<ApiResponse<CompetitorInsights>>(`/brands/${brandId}/competitor-insights`),
+        apiClient.getCompetitorGaps(brandId).catch(() => ({ success: false, data: undefined })),
       ])
 
       const compList = compsRes.data || []
       setCompetitors(compList)
       setInsights(insightsRes.data || null)
+      if (gapsRes.success && gapsRes.data) {
+        setGaps(gapsRes.data)
+      }
 
       if (compList.length > 0 && !activeCompetitorId) {
         setActiveCompetitorId(compList[0].id)
@@ -163,8 +173,8 @@ export const CompetitorManager: React.FC<CompetitorManagerProps> = ({ brandId })
 
   if (loading && competitors.length === 0) {
     return (
-      <div className="p-12 text-center text-xs text-[#667085]">
-        <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2 text-[#6257E8]" />
+      <div className="p-12 text-center text-xs text-foreground-secondary">
+        <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2 text-brand-accent" />
         Loading competitor intelligence...
       </div>
     )
@@ -174,24 +184,24 @@ export const CompetitorManager: React.FC<CompetitorManagerProps> = ({ brandId })
     <div className="space-y-6">
       {/* Alert Messages */}
       {success && (
-        <div className="p-3 rounded-lg bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 flex items-center justify-between">
+        <div className="p-3.5 rounded-xl bg-status-success-bg border border-status-success text-xs text-status-success flex items-center justify-between font-semibold">
           <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+            <CheckCircle2 className="w-4 h-4 shrink-0" />
             <span>{success}</span>
           </div>
-          <button onClick={() => setSuccess(null)} className="text-emerald-600 hover:text-emerald-800">
+          <button type="button" onClick={() => setSuccess(null)} className="hover:opacity-80">
             <X className="w-3.5 h-3.5" />
           </button>
         </div>
       )}
 
       {error && (
-        <div className="p-3 rounded-lg bg-rose-50 border border-rose-200 text-xs text-rose-700 flex items-center justify-between">
+        <div className="p-3.5 rounded-xl bg-status-danger-bg border border-status-danger text-xs text-status-danger flex items-center justify-between font-semibold">
           <div className="flex items-center gap-2">
-            <XCircle className="w-4 h-4 text-rose-500" />
+            <XCircle className="w-4 h-4 shrink-0" />
             <span>{error}</span>
           </div>
-          <button onClick={() => setError(null)} className="text-rose-600 hover:text-rose-800">
+          <button type="button" onClick={() => setError(null)} className="hover:opacity-80">
             <X className="w-3.5 h-3.5" />
           </button>
         </div>
@@ -200,35 +210,35 @@ export const CompetitorManager: React.FC<CompetitorManagerProps> = ({ brandId })
       {/* Aggregate Insights Banner */}
       {insights && (
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-          <div className="bg-white p-4 rounded-xl border border-[#EAECF0] shadow-xs">
-            <span className="text-xs font-medium text-[#667085]">Competitors Tracked</span>
+          <div className="bg-surface p-4 rounded-2xl border border-border shadow-2xs">
+            <span className="text-xs font-medium text-foreground-secondary">Competitors Tracked</span>
             <div className="mt-1 flex items-baseline gap-2">
-              <span className="text-xl font-bold text-[#101828]">{insights.total_competitors}</span>
-              <span className="text-xs text-emerald-600 font-medium">Active</span>
+              <span className="text-xl font-bold text-foreground">{insights.total_competitors}</span>
+              <Badge variant="success">Active</Badge>
             </div>
           </div>
 
-          <div className="bg-white p-4 rounded-xl border border-[#EAECF0] shadow-xs">
-            <span className="text-xs font-medium text-[#667085]">Observed Posts</span>
+          <div className="bg-surface p-4 rounded-2xl border border-border shadow-2xs">
+            <span className="text-xs font-medium text-foreground-secondary">Observed Posts</span>
             <div className="mt-1 flex items-baseline gap-2">
-              <span className="text-xl font-bold text-[#101828]">{insights.total_posts_observed}</span>
-              <span className="text-xs text-[#667085]">Logged</span>
+              <span className="text-xl font-bold text-foreground">{insights.total_posts_observed}</span>
+              <span className="text-xs text-foreground-muted">Logged</span>
             </div>
           </div>
 
-          <div className="bg-white p-4 rounded-xl border border-[#EAECF0] shadow-xs">
-            <span className="text-xs font-medium text-[#667085]">Avg Posts / Week</span>
+          <div className="bg-surface p-4 rounded-2xl border border-border shadow-2xs">
+            <span className="text-xs font-medium text-foreground-secondary">Avg Posts / Week</span>
             <div className="mt-1 flex items-baseline gap-2">
-              <span className="text-xl font-bold text-[#101828]">{insights.avg_posts_per_week}</span>
-              <span className="text-xs text-[#667085]">Cadence</span>
+              <span className="text-xl font-bold text-foreground">{insights.avg_posts_per_week}</span>
+              <span className="text-xs text-foreground-muted">Cadence</span>
             </div>
           </div>
 
-          <div className="bg-white p-4 rounded-xl border border-[#EAECF0] shadow-xs">
-            <span className="text-xs font-medium text-[#667085]">Total Engagements</span>
+          <div className="bg-surface p-4 rounded-2xl border border-border shadow-2xs">
+            <span className="text-xs font-medium text-foreground-secondary">Total Engagements</span>
             <div className="mt-1 flex items-baseline gap-2">
-              <span className="text-xl font-bold text-[#6257E8]">{insights.total_engagements_observed}</span>
-              <span className="text-xs text-[#667085]">Signals</span>
+              <span className="text-xl font-bold text-brand-accent">{insights.total_engagements_observed}</span>
+              <span className="text-xs text-foreground-muted">Signals</span>
             </div>
           </div>
         </div>
@@ -236,19 +246,19 @@ export const CompetitorManager: React.FC<CompetitorManagerProps> = ({ brandId })
 
       {/* Top Themes Tag Cloud */}
       {insights && insights.top_themes.length > 0 && (
-        <div className="p-4 rounded-xl bg-white border border-[#EAECF0] shadow-xs">
+        <div className="p-4 rounded-2xl bg-surface border border-border shadow-2xs">
           <div className="flex items-center gap-2 mb-2.5">
-            <Tag className="w-3.5 h-3.5 text-[#6257E8]" />
-            <span className="text-xs font-bold text-[#101828]">Top Observed Themes in Market</span>
+            <Tag className="w-3.5 h-3.5 text-brand-accent" />
+            <span className="text-xs font-bold text-foreground">Top Observed Themes in Market</span>
           </div>
           <div className="flex flex-wrap gap-2">
             {insights.top_themes.map((t) => (
               <span
                 key={t.theme}
-                className="px-2.5 py-1 rounded-lg text-xs font-medium bg-[#F4F3FF] text-[#6257E8] border border-[#6257E8]/20 flex items-center gap-1.5"
+                className="px-2.5 py-1 rounded-lg text-xs font-medium bg-background-subtle text-foreground border border-border flex items-center gap-1.5"
               >
                 <span>#{t.theme}</span>
-                <span className="text-[10px] bg-white px-1.5 py-0.2 rounded-full font-bold shadow-xs">
+                <span className="text-[10px] bg-surface px-1.5 py-0.5 rounded-full font-bold shadow-2xs border border-border">
                   {t.count}
                 </span>
               </span>
@@ -257,43 +267,82 @@ export const CompetitorManager: React.FC<CompetitorManagerProps> = ({ brandId })
         </div>
       )}
 
+      {/* Strategic Market Whitespace (Gap Analysis) */}
+      {gaps && gaps.whitespace_opportunities.length > 0 && (
+        <div className="p-4 rounded-2xl bg-surface border border-brand-accent/30 shadow-2xs">
+          <div className="flex items-center gap-2 mb-3">
+            <Compass className="w-4 h-4 text-brand-accent" />
+            <span className="text-xs font-bold text-foreground">
+              Market Whitespace: Untapped Content Pillar Opportunities
+            </span>
+            <Badge variant="accent">
+              {gaps.total_gaps_identified} Untapped Themes
+            </Badge>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {gaps.whitespace_opportunities.map((gap) => (
+              <div
+                key={gap.pillar_id}
+                className="p-3 rounded-xl bg-surface-raised border border-border text-xs space-y-1.5"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-foreground">{gap.pillar_name}</span>
+                  <Badge variant="success">Zero Competitor Activity</Badge>
+                </div>
+                <p className="text-[11px] text-foreground-secondary leading-relaxed">
+                  {gap.strategic_advantage}
+                </p>
+                <div className="text-[11px] font-medium text-brand-accent">
+                  👉 {gap.recommended_action}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Main Workspace: Left Column Competitor List, Right Column Posts */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Left Column: Competitors */}
-        <div className="bg-white rounded-xl border border-[#EAECF0] p-4 shadow-xs space-y-3">
-          <div className="flex items-center justify-between pb-3 border-b border-[#EAECF0]">
-            <h4 className="text-xs font-bold text-[#101828] uppercase tracking-wide">Competitors</h4>
-            <button
+        <div className="bg-surface rounded-2xl border border-border p-4 shadow-2xs space-y-3">
+          <div className="flex items-center justify-between pb-3 border-b border-border">
+            <h4 className="text-xs font-bold text-foreground-muted uppercase tracking-wide">Competitors</h4>
+            <Button
+              type="button"
               onClick={() => setShowAddCompetitorModal(true)}
-              className="p-1 rounded-md bg-[#6257E8] text-white hover:bg-[#5245db] transition-colors"
+              variant="default"
+              size="icon"
               title="Add Competitor"
+              aria-label="Add Competitor"
+              className="w-7 h-7"
             >
               <Plus className="w-3.5 h-3.5" />
-            </button>
+            </Button>
           </div>
 
           {competitors.length === 0 ? (
-            <div className="py-8 text-center text-xs text-[#667085]">No competitors registered yet.</div>
+            <div className="py-8 text-center text-xs text-foreground-muted">No competitors registered yet.</div>
           ) : (
             <div className="space-y-1.5">
               {competitors.map((comp) => (
                 <button
                   key={comp.id}
+                  type="button"
                   onClick={() => handleSelectCompetitor(comp.id)}
-                  className={`w-full text-left p-3 rounded-lg border transition-all ${
+                  className={`w-full text-left p-3 rounded-xl border transition-all outline-hidden focus-visible:ring-2 focus-visible:ring-focus-ring ${
                     activeCompetitorId === comp.id
-                      ? 'bg-[#F4F3FF] border-[#6257E8] text-[#101828]'
-                      : 'border-[#EAECF0] hover:bg-gray-50 text-[#344054]'
+                      ? 'bg-background-subtle border-brand-accent text-foreground font-semibold'
+                      : 'border-border hover:bg-surface-raised text-foreground-secondary hover:text-foreground'
                   }`}
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold truncate">{comp.name}</span>
-                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-white border border-[#EAECF0] font-semibold text-[#667085]">
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-surface border border-border font-semibold text-foreground-muted">
                       {comp.posts_count ?? 0} posts
                     </span>
                   </div>
                   {comp.website_url && (
-                    <span className="text-[11px] text-[#667085] truncate block mt-0.5">
+                    <span className="text-[11px] text-foreground-muted truncate block mt-0.5">
                       {comp.website_url.replace(/^https?:\/\//, '')}
                     </span>
                   )}
@@ -306,72 +355,75 @@ export const CompetitorManager: React.FC<CompetitorManagerProps> = ({ brandId })
         {/* Right Column: Active Competitor Posts & Observation */}
         <div className="md:col-span-2 space-y-4">
           {activeComp ? (
-            <div className="bg-white rounded-xl border border-[#EAECF0] p-5 shadow-xs">
-              <div className="flex items-start justify-between pb-4 border-b border-[#EAECF0] mb-4">
+            <div className="bg-surface rounded-2xl border border-border p-5 shadow-2xs">
+              <div className="flex flex-wrap items-start justify-between pb-4 border-b border-border mb-4 gap-2">
                 <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="text-sm font-bold text-[#101828]">{activeComp.name}</h3>
+                    <h3 className="text-sm font-bold text-foreground">{activeComp.name}</h3>
                     {activeComp.website_url && (
                       <a
                         href={activeComp.website_url}
                         target="_blank"
                         rel="noreferrer"
-                        className="text-[#6257E8] hover:text-[#5245db]"
+                        className="text-brand-accent hover:opacity-80"
                       >
                         <ExternalLink className="w-3.5 h-3.5" />
                       </a>
                     )}
                   </div>
-                  <div className="flex items-center gap-3 mt-1 text-xs text-[#667085]">
+                  <div className="flex items-center gap-3 mt-1 text-xs text-foreground-secondary">
                     {activeComp.strengths && <span>Strengths: {activeComp.strengths}</span>}
                   </div>
                 </div>
 
-                <button
+                <Button
+                  type="button"
                   onClick={() => setShowLogPostModal(true)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#6257E8] text-white text-xs font-semibold hover:bg-[#5245db] transition-all shadow-xs"
+                  variant="default"
+                  size="sm"
+                  className="gap-1.5"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   <span>Log Post</span>
-                </button>
+                </Button>
               </div>
 
               {/* Observed Posts Feed */}
               {posts.length === 0 ? (
-                <div className="p-8 text-center text-xs text-[#667085]">
+                <div className="p-8 text-center text-xs text-foreground-secondary">
                   No posts logged for {activeComp.name} yet. Click &quot;Log Post&quot; to track their content moves.
                 </div>
               ) : (
                 <div className="space-y-3.5">
                   {posts.map((post) => (
-                    <div key={post.id} className="p-4 rounded-xl border border-[#EAECF0] bg-[#FAFAFA] space-y-2.5">
+                    <div key={post.id} className="p-4 rounded-xl border border-border bg-background-subtle space-y-2.5">
                       <div className="flex items-center justify-between text-xs">
                         <div className="flex items-center gap-2">
-                          <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-[#101828] text-white">
+                          <Badge variant="default" className="uppercase font-bold">
                             {post.platform}
-                          </span>
-                          <span className="text-[#667085] text-[11px]">
+                          </Badge>
+                          <span className="text-foreground-muted text-[11px] font-mono">
                             {post.published_at ? new Date(post.published_at).toLocaleDateString() : 'Observed recently'}
                           </span>
                         </div>
 
                         {post.engagement_signals && (
-                          <div className="flex items-center gap-3 text-[11px] text-[#475467] font-medium">
+                          <div className="flex items-center gap-3 text-[11px] text-foreground-secondary font-medium">
                             <span className="flex items-center gap-1">
-                              <ThumbsUp className="w-3 h-3 text-[#6257E8]" /> {post.engagement_signals.likes ?? 0}
+                              <ThumbsUp className="w-3 h-3 text-brand-accent" /> {post.engagement_signals.likes ?? 0}
                             </span>
                             <span className="flex items-center gap-1">
-                              <MessageSquare className="w-3 h-3 text-[#6257E8]" /> {post.engagement_signals.comments ?? 0}
+                              <MessageSquare className="w-3 h-3 text-brand-accent" /> {post.engagement_signals.comments ?? 0}
                             </span>
                           </div>
                         )}
                       </div>
 
-                      <p className="text-xs text-[#101828] leading-relaxed whitespace-pre-wrap">{post.post_text}</p>
+                      <p className="text-xs text-foreground leading-relaxed whitespace-pre-wrap">{post.post_text}</p>
 
                       {post.tactical_takeaway && (
-                        <div className="p-2.5 rounded-lg bg-amber-50/60 border border-amber-200/50 flex items-start gap-2 text-xs text-amber-900">
-                          <Lightbulb className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                        <div className="p-2.5 rounded-xl bg-status-warning-bg border border-status-warning text-status-warning flex items-start gap-2 text-xs">
+                          <Lightbulb className="w-4 h-4 shrink-0 mt-0.5" />
                           <span>
                             <strong>Takeaway:</strong> {post.tactical_takeaway}
                           </span>
@@ -381,12 +433,12 @@ export const CompetitorManager: React.FC<CompetitorManagerProps> = ({ brandId })
                       {post.observed_themes && post.observed_themes.length > 0 && (
                         <div className="flex items-center gap-1.5 flex-wrap pt-1">
                           {post.observed_themes.map((th) => (
-                            <span
+                            <Badge
                               key={th}
-                              className="px-2 py-0.5 rounded text-[10px] font-medium bg-white border border-[#D0D5DD] text-[#344054]"
+                              variant="outline"
                             >
                               #{th}
-                            </span>
+                            </Badge>
                           ))}
                         </div>
                       )}
@@ -396,7 +448,7 @@ export const CompetitorManager: React.FC<CompetitorManagerProps> = ({ brandId })
               )}
             </div>
           ) : (
-            <div className="bg-white rounded-xl border border-[#EAECF0] p-12 text-center text-xs text-[#667085]">
+            <div className="bg-surface rounded-2xl border border-border p-12 text-center text-xs text-foreground-secondary">
               Select a competitor from the left or register a new one to view observations.
             </div>
           )}
@@ -405,13 +457,14 @@ export const CompetitorManager: React.FC<CompetitorManagerProps> = ({ brandId })
 
       {/* Add Competitor Modal */}
       {showAddCompetitorModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4">
-          <div className="bg-white rounded-2xl w-full max-w-md border border-[#EAECF0] shadow-xl p-6">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
+          <div className="bg-surface rounded-2xl w-full max-w-md border border-border shadow-xl p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-base font-bold text-[#101828]">Add Competitor Profile</h3>
+              <h3 className="text-base font-bold text-foreground">Add Competitor Profile</h3>
               <button
+                type="button"
                 onClick={() => setShowAddCompetitorModal(false)}
-                className="text-[#667085] hover:text-[#101828] p-1 rounded-lg"
+                className="text-foreground-muted hover:text-foreground p-1 rounded-lg outline-hidden focus-visible:ring-2 focus-visible:ring-focus-ring"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -419,45 +472,42 @@ export const CompetitorManager: React.FC<CompetitorManagerProps> = ({ brandId })
 
             <form onSubmit={handleAddCompetitorSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-[#344054] mb-1">Competitor Name</label>
-                <input
+                <label className="block text-xs font-semibold text-foreground mb-1">Competitor Name</label>
+                <Input
                   type="text"
                   required
                   placeholder="e.g. Acme Corp"
                   value={compName}
                   onChange={(e) => setCompName(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border border-[#D0D5DD] text-xs focus:outline-none focus:border-[#6257E8]"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-[#344054] mb-1">Website URL</label>
-                <input
+                <label className="block text-xs font-semibold text-foreground mb-1">Website URL</label>
+                <Input
                   type="url"
                   placeholder="https://acme.example.com"
                   value={compWebsite}
                   onChange={(e) => setCompWebsite(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border border-[#D0D5DD] text-xs focus:outline-none focus:border-[#6257E8]"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-[#344054] mb-1">Key Strengths</label>
-                <input
+                <label className="block text-xs font-semibold text-foreground mb-1">Key Strengths</label>
+                <Input
                   type="text"
                   placeholder="e.g. Fast shipping, high ad spend"
                   value={compStrengths}
                   onChange={(e) => setCompStrengths(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border border-[#D0D5DD] text-xs focus:outline-none focus:border-[#6257E8]"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-[#344054] mb-1">Observation Frequency</label>
+                <label className="block text-xs font-semibold text-foreground mb-1">Observation Frequency</label>
                 <select
                   value={compCadence}
                   onChange={(e) => setCompCadence(e.target.value as 'daily' | 'weekly' | 'monthly')}
-                  className="w-full px-3 py-2 rounded-lg border border-[#D0D5DD] text-xs focus:outline-none focus:border-[#6257E8]"
+                  className="w-full px-3 py-2 rounded-xl bg-surface text-foreground border border-border text-xs outline-hidden focus:ring-2 focus:ring-focus-ring"
                 >
                   <option value="daily">Daily</option>
                   <option value="weekly">Weekly</option>
@@ -466,31 +516,30 @@ export const CompetitorManager: React.FC<CompetitorManagerProps> = ({ brandId })
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-[#344054] mb-1">Vulnerabilities / Gaps</label>
-                <input
+                <label className="block text-xs font-semibold text-foreground mb-1">Vulnerabilities / Gaps</label>
+                <Input
                   type="text"
                   placeholder="e.g. Weak technical content, slow replies"
                   value={compWeaknesses}
                   onChange={(e) => setCompWeaknesses(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border border-[#D0D5DD] text-xs focus:outline-none focus:border-[#6257E8]"
                 />
               </div>
 
               <div className="pt-2 flex items-center justify-end gap-2">
-                <button
+                <Button
                   type="button"
+                  variant="outline"
                   onClick={() => setShowAddCompetitorModal(false)}
-                  className="px-4 py-2 rounded-lg border border-[#D0D5DD] text-xs font-semibold text-[#344054] hover:bg-gray-50"
                 >
                   Cancel
-                </button>
-                <button
+                </Button>
+                <Button
                   type="submit"
                   disabled={submitting}
-                  className="px-4 py-2 rounded-lg bg-[#6257E8] text-white text-xs font-semibold hover:bg-[#5245db] disabled:opacity-50"
+                  variant="default"
                 >
                   {submitting ? 'Saving...' : 'Add Competitor'}
-                </button>
+                </Button>
               </div>
             </form>
           </div>
@@ -499,16 +548,17 @@ export const CompetitorManager: React.FC<CompetitorManagerProps> = ({ brandId })
 
       {/* Log Post Modal */}
       {showLogPostModal && activeComp && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4">
-          <div className="bg-white rounded-2xl w-full max-w-lg border border-[#EAECF0] shadow-xl p-6">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
+          <div className="bg-surface rounded-2xl w-full max-w-lg border border-border shadow-xl p-6">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h3 className="text-base font-bold text-[#101828]">Log Competitor Post</h3>
-                <p className="text-xs text-[#667085]">Observed post for {activeComp.name}</p>
+                <h3 className="text-base font-bold text-foreground">Log Competitor Post</h3>
+                <p className="text-xs text-foreground-secondary">Observed post for {activeComp.name}</p>
               </div>
               <button
+                type="button"
                 onClick={() => setShowLogPostModal(false)}
-                className="text-[#667085] hover:text-[#101828] p-1 rounded-lg"
+                className="text-foreground-muted hover:text-foreground p-1 rounded-lg outline-hidden focus-visible:ring-2 focus-visible:ring-focus-ring"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -517,11 +567,11 @@ export const CompetitorManager: React.FC<CompetitorManagerProps> = ({ brandId })
             <form onSubmit={handleLogPostSubmit} className="space-y-3.5">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-[#344054] mb-1">Platform</label>
+                  <label className="block text-xs font-semibold text-foreground mb-1">Platform</label>
                   <select
                     value={postPlatform}
                     onChange={(e) => setPostPlatform(e.target.value as any)}
-                    className="w-full px-3 py-2 rounded-lg border border-[#D0D5DD] text-xs focus:outline-none focus:border-[#6257E8]"
+                    className="w-full px-3 py-2 rounded-xl bg-surface text-foreground border border-border text-xs outline-hidden focus:ring-2 focus:ring-focus-ring"
                   >
                     <option value="linkedin">LinkedIn</option>
                     <option value="facebook">Facebook</option>
@@ -533,90 +583,85 @@ export const CompetitorManager: React.FC<CompetitorManagerProps> = ({ brandId })
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-[#344054] mb-1">Tone</label>
-                  <input
+                  <label className="block text-xs font-semibold text-foreground mb-1">Tone</label>
+                  <Input
                     type="text"
                     value={postTone}
                     onChange={(e) => setPostTone(e.target.value)}
                     placeholder="e.g. Technical, Promotional"
-                    className="w-full px-3 py-2 rounded-lg border border-[#D0D5DD] text-xs focus:outline-none focus:border-[#6257E8]"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-[#344054] mb-1">Post Text / Copy</label>
+                <label className="block text-xs font-semibold text-foreground mb-1">Post Text / Copy</label>
                 <textarea
                   rows={4}
                   required
                   placeholder="Paste observed post copy..."
                   value={postText}
                   onChange={(e) => setPostText(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border border-[#D0D5DD] text-xs focus:outline-none focus:border-[#6257E8]"
+                  className="w-full px-3 py-2 rounded-xl bg-surface border border-border text-xs text-foreground placeholder:text-foreground-muted outline-hidden focus:ring-2 focus:ring-focus-ring"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-[#344054] mb-1">Estimated Likes</label>
-                  <input
+                  <label className="block text-xs font-semibold text-foreground mb-1">Estimated Likes</label>
+                  <Input
                     type="number"
                     value={postLikes}
                     onChange={(e) => setPostLikes(Number(e.target.value))}
-                    className="w-full px-3 py-2 rounded-lg border border-[#D0D5DD] text-xs focus:outline-none focus:border-[#6257E8]"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-[#344054] mb-1">Estimated Comments</label>
-                  <input
+                  <label className="block text-xs font-semibold text-foreground mb-1">Estimated Comments</label>
+                  <Input
                     type="number"
                     value={postComments}
                     onChange={(e) => setPostComments(Number(e.target.value))}
-                    className="w-full px-3 py-2 rounded-lg border border-[#D0D5DD] text-xs focus:outline-none focus:border-[#6257E8]"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-[#344054] mb-1">
+                <label className="block text-xs font-semibold text-foreground mb-1">
                   Observed Themes (comma-separated)
                 </label>
-                <input
+                <Input
                   type="text"
                   value={postThemesStr}
                   onChange={(e) => setPostThemesStr(e.target.value)}
                   placeholder="e.g. ai_trends, hiring, customer_story"
-                  className="w-full px-3 py-2 rounded-lg border border-[#D0D5DD] text-xs focus:outline-none focus:border-[#6257E8]"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-[#344054] mb-1">Tactical Takeaway / Opportunity</label>
-                <input
+                <label className="block text-xs font-semibold text-foreground mb-1">Tactical Takeaway / Opportunity</label>
+                <Input
                   type="text"
                   value={postTakeaway}
                   onChange={(e) => setPostTakeaway(e.target.value)}
                   placeholder="e.g. They ignored pricing pushback; we can post about transparent pricing"
-                  className="w-full px-3 py-2 rounded-lg border border-[#D0D5DD] text-xs focus:outline-none focus:border-[#6257E8]"
                 />
               </div>
 
               <div className="pt-2 flex items-center justify-end gap-2">
-                <button
+                <Button
                   type="button"
+                  variant="outline"
                   onClick={() => setShowLogPostModal(false)}
-                  className="px-4 py-2 rounded-lg border border-[#D0D5DD] text-xs font-semibold text-[#344054] hover:bg-gray-50"
                 >
                   Cancel
-                </button>
-                <button
+                </Button>
+                <Button
                   type="submit"
                   disabled={submitting}
-                  className="px-4 py-2 rounded-lg bg-[#6257E8] text-white text-xs font-semibold hover:bg-[#5245db] disabled:opacity-50"
+                  variant="default"
                 >
                   {submitting ? 'Recording...' : 'Log Observation'}
-                </button>
+                </Button>
               </div>
             </form>
           </div>

@@ -71,6 +71,11 @@ class AuthService
                 'role' => 'owner',
             ]);
 
+            // Assign RBAC Role if preset exists
+            if (\App\Models\Role::where('name', 'org_owner')->exists()) {
+                $user->assignRole('org_owner', $organization->id);
+            }
+
             // 6. Update User's Active Context
             $user->update([
                 'current_organization_id' => $organization->id,

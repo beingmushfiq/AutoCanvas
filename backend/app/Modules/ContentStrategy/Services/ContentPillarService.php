@@ -60,4 +60,78 @@ class ContentPillarService
         AuditLogger::log('content_pillar.deleted', $pillar, ['name' => $pillar->name], null, $pillar->organization_id);
         $pillar->delete();
     }
+
+    /**
+     * Calculate strategic pillar allocation balance and identify under/over-represented pillars.
+     */
+    public function calculateBalance(Brand $brand): array
+    {
+        $pillars = ContentPillar::where('brand_id', $brand->id)
+            ->where('status', 'active')
+            ->withCount('contentItems')
+            ->get();
+
+        $totalItems = $pillars->sum('content_items_count');
+        $distribution = [];
+        $recommendedPillar = null;
+        $lowestGap = 999;
+
+        foreach ($pillars as $pillar) {
+            $targetWeight = (float) $pillar->weight_percentage;
+            $actualShare = $totalItems > 0
+                ? round(($pillar->content_items_count / $totalItems) * 100, 1)
+                : 0.0;
+
+            $gap = $actualShare - $targetWeight;
+
+            $status = 'balanced';
+            if ($gap < -5.0 || ($totalItems > 0 && $pillar->content_items_count === 0)) {
+                $status = 'under_represented';
+            } elseif ($gap > 5.0) {
+                $status = 'over_represented';
+            }
+
+            if ($gap < $lowestGap) {
+                $lowestGap = $gap;
+                $recommendedPillar = $pillar;
+            }
+
+            $distribution[] = [
+                'id' => $pillar->id,
+                'name' => $pillar->name,
+                'slug' => $pillar->slug,
+                'target_percentage' => $targetWeight,
+                'actual_percentage' => $actualShare,
+                'post_count' => $pillar->content_items_count,
+                'gap' => $gap,
+                'status' => $status,
+                'color_tag' => $pillar->color_tag,
+            ];
+        }
+
+        return [
+            'brand_id' => $brand->id,
+            'total_posts' => $totalItems,
+            'pillars' => $distribution,
+            'recommended_pillar' => $recommendedPillar ? [
+                'id' => $recommendedPillar->id,
+                'name' => $recommendedPillar->name,
+                'color_tag' => $recommendedPillar->color_tag,
+                'target_percentage' => $recommendedPillar->weight_percentage,
+            ] : null,
+        ];
+    }
+
+    /**
+     * Get the next recommended content pillar to maintain balanced editorial ratios.
+     */
+    public function getRecommendedPillar(Brand $brand): ?ContentPillar
+    {
+        $balance = $this->calculateBalance($brand);
+        if (!empty($balance['recommended_pillar']['id'])) {
+            return ContentPillar::find($balance['recommended_pillar']['id']);
+        }
+
+        return ContentPillar::where('brand_id', $brand->id)->where('status', 'active')->first();
+    }
 }

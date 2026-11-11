@@ -61,3 +61,4 @@ class FeedArticle extends Model
         return $this->hasMany(ContentOpportunity::class);
     }
 }
+

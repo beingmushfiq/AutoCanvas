@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import { Save, Loader2, CheckCircle2 } from 'lucide-react'
 import { apiClient, type BrandProfileData } from '../../../lib/api/client'
+import { Button } from '../../../components/ui/button'
+import { Input } from '../../../components/ui/input'
 
 interface ProfileTabProps {
   brandId: string
@@ -58,37 +60,36 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({ brandId, initialProfile,
   return (
     <form onSubmit={handleSave} className="space-y-6 max-w-4xl">
       {successMsg && (
-        <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl flex items-center gap-2 text-xs font-semibold">
-          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+        <div className="p-3 bg-status-success-bg border border-status-success text-status-success rounded-xl flex items-center gap-2 text-xs font-semibold">
+          <CheckCircle2 className="w-4 h-4 shrink-0" />
           <span>{successMsg}</span>
         </div>
       )}
 
       {error && (
-        <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 rounded-xl text-xs">
+        <div className="p-3 bg-status-danger-bg border border-status-danger text-status-danger rounded-xl text-xs font-semibold">
           {error}
         </div>
       )}
 
       {/* Core Positioning */}
-      <div className="bg-white p-6 rounded-xl border border-[#EAECF0] shadow-xs space-y-4">
-        <h3 className="text-sm font-bold text-[#101828]">Positioning & Core Strategy</h3>
+      <div className="bg-surface p-6 rounded-2xl border border-border shadow-2xs space-y-4">
+        <h3 className="text-sm font-bold text-foreground">Positioning & Core Strategy</h3>
 
         <div>
-          <label className="block text-xs font-semibold text-[#344054] mb-1">
+          <label className="block text-xs font-semibold text-foreground mb-1">
             Market Positioning Statement
           </label>
-          <input
+          <Input
             type="text"
             value={positioning}
             onChange={(e) => setPositioning(e.target.value)}
             placeholder="e.g. The modern, autonomous operating system for high-growth brands"
-            className="w-full px-3 py-2 text-xs border border-[#D0D5DD] rounded-lg focus:ring-2 focus:ring-[#6257E8]"
           />
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-[#344054] mb-1">
+          <label className="block text-xs font-semibold text-foreground mb-1">
             Business & Company Overview
           </label>
           <textarea
@@ -96,92 +97,89 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({ brandId, initialProfile,
             value={businessDescription}
             onChange={(e) => setBusinessDescription(e.target.value)}
             placeholder="Detailed description of what the company does, products offered, and origin story..."
-            className="w-full px-3 py-2 text-xs border border-[#D0D5DD] rounded-lg focus:ring-2 focus:ring-[#6257E8]"
+            className="w-full px-3 py-2 text-xs bg-surface border border-border rounded-xl text-foreground placeholder:text-foreground-muted outline-hidden focus:ring-2 focus:ring-focus-ring"
           />
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-semibold text-[#344054] mb-1">Mission Statement</label>
+            <label className="block text-xs font-semibold text-foreground mb-1">Mission Statement</label>
             <textarea
               rows={2}
               value={mission}
               onChange={(e) => setMission(e.target.value)}
               placeholder="Why this company exists..."
-              className="w-full px-3 py-2 text-xs border border-[#D0D5DD] rounded-lg focus:ring-2 focus:ring-[#6257E8]"
+              className="w-full px-3 py-2 text-xs bg-surface border border-border rounded-xl text-foreground placeholder:text-foreground-muted outline-hidden focus:ring-2 focus:ring-focus-ring"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-[#344054] mb-1">Vision Statement</label>
+            <label className="block text-xs font-semibold text-foreground mb-1">Vision Statement</label>
             <textarea
               rows={2}
               value={vision}
               onChange={(e) => setVision(e.target.value)}
               placeholder="Where the company aims to be in 5-10 years..."
-              className="w-full px-3 py-2 text-xs border border-[#D0D5DD] rounded-lg focus:ring-2 focus:ring-[#6257E8]"
+              className="w-full px-3 py-2 text-xs bg-surface border border-border rounded-xl text-foreground placeholder:text-foreground-muted outline-hidden focus:ring-2 focus:ring-focus-ring"
             />
           </div>
         </div>
       </div>
 
       {/* Target Audience & USPs */}
-      <div className="bg-white p-6 rounded-xl border border-[#EAECF0] shadow-xs space-y-4">
-        <h3 className="text-sm font-bold text-[#101828]">Target Audience & Differentiation</h3>
+      <div className="bg-surface p-6 rounded-2xl border border-border shadow-2xs space-y-4">
+        <h3 className="text-sm font-bold text-foreground">Target Audience & Differentiation</h3>
 
         <div>
-          <label className="block text-xs font-semibold text-[#344054] mb-1">Target Audience</label>
-          <input
+          <label className="block text-xs font-semibold text-foreground mb-1">Target Audience</label>
+          <Input
             type="text"
             value={targetAudience}
             onChange={(e) => setTargetAudience(e.target.value)}
             placeholder="e.g. Founders, Marketing Directors, Mid-market B2B executives"
-            className="w-full px-3 py-2 text-xs border border-[#D0D5DD] rounded-lg focus:ring-2 focus:ring-[#6257E8]"
           />
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-[#344054] mb-1">
+          <label className="block text-xs font-semibold text-foreground mb-1">
             Unique Selling Propositions (USPs)
-            <span className="text-[11px] font-normal text-[#667085] ml-1">(One per line)</span>
+            <span className="text-[11px] font-normal text-foreground-muted ml-1">(One per line)</span>
           </label>
           <textarea
             rows={3}
             value={uspsText}
             onChange={(e) => setUspsText(e.target.value)}
             placeholder="Autonomous end-to-end content delivery&#10;Verified brand voice consistency&#10;Instant multi-network publishing"
-            className="w-full px-3 py-2 text-xs border border-[#D0D5DD] rounded-lg font-mono focus:ring-2 focus:ring-[#6257E8]"
+            className="w-full px-3 py-2 text-xs bg-surface border border-border rounded-xl text-foreground font-mono placeholder:text-foreground-muted outline-hidden focus:ring-2 focus:ring-focus-ring"
           />
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-semibold text-[#344054] mb-1">Primary Call-to-Action</label>
-            <input
+            <label className="block text-xs font-semibold text-foreground mb-1">Primary Call-to-Action</label>
+            <Input
               type="text"
               value={primaryCta}
               onChange={(e) => setPrimaryCta(e.target.value)}
               placeholder="e.g. Book a Demo / Start Free Trial"
-              className="w-full px-3 py-2 text-xs border border-[#D0D5DD] rounded-lg"
             />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-[#344054] mb-1">Secondary Call-to-Action</label>
-            <input
+            <label className="block text-xs font-semibold text-foreground mb-1">Secondary Call-to-Action</label>
+            <Input
               type="text"
               value={secondaryCta}
               onChange={(e) => setSecondaryCta(e.target.value)}
               placeholder="e.g. Download Case Study / Learn More"
-              className="w-full px-3 py-2 text-xs border border-[#D0D5DD] rounded-lg"
             />
           </div>
         </div>
       </div>
 
       {/* Compliance & Exclusions */}
-      <div className="bg-white p-6 rounded-xl border border-[#EAECF0] shadow-xs space-y-4">
-        <h3 className="text-sm font-bold text-rose-700">Content Guardrails & Prohibited Topics</h3>
-        <p className="text-xs text-[#667085]">
+      <div className="bg-surface p-6 rounded-2xl border border-status-danger/30 shadow-2xs space-y-4">
+        <h3 className="text-sm font-bold text-status-danger">Content Guardrails & Prohibited Topics</h3>
+        <p className="text-xs text-foreground-secondary">
           Topics, competitors, or claims the AI content engine is strictly forbidden from referencing.
         </p>
         <textarea
@@ -189,22 +187,22 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({ brandId, initialProfile,
           value={prohibitedText}
           onChange={(e) => setProhibitedText(e.target.value)}
           placeholder="Unverified health benefits&#10;Direct competitor disparagement&#10;Price discounting without approval"
-          className="w-full px-3 py-2 text-xs border border-rose-200 rounded-lg font-mono focus:ring-2 focus:ring-rose-500"
+          className="w-full px-3 py-2 text-xs bg-surface border border-status-danger/40 rounded-xl text-foreground font-mono placeholder:text-foreground-muted outline-hidden focus:ring-2 focus:ring-status-danger"
         />
       </div>
 
       {/* Save Button */}
       <div className="flex justify-end">
-        <button
+        <Button
           type="submit"
           disabled={saving}
-          className="flex items-center gap-2 px-6 py-2.5 bg-[#6257E8] text-white text-xs font-semibold rounded-xl hover:bg-[#5246D6] disabled:opacity-50 shadow-xs"
+          variant="default"
+          className="gap-2 px-6"
         >
           {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
           <span>Save Profile Changes</span>
-        </button>
+        </Button>
       </div>
     </form>
   )
 }
-

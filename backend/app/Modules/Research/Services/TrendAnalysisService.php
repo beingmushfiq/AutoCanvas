@@ -101,7 +101,8 @@ PROMPT;
         $rawOpps = $decoded['opportunities'] ?? [];
 
         $savedOpportunities = collect();
-        $defaultPillarId = $pillars->first()?->id;
+        $recommendedPillar = app(\App\Modules\ContentStrategy\Services\ContentPillarService::class)->getRecommendedPillar($brand);
+        $defaultPillarId = $recommendedPillar?->id ?? $pillars->first()?->id;
 
         foreach ($rawOpps as $opp) {
             $pillarId = ! empty($opp['content_pillar_id']) && $pillars->contains('id', $opp['content_pillar_id'])
@@ -111,6 +112,11 @@ PROMPT;
             $articleId = ! empty($opp['feed_article_id']) && $recentArticles->contains('id', $opp['feed_article_id'])
                 ? $opp['feed_article_id']
                 : $recentArticles->first()?->id;
+
+            $urgency = (int) ($opp['urgency_score'] ?? 75);
+            $freshness = (int) ($opp['freshness_score'] ?? 80);
+            $brandFit = (int) ($opp['brand_fit_score'] ?? 85);
+            $overall = (int) ($opp['overall_opportunity_score'] ?? $this->calculateOpportunityScore($freshness, $brandFit, $urgency));
 
             $opportunity = ContentOpportunity::create([
                 'organization_id' => $brand->organization_id,
@@ -122,9 +128,9 @@ PROMPT;
                 'angle' => $opp['angle'],
                 'why_it_matters' => $opp['why_it_matters'],
                 'recommended_channels' => $opp['recommended_channels'] ?? ['linkedin', 'facebook', 'instagram'],
-                'urgency_score' => $opp['urgency_score'] ?? 75,
-                'freshness_score' => $opp['freshness_score'] ?? 80,
-                'overall_opportunity_score' => $opp['overall_opportunity_score'] ?? 78,
+                'urgency_score' => $urgency,
+                'freshness_score' => $freshness,
+                'overall_opportunity_score' => $overall,
                 'status' => 'new',
             ]);
 
@@ -132,6 +138,19 @@ PROMPT;
         }
 
         return $savedOpportunities;
+    }
+
+    /**
+     * Compute multi-factor opportunity score:
+     * 35% Freshness + 35% Brand Fit + 30% Audience Urgency
+     */
+    public function calculateOpportunityScore(int $freshness, int $brandFit, int $urgency): int
+    {
+        $freshness = max(0, min(100, $freshness));
+        $brandFit = max(0, min(100, $brandFit));
+        $urgency = max(0, min(100, $urgency));
+
+        return (int) round((0.35 * $freshness) + (0.35 * $brandFit) + (0.30 * $urgency));
     }
 
     /**

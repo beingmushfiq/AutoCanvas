@@ -9,9 +9,12 @@ use App\Modules\ContentProduction\Models\ContentItem;
 use App\Modules\ContentProduction\Models\ContentVariant;
 use App\Modules\ContentStrategy\Models\Campaign;
 use App\Modules\ContentStrategy\Models\ContentPillar;
+use App\Modules\ContentStrategy\Services\ContentPillarService;
 use App\Modules\Creative\Services\CreativeRenderingService;
 use App\Modules\Knowledge\Services\BrandKnowledgeRetrievalService;
 use App\Modules\Organization\Services\AuditLogger;
+use App\Modules\Research\Services\NoveltyVerificationEngine;
+use Illuminate\Support\Str;
 
 class ContentGenerationService
 {
@@ -19,8 +22,13 @@ class ContentGenerationService
         protected AIGateway $aiGateway,
         protected BrandKnowledgeRetrievalService $retrievalService,
         protected ContentQAService $qaService,
-        protected CreativeRenderingService $creativeService
-    ) {}
+        protected CreativeRenderingService $creativeService,
+        protected ?ContentPillarService $pillarService = null,
+        protected ?NoveltyVerificationEngine $noveltyEngine = null
+    ) {
+        $this->pillarService = $pillarService ?? new ContentPillarService();
+        $this->noveltyEngine = $noveltyEngine ?? new NoveltyVerificationEngine();
+    }
 
     /**
      * Generate multi-channel post concept, platform variants, and creative assets.
@@ -34,25 +42,32 @@ class ContentGenerationService
         $generateCreative = $options['generate_creative'] ?? true;
         $useKnowledge = $options['use_knowledge'] ?? true;
 
-        $pillar = $pillarId ? ContentPillar::find($pillarId) : null;
+        // 1. Resolve Pillar (auto-recommend if unassigned)
+        if ($pillarId) {
+            $pillar = ContentPillar::find($pillarId);
+        } else {
+            $pillar = $this->pillarService->getRecommendedPillar($brand);
+            $pillarId = $pillar?->id;
+        }
+
         $campaign = $campaignId ? Campaign::find($campaignId) : null;
 
-        // 1. RAG Knowledge Retrieval
+        // 2. RAG Knowledge Retrieval with Sanitized Context
         $citations = [];
+        $citationContext = '';
         if ($useKnowledge) {
             $citations = $this->retrievalService->search($brand, $topic, 3);
+            if (!empty($citations)) {
+                $citationContext = $this->retrievalService->formatContextForPrompt($citations);
+            }
         }
 
-        $citationContext = '';
-        foreach ($citations as $cit) {
-            $citationContext .= "- {$cit['citation']}: \"{$cit['content']}\"\n";
-        }
+        $linkedinGuideline = $brand->voiceProfile?->channel_language_rules['linkedin']['tone'] ?? 'Professional, thought leadership hook, scannable spacing, 3-5 hashtags';
+        $facebookGuideline = $brand->voiceProfile?->channel_language_rules['facebook']['tone'] ?? 'Conversational, storytelling, community question, clear link CTA';
+        $instagramGuideline = $brand->voiceProfile?->channel_language_rules['instagram']['tone'] ?? 'Punchy aesthetic caption, visual hook, line breaks, 5-15 hashtags';
+        $twitterGuideline = $brand->voiceProfile?->channel_language_rules['twitter']['tone'] ?? 'Concise observation under 280 chars, high-energy hook, 1-2 tags';
 
-        $linkedinGuideline = $brand->voiceProfile?->channel_language_rules['linkedin']['tone'] ?? 'Professional, thought leadership, scannable spacing, 3-5 hashtags';
-        $facebookGuideline = $brand->voiceProfile?->channel_language_rules['facebook']['tone'] ?? 'Conversational, storytelling, clear link CTA';
-        $instagramGuideline = $brand->voiceProfile?->channel_language_rules['instagram']['tone'] ?? 'Punchy aesthetic caption, line breaks, 5-15 hashtags';
-
-        // 2. Formulate Context Prompt
+        // 3. Formulate Prompt
         $prompt = <<<PROMPT
 Generate a cohesive multi-channel content campaign for:
 Brand: {$brand->name}
@@ -67,6 +82,7 @@ Channel Guidelines:
 - LinkedIn: {$linkedinGuideline}
 - Facebook: {$facebookGuideline}
 - Instagram: {$instagramGuideline}
+- Twitter / X: {$twitterGuideline}
 
 Content Pillar: {$pillar?->name} ({$pillar?->description})
 Campaign: {$campaign?->name} ({$campaign?->objective})
@@ -82,7 +98,8 @@ Return a valid JSON object matching this schema:
   "variants": {
     "linkedin": { "caption": "...", "hashtags": ["#tag1"], "cta_text": "...", "cta_url": "..." },
     "facebook": { "caption": "...", "hashtags": ["#tag1"], "cta_text": "...", "cta_url": "..." },
-    "instagram": { "caption": "...", "hashtags": ["#tag1"], "cta_text": "...", "cta_url": "..." }
+    "instagram": { "caption": "...", "hashtags": ["#tag1"], "cta_text": "...", "cta_url": "..." },
+    "twitter": { "caption": "...", "hashtags": ["#tag1"], "cta_text": "...", "cta_url": "..." }
   },
   "creative_prompt": {
     "headline": "Bold 4-8 word headline",
@@ -124,6 +141,12 @@ PROMPT;
                         'cta_text' => 'Link in Bio',
                         'cta_url' => $brand->website_url,
                     ],
+                    'twitter' => [
+                        'caption' => "Quality over noise. How {$brand->name} scales brand operations.",
+                        'hashtags' => ['#Operations'],
+                        'cta_text' => null,
+                        'cta_url' => null,
+                    ],
                 ],
                 'creative_prompt' => [
                     'headline' => $brand->name,
@@ -132,17 +155,6 @@ PROMPT;
                     'template_id' => 'minimal_corporate_v1',
                 ],
             ];
-        }
-
-        // 3. Render Creative Graphic if requested
-        $renderedAsset = null;
-        if ($generateCreative && ! empty($generated['creative_prompt'])) {
-            $renderedAsset = $this->creativeService->render($brand, [
-                'headline' => $generated['creative_prompt']['headline'] ?? $brand->name,
-                'supporting_text' => $generated['creative_prompt']['supporting_text'] ?? null,
-                'call_to_action' => $generated['creative_prompt']['cta'] ?? null,
-                'template_id' => $generated['creative_prompt']['template_id'] ?? 'minimal_corporate_v1',
-            ]);
         }
 
         // 4. Run Automated QA & Risk Evaluation
@@ -169,7 +181,19 @@ PROMPT;
             'qa_report' => $qaReport,
         ]);
 
-        // 6. Create Platform Variants
+        // 6. Render Creative Graphic if requested
+        $renderedAsset = null;
+        if ($generateCreative && ! empty($generated['creative_prompt'])) {
+            $renderedAsset = $this->creativeService->render($brand, [
+                'headline' => $generated['creative_prompt']['headline'] ?? $brand->name,
+                'supporting_text' => $generated['creative_prompt']['supporting_text'] ?? null,
+                'call_to_action' => $generated['creative_prompt']['cta'] ?? null,
+                'template_id' => $generated['creative_prompt']['template_id'] ?? 'minimal_corporate_v1',
+                'content_item_id' => $contentItem->id,
+            ]);
+        }
+
+        // 7. Create Platform Variants
         foreach ($platforms as $platformKey) {
             $vData = $generated['variants'][$platformKey] ?? null;
             if (! $vData) {
@@ -197,6 +221,22 @@ PROMPT;
             'quality_score' => $contentItem->overall_quality_score,
             'risk_level' => $contentItem->risk_level,
         ], $brand->organization_id, $brand->workspace_id);
+
+        // 8. Register Fingerprint in Anti-Duplication Registry
+        if ($this->noveltyEngine) {
+            $templateId = $generated['creative_prompt']['template_id'] ?? 'minimal_corporate_v1';
+            foreach ($contentItem->variants as $variant) {
+                $hook = Str::limit($variant->caption, 80);
+                $this->noveltyEngine->registerFingerprint(
+                    $brand,
+                    $contentItem,
+                    $variant->platform,
+                    $hook,
+                    $contentItem->concept,
+                    $templateId
+                );
+            }
+        }
 
         return $contentItem->load(['variants', 'pillar', 'campaign']);
     }

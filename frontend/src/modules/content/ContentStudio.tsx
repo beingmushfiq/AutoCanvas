@@ -21,6 +21,9 @@ import { ContentGeneratorModal } from './ContentGeneratorModal'
 import { PillarsManagerModal } from './PillarsManagerModal'
 import { PostDetailModal } from './PostDetailModal'
 import { CreativeEditorModal } from '../creative/CreativeEditorModal'
+import { Button } from '../../components/ui/button'
+import { Badge } from '../../components/ui/badge'
+import { EmptyState } from '../../components/ui/empty-state'
 
 interface ContentStudioProps {
   initialView?: 'posts' | 'creative'
@@ -113,21 +116,19 @@ export const ContentStudio: React.FC<ContentStudioProps> = ({ initialView = 'pos
   if (loading && brands.length === 0) {
     return (
       <div className="flex items-center justify-center p-16">
-        <Loader2 className="w-8 h-8 animate-spin text-[#6257E8]" />
+        <Loader2 className="w-8 h-8 animate-spin text-brand-accent" />
       </div>
     )
   }
 
   if (brands.length === 0) {
     return (
-      <div className="bg-white rounded-2xl border border-[#EAECF0] p-12 text-center max-w-lg mx-auto mt-8 shadow-xs">
-        <div className="w-12 h-12 rounded-xl bg-[#6257E8]/10 text-[#6257E8] flex items-center justify-center mx-auto mb-4">
-          <Layers className="w-6 h-6" />
-        </div>
-        <h3 className="text-base font-bold text-[#101828]">No Brands Registered</h3>
-        <p className="text-xs text-[#667085] mt-1.5">
-          Please register a brand in the Brand Studio before creating content.
-        </p>
+      <div className="max-w-lg mx-auto mt-8">
+        <EmptyState
+          icon={Layers}
+          title="No Brands Registered"
+          description="Please register a brand in the Brand Studio before creating content."
+        />
       </div>
     )
   }
@@ -179,17 +180,17 @@ export const ContentStudio: React.FC<ContentStudioProps> = ({ initialView = 'pos
       )}
 
       {error && (
-        <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 rounded-xl text-xs">
+        <div className="p-3 bg-status-danger-bg border border-status-danger text-status-danger rounded-xl text-xs font-semibold">
           {error}
         </div>
       )}
 
       {/* Top Header Bar */}
-      <div className="bg-white rounded-2xl border border-[#EAECF0] p-6 shadow-xs flex flex-wrap items-center justify-between gap-4">
+      <div className="bg-surface rounded-2xl border border-border p-6 shadow-2xs flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-4">
           <div
-            className="w-11 h-11 rounded-xl flex items-center justify-center text-white font-bold text-base shadow-sm shrink-0"
-            style={{ backgroundColor: activeBrand?.primary_color || '#101828' }}
+            className="w-11 h-11 rounded-xl flex items-center justify-center text-interactive-primary-fg font-bold text-base shadow-sm shrink-0 border border-border/30"
+            style={{ backgroundColor: activeBrand?.primary_color || 'var(--brand-primary)' }}
           >
             {activeBrand?.name.charAt(0) || 'B'}
           </div>
@@ -197,32 +198,34 @@ export const ContentStudio: React.FC<ContentStudioProps> = ({ initialView = 'pos
           <div>
             <div className="relative inline-block">
               <button
+                type="button"
                 onClick={() => setShowBrandMenu(!showBrandMenu)}
-                className="flex items-center gap-2 text-base font-bold text-[#101828] hover:text-[#6257E8] transition-colors"
+                className="flex items-center gap-2 text-base font-bold text-foreground hover:text-brand-accent transition-colors outline-hidden focus-visible:ring-2 focus-visible:ring-focus-ring rounded-lg px-1 -ml-1"
               >
                 <span>{activeBrand?.name}</span>
-                <ChevronDown className="w-4 h-4 text-[#667085]" />
+                <ChevronDown className="w-4 h-4 text-foreground-muted" />
               </button>
 
               {showBrandMenu && (
-                <div className="absolute top-full left-0 mt-2 w-56 bg-white border border-[#EAECF0] rounded-xl shadow-lg p-1.5 z-30 animate-in fade-in zoom-in-95 duration-100">
-                  <div className="px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-wider text-[#98A2B3]">
+                <div className="absolute top-full left-0 mt-2 w-56 bg-surface-overlay border border-border rounded-xl shadow-lg p-1.5 z-30 animate-in fade-in zoom-in-95 duration-100">
+                  <div className="px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-wider text-foreground-muted">
                     Switch Brand
                   </div>
                   {brands.map((b) => (
                     <button
                       key={b.id}
+                      type="button"
                       onClick={() => handleBrandChange(b.id)}
-                      className="w-full flex items-center gap-2 px-2.5 py-2 text-xs rounded-lg text-left hover:bg-[#F2F4F7] transition-colors"
+                      className="w-full flex items-center gap-2 px-2.5 py-2 text-xs rounded-lg text-left hover:bg-background-subtle text-foreground-secondary hover:text-foreground transition-colors"
                     >
-                      <div className="w-3 h-3 rounded-full" style={{ backgroundColor: b.primary_color }} />
+                      <div className="w-3 h-3 rounded-full border border-border/30" style={{ backgroundColor: b.primary_color }} />
                       <span className="truncate">{b.name}</span>
                     </button>
                   ))}
                 </div>
               )}
             </div>
-            <p className="text-xs text-[#667085] mt-0.5">
+            <p className="text-xs text-foreground-secondary mt-0.5">
               Omnichannel Content Generation & Production Pipeline
             </p>
           </div>
@@ -230,34 +233,40 @@ export const ContentStudio: React.FC<ContentStudioProps> = ({ initialView = 'pos
 
         {/* Action Buttons */}
         <div className="flex items-center gap-2.5">
-          <button
+          <Button
+            type="button"
+            variant="outline"
             onClick={() => setShowPillars(true)}
-            className="flex items-center gap-1.5 px-3.5 py-2 bg-white border border-[#D0D5DD] hover:bg-[#F2F4F7] text-[#344054] rounded-xl text-xs font-semibold transition-colors"
+            className="gap-1.5"
           >
-            <PieChart className="w-3.5 h-3.5 text-[#6257E8]" />
+            <PieChart className="w-3.5 h-3.5 text-brand-accent" />
             <span>Content Pillars</span>
-          </button>
+          </Button>
 
-          <button
+          <Button
+            type="button"
+            variant="outline"
             onClick={() => setShowCreative(true)}
-            className="flex items-center gap-1.5 px-3.5 py-2 bg-white border border-[#D0D5DD] hover:bg-[#F2F4F7] text-[#344054] rounded-xl text-xs font-semibold transition-colors"
+            className="gap-1.5"
           >
-            <Palette className="w-3.5 h-3.5 text-[#6257E8]" />
+            <Palette className="w-3.5 h-3.5 text-brand-accent" />
             <span>Creative Studio</span>
-          </button>
+          </Button>
 
-          <button
+          <Button
+            type="button"
+            variant="default"
             onClick={() => setShowGenerator(true)}
-            className="flex items-center gap-1.5 px-4 py-2 bg-[#6257E8] text-white hover:bg-[#5246D6] rounded-xl text-xs font-semibold shadow-xs transition-colors"
+            className="gap-1.5"
           >
             <Sparkles className="w-3.5 h-3.5" />
             <span>AI Multi-Channel Generator</span>
-          </button>
+          </Button>
         </div>
       </div>
 
       {/* Filter Tabs & Platform Badges */}
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#EAECF0] pb-3">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border pb-3">
         {/* Status Tabs */}
         <div className="flex gap-2">
           {[
@@ -269,11 +278,12 @@ export const ContentStudio: React.FC<ContentStudioProps> = ({ initialView = 'pos
           ].map((tab) => (
             <button
               key={tab.id}
+              type="button"
               onClick={() => setStatusFilter(tab.id as any)}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
+              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors outline-hidden focus-visible:ring-2 focus-visible:ring-focus-ring ${
                 statusFilter === tab.id
-                  ? 'bg-[#101828] text-white'
-                  : 'bg-white border border-[#D0D5DD] text-[#344054] hover:bg-[#F2F4F7]'
+                  ? 'bg-interactive-primary text-interactive-primary-fg shadow-2xs'
+                  : 'bg-surface border border-border text-foreground-secondary hover:bg-surface-raised hover:text-foreground'
               }`}
             >
               {tab.label}
@@ -283,15 +293,16 @@ export const ContentStudio: React.FC<ContentStudioProps> = ({ initialView = 'pos
 
         {/* Platform Filter */}
         <div className="flex items-center gap-1.5">
-          <Filter className="w-3.5 h-3.5 text-[#667085] mr-1" />
+          <Filter className="w-3.5 h-3.5 text-foreground-muted mr-1" />
           {['all', 'linkedin', 'facebook', 'instagram'].map((plat) => (
             <button
               key={plat}
+              type="button"
               onClick={() => setPlatformFilter(plat)}
-              className={`px-2.5 py-1 text-[11px] font-semibold capitalize rounded-full transition-colors ${
+              className={`px-2.5 py-1 text-[11px] font-semibold capitalize rounded-full transition-colors outline-hidden focus-visible:ring-2 focus-visible:ring-focus-ring ${
                 platformFilter === plat
-                  ? 'bg-[#6257E8] text-white'
-                  : 'bg-[#F2F4F7] text-[#667085] hover:bg-[#EAECF0]'
+                  ? 'bg-brand-accent text-interactive-primary-fg font-bold'
+                  : 'bg-background-subtle text-foreground-secondary hover:text-foreground'
               }`}
             >
               {plat}
@@ -302,22 +313,24 @@ export const ContentStudio: React.FC<ContentStudioProps> = ({ initialView = 'pos
 
       {/* Content Posts List */}
       {filteredPosts.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-[#EAECF0] p-12 text-center shadow-xs">
-          <FileText className="w-10 h-10 text-[#98A2B3] mx-auto mb-3" />
-          <h3 className="text-sm font-bold text-[#101828]">No posts found</h3>
-          <p className="text-xs text-[#667085] mt-1 max-w-sm mx-auto">
+        <div className="bg-surface rounded-2xl border border-border p-12 text-center shadow-2xs">
+          <FileText className="w-10 h-10 text-foreground-muted mx-auto mb-3" />
+          <h3 className="text-sm font-bold text-foreground">No posts found</h3>
+          <p className="text-xs text-foreground-secondary mt-1 max-w-sm mx-auto">
             No content matches the selected filters. Use the AI Multi-Channel Generator to create your next social post.
           </p>
-          <button
+          <Button
+            type="button"
+            variant="default"
             onClick={() => setShowGenerator(true)}
-            className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 bg-[#6257E8] text-white text-xs font-semibold rounded-xl hover:bg-[#5246D6] shadow-xs"
+            className="mt-4 gap-1.5"
           >
             <Sparkles className="w-3.5 h-3.5" />
             <span>Generate Post</span>
-          </button>
+          </Button>
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {filteredPosts.map((post) => {
             const firstVariant = post.variants?.[0]
             const creativeUrl = firstVariant?.media_urls?.[0]
@@ -325,7 +338,7 @@ export const ContentStudio: React.FC<ContentStudioProps> = ({ initialView = 'pos
             return (
               <div
                 key={post.id}
-                className="bg-white rounded-2xl border border-[#EAECF0] p-5 shadow-xs hover:border-[#D0D5DD] transition-all flex flex-col justify-between space-y-4"
+                className="bg-surface rounded-2xl border border-border p-5 shadow-2xs hover:border-brand-accent/40 transition-all flex flex-col justify-between space-y-4"
               >
                 <div className="space-y-3">
                   {/* Top Bar: Pillar & Status */}
@@ -339,24 +352,24 @@ export const ContentStudio: React.FC<ContentStudioProps> = ({ initialView = 'pos
                           {post.pillar.name}
                         </span>
                       )}
-                      <span
-                        className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                      <Badge
+                        variant={
                           post.status === 'approved'
-                            ? 'bg-emerald-100 text-emerald-800'
+                            ? 'success'
                             : post.status === 'review'
-                            ? 'bg-amber-100 text-amber-800'
+                            ? 'warning'
                             : post.status === 'rejected'
-                            ? 'bg-rose-100 text-rose-800'
-                            : 'bg-gray-100 text-gray-800'
-                        }`}
+                            ? 'danger'
+                            : 'secondary'
+                        }
                       >
                         {post.status}
-                      </span>
+                      </Badge>
                     </div>
 
                     <div className="flex items-center gap-1.5">
-                      <div className="flex items-center gap-1 px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded-md text-[11px] font-bold font-mono">
-                        <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                      <div className="flex items-center gap-1 px-2 py-0.5 bg-status-success-bg text-status-success rounded-md text-[11px] font-bold font-mono">
+                        <CheckCircle2 className="w-3 h-3 text-status-success" />
                         <span>{post.overall_quality_score}/100</span>
                       </div>
                     </div>
@@ -364,14 +377,14 @@ export const ContentStudio: React.FC<ContentStudioProps> = ({ initialView = 'pos
 
                   {/* Title & Concept */}
                   <div>
-                    <h4 className="text-sm font-bold text-[#101828] leading-snug">{post.title}</h4>
-                    <p className="text-xs text-[#667085] mt-1 line-clamp-2">{post.concept}</p>
+                    <h4 className="text-sm font-bold text-foreground leading-snug">{post.title}</h4>
+                    <p className="text-xs text-foreground-secondary mt-1 line-clamp-2">{post.concept}</p>
                   </div>
 
                   {/* Variant & Creative Snippet */}
                   <div className="flex gap-3 pt-1">
                     {creativeUrl && (
-                      <div className="w-20 h-20 rounded-xl overflow-hidden border border-[#EAECF0] shrink-0 bg-black/5">
+                      <div className="w-20 h-20 rounded-xl overflow-hidden border border-border shrink-0 bg-background-subtle">
                         <img
                           src={creativeUrl}
                           alt="Creative thumbnail"
@@ -382,15 +395,16 @@ export const ContentStudio: React.FC<ContentStudioProps> = ({ initialView = 'pos
                     <div className="flex-1">
                       <div className="flex gap-1 mb-1.5">
                         {post.variants?.map((v) => (
-                          <span
+                          <Badge
                             key={v.platform}
-                            className="text-[10px] uppercase font-bold text-[#6257E8] bg-[#6257E8]/10 px-1.5 py-0.2 rounded"
+                            variant="accent"
+                            className="uppercase"
                           >
                             {v.platform}
-                          </span>
+                          </Badge>
                         ))}
                       </div>
-                      <p className="text-xs text-[#475467] line-clamp-2 italic">
+                      <p className="text-xs text-foreground-secondary line-clamp-2 italic">
                         "{firstVariant?.caption}"
                       </p>
                     </div>
@@ -398,21 +412,27 @@ export const ContentStudio: React.FC<ContentStudioProps> = ({ initialView = 'pos
                 </div>
 
                 {/* Card Actions */}
-                <div className="pt-3 border-t border-[#EAECF0] flex items-center justify-between">
-                  <span className="text-[11px] text-[#98A2B3]">
+                <div className="pt-3 border-t border-border flex items-center justify-between">
+                  <span className="text-[11px] text-foreground-muted font-mono">
                     {new Date(post.created_at).toLocaleDateString()}
                   </span>
 
                   <div className="flex items-center gap-2">
-                    <button
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
                       onClick={() => setSelectedPost(post)}
-                      className="px-3 py-1.5 text-xs font-semibold text-[#6257E8] hover:bg-[#6257E8]/10 rounded-lg transition-colors"
+                      className="text-brand-accent hover:text-brand-accent hover:bg-brand-accent/10"
                     >
                       Inspect & Review
-                    </button>
+                    </Button>
                     <button
+                      type="button"
                       onClick={() => handleDeletePost(post.id, post.title)}
-                      className="p-1.5 text-[#98A2B3] hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                      title="Delete post"
+                      aria-label="Delete post"
+                      className="p-1.5 text-foreground-muted hover:text-status-danger hover:bg-status-danger-bg rounded-lg transition-colors outline-hidden focus-visible:ring-2 focus-visible:ring-focus-ring"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>

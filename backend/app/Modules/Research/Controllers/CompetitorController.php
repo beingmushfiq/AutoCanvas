@@ -155,4 +155,20 @@ class CompetitorController extends Controller
             'data' => $insights,
         ]);
     }
+
+    /**
+     * Return competitor gaps and white-space opportunities.
+     */
+    public function gaps(string $brandId, CompetitorTrackerService $service): JsonResponse
+    {
+        $brand = Brand::findOrFail($brandId);
+
+        $gaps = $service->analyzeCompetitorGaps($brand);
+
+        return response()->json([
+            'success' => true,
+            'data' => $gaps,
+        ]);
+    }
 }
+

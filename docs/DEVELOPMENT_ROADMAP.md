@@ -34,8 +34,8 @@ gantt
 | **Phase 2** | Brand profiles, visual guide, voice, personas, knowledge base RAG | Document uploaded, chunked, and queried with strict brand boundaries | PENDING |
 | **Phase 3** | Content pillars, campaigns, AI calendar, platform-specific generation | Formatted posts generated for FB, IG, LinkedIn with quality scores | PENDING |
 | **Phase 4** | Template library, Chromium renderer daemon, visual QA | High-res PNG/JPEG creative rendered with brand colors & fonts | PENDING |
-| **Phase 5** | Social connectors, OAuth, idempotent queue, retry logic | Real post published to Facebook/Instagram/LinkedIn test accounts | PENDING |
-| **Phase 6** | Unified inbox, AI reply suggestions, analytics ingestion | Live comments visible, sentiment scored, metrics charted | PENDING |
-| **Phase 7** | Hourly planning cycle, emergency pause, Command Center UI | Autonomous operation functioning within configured policy limits | PENDING |
+| **Phase 5** | Social connectors, OAuth, idempotent queue, retry logic | Real post published to Facebook/Instagram/LinkedIn test accounts | ✅ DONE |
+| **Phase 6** | Unified inbox, AI reply suggestions, analytics ingestion | Live comments visible, sentiment scored, metrics charted | ✅ DONE |
+| **Phase 7** | Hourly planning cycle, emergency pause, Command Center UI | Autonomous operation functioning within configured policy limits | ✅ DONE |
 | **Phase 8+**| Additional networks (TikTok, YouTube, X), video formats, launch | Public beta onboarding ready, security audited | PENDING |
 

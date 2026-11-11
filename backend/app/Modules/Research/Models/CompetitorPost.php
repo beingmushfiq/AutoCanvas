@@ -52,3 +52,4 @@ class CompetitorPost extends Model
         return $this->belongsTo(CompetitorProfile::class, 'competitor_profile_id');
     }
 }
+

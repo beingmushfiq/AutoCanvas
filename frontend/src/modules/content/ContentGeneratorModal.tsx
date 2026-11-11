@@ -14,6 +14,8 @@ import {
   type ContentPillar,
   type Campaign,
 } from '../../lib/api/client'
+import { Button } from '../../components/ui/button'
+import { Badge } from '../../components/ui/badge'
 
 interface ContentGeneratorModalProps {
   isOpen: boolean
@@ -119,24 +121,25 @@ export const ContentGeneratorModal: React.FC<ContentGeneratorModalProps> = ({
   const activeVariant = generatedItem?.variants?.find((v) => v.platform === previewPlatform)
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 animate-in fade-in duration-150">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-3xl border border-[#EAECF0] overflow-hidden flex flex-col max-h-[92vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-150">
+      <div className="bg-surface rounded-2xl shadow-xl w-full max-w-3xl border border-border overflow-hidden flex flex-col max-h-[92vh]">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#EAECF0] bg-gradient-to-r from-[#6257E8]/5 to-indigo-50/50">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-background-subtle">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-[#6257E8] text-white flex items-center justify-center shadow-xs">
+            <div className="w-8 h-8 rounded-lg bg-surface border border-border text-brand-accent flex items-center justify-center shadow-2xs">
               <Sparkles className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-[#101828]">Autonomous Multi-Channel Generator</h3>
-              <p className="text-xs text-[#667085]">
+              <h3 className="text-base font-bold text-foreground">Autonomous Multi-Channel Generator</h3>
+              <p className="text-xs text-foreground-secondary">
                 Tailored platform copy, RAG verified context, deterministic creative & QA score
               </p>
             </div>
           </div>
           <button
+            type="button"
             onClick={onClose}
-            className="p-1 rounded-lg text-[#98A2B3] hover:text-[#344054] hover:bg-[#F2F4F7]"
+            className="p-1 rounded-lg text-foreground-muted hover:text-foreground hover:bg-surface-raised transition-colors outline-hidden focus-visible:ring-2 focus-visible:ring-focus-ring"
           >
             <X className="w-5 h-5" />
           </button>
@@ -145,7 +148,7 @@ export const ContentGeneratorModal: React.FC<ContentGeneratorModalProps> = ({
         {/* Modal Body */}
         <div className="p-6 overflow-y-auto space-y-5">
           {error && (
-            <div className="p-3 text-xs bg-rose-50 text-rose-700 rounded-lg border border-rose-200">
+            <div className="p-3 text-xs bg-status-danger-bg text-status-danger rounded-xl border border-status-danger font-semibold">
               {error}
             </div>
           )}
@@ -155,11 +158,11 @@ export const ContentGeneratorModal: React.FC<ContentGeneratorModalProps> = ({
               {/* Pillars & Campaigns */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-[#344054] mb-1">Content Pillar</label>
+                  <label className="block text-xs font-semibold text-foreground mb-1">Content Pillar</label>
                   <select
                     value={selectedPillarId}
                     onChange={(e) => setSelectedPillarId(e.target.value)}
-                    className="w-full px-3 py-2 text-xs border border-[#D0D5DD] rounded-lg"
+                    className="w-full px-3 py-2 text-xs bg-surface text-foreground border border-border rounded-xl outline-hidden focus:ring-2 focus:ring-focus-ring"
                   >
                     <option value="">General Brand Pillar</option>
                     {pillars.map((p) => (
@@ -171,13 +174,13 @@ export const ContentGeneratorModal: React.FC<ContentGeneratorModalProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-[#344054] mb-1">
+                  <label className="block text-xs font-semibold text-foreground mb-1">
                     Marketing Campaign (Optional)
                   </label>
                   <select
                     value={selectedCampaignId}
                     onChange={(e) => setSelectedCampaignId(e.target.value)}
-                    className="w-full px-3 py-2 text-xs border border-[#D0D5DD] rounded-lg"
+                    className="w-full px-3 py-2 text-xs bg-surface text-foreground border border-border rounded-xl outline-hidden focus:ring-2 focus:ring-focus-ring"
                   >
                     <option value="">None / Standalone Post</option>
                     {campaigns.map((c) => (
@@ -191,7 +194,7 @@ export const ContentGeneratorModal: React.FC<ContentGeneratorModalProps> = ({
 
               {/* Target Platforms */}
               <div>
-                <label className="block text-xs font-semibold text-[#344054] mb-1.5">
+                <label className="block text-xs font-semibold text-foreground mb-1.5">
                   Target Social Channels
                 </label>
                 <div className="flex gap-3">
@@ -206,23 +209,23 @@ export const ContentGeneratorModal: React.FC<ContentGeneratorModalProps> = ({
                         key={p.id}
                         type="button"
                         onClick={() => handleTogglePlatform(p.id)}
-                        className={`flex-1 p-3 text-left rounded-xl border transition-all ${
+                        className={`flex-1 p-3 text-left rounded-xl border transition-all outline-hidden focus-visible:ring-2 focus-visible:ring-focus-ring ${
                           isChecked
-                            ? 'border-[#6257E8] bg-[#6257E8]/5 ring-1 ring-[#6257E8]'
-                            : 'border-[#EAECF0] hover:border-[#D0D5DD]'
+                            ? 'border-brand-accent bg-background-subtle shadow-2xs font-semibold'
+                            : 'border-border hover:border-border-strong bg-surface text-foreground-secondary'
                         }`}
                       >
                         <div className="flex items-center justify-between">
-                          <span className="text-xs font-bold text-[#101828]">{p.label}</span>
+                          <span className="text-xs font-bold text-foreground">{p.label}</span>
                           <div
                             className={`w-4 h-4 rounded-full flex items-center justify-center ${
-                              isChecked ? 'bg-[#6257E8] text-white' : 'border border-gray-300'
+                              isChecked ? 'bg-brand-accent text-interactive-primary-fg' : 'border border-border'
                             }`}
                           >
                             {isChecked && <Check className="w-2.5 h-2.5" />}
                           </div>
                         </div>
-                        <span className="text-[10px] text-[#667085] mt-0.5 block">{p.desc}</span>
+                        <span className="text-[10px] text-foreground-muted mt-0.5 block">{p.desc}</span>
                       </button>
                     )
                   })}
@@ -231,7 +234,7 @@ export const ContentGeneratorModal: React.FC<ContentGeneratorModalProps> = ({
 
               {/* Topic / Prompt */}
               <div>
-                <label className="block text-xs font-semibold text-[#344054] mb-1">
+                <label className="block text-xs font-semibold text-foreground mb-1">
                   Topic Brief, Announcement, or Milestone
                 </label>
                 <textarea
@@ -240,43 +243,43 @@ export const ContentGeneratorModal: React.FC<ContentGeneratorModalProps> = ({
                   value={topic}
                   onChange={(e) => setTopic(e.target.value)}
                   placeholder="e.g. Announce our SOC2 Type II compliance audit completion with zero non-conformances, emphasizing enterprise data privacy and autonomous security..."
-                  className="w-full p-3 text-xs border border-[#D0D5DD] rounded-xl focus:ring-2 focus:ring-[#6257E8]"
+                  className="w-full p-3 text-xs bg-surface border border-border rounded-xl text-foreground placeholder:text-foreground-muted outline-hidden focus:ring-2 focus:ring-focus-ring leading-relaxed"
                 />
               </div>
 
               {/* Toggles */}
               <div className="grid grid-cols-2 gap-4 pt-1">
-                <label className="flex items-center gap-2.5 p-3 rounded-xl border border-[#EAECF0] bg-[#F9FAFB] cursor-pointer">
+                <label className="flex items-center gap-2.5 p-3 rounded-xl border border-border bg-background-subtle cursor-pointer">
                   <input
                     type="checkbox"
                     checked={useKnowledge}
                     onChange={(e) => setUseKnowledge(e.target.checked)}
-                    className="rounded text-[#6257E8] focus:ring-[#6257E8]"
+                    className="rounded text-brand-accent focus:ring-focus-ring"
                   />
                   <div>
-                    <div className="text-xs font-semibold text-[#101828] flex items-center gap-1.5">
-                      <BookOpen className="w-3.5 h-3.5 text-[#6257E8]" />
+                    <div className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                      <BookOpen className="w-3.5 h-3.5 text-brand-accent" />
                       <span>RAG Knowledge Retrieval</span>
                     </div>
-                    <span className="text-[10px] text-[#667085]">
+                    <span className="text-[10px] text-foreground-muted">
                       Cite verified facts from brand docs
                     </span>
                   </div>
                 </label>
 
-                <label className="flex items-center gap-2.5 p-3 rounded-xl border border-[#EAECF0] bg-[#F9FAFB] cursor-pointer">
+                <label className="flex items-center gap-2.5 p-3 rounded-xl border border-border bg-background-subtle cursor-pointer">
                   <input
                     type="checkbox"
                     checked={generateCreative}
                     onChange={(e) => setGenerateCreative(e.target.checked)}
-                    className="rounded text-[#6257E8] focus:ring-[#6257E8]"
+                    className="rounded text-brand-accent focus:ring-focus-ring"
                   />
                   <div>
-                    <div className="text-xs font-semibold text-[#101828] flex items-center gap-1.5">
-                      <ImageIcon className="w-3.5 h-3.5 text-[#6257E8]" />
+                    <div className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                      <ImageIcon className="w-3.5 h-3.5 text-brand-accent" />
                       <span>Deterministic Creative Graphic</span>
                     </div>
-                    <span className="text-[10px] text-[#667085]">
+                    <span className="text-[10px] text-foreground-muted">
                       Render branded 2x retina graphic
                     </span>
                   </div>
@@ -284,10 +287,11 @@ export const ContentGeneratorModal: React.FC<ContentGeneratorModalProps> = ({
               </div>
 
               {/* Submit */}
-              <button
+              <Button
                 type="submit"
                 disabled={generating}
-                className="w-full flex items-center justify-center gap-2 py-3 bg-[#6257E8] text-white text-xs font-semibold rounded-xl hover:bg-[#5246D6] disabled:opacity-50 shadow-xs transition-colors"
+                variant="default"
+                className="w-full py-3 gap-2"
               >
                 {generating ? (
                   <>
@@ -300,25 +304,25 @@ export const ContentGeneratorModal: React.FC<ContentGeneratorModalProps> = ({
                     <span>Generate Multi-Channel Campaign</span>
                   </>
                 )}
-              </button>
+              </Button>
             </form>
           ) : (
             /* Results View */
             <div className="space-y-4">
               {/* QA Summary Banner */}
-              <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-between">
+              <div className="p-4 bg-status-success-bg border border-status-success rounded-xl flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white font-bold text-sm flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-xl bg-status-success text-interactive-primary-fg font-bold text-sm flex items-center justify-center font-mono">
                     {generatedItem.overall_quality_score}
                   </div>
                   <div>
-                    <div className="text-xs font-bold text-emerald-950 flex items-center gap-2">
+                    <div className="text-xs font-bold text-foreground flex items-center gap-2">
                       <span>Overall Quality Score</span>
-                      <span className="px-2 py-0.2 rounded-full text-[10px] font-semibold bg-emerald-200 text-emerald-800 uppercase">
+                      <Badge variant="success">
                         {generatedItem.risk_level} Risk
-                      </span>
+                      </Badge>
                     </div>
-                    <p className="text-[11px] text-emerald-800 mt-0.5">
+                    <p className="text-[11px] text-foreground-secondary mt-0.5">
                       Brand Alignment: {generatedItem.qa_report?.brand_alignment_score ?? 94}% • Platform Fit: {generatedItem.qa_report?.platform_fit_score ?? 92}% • Readability: {generatedItem.qa_report?.readability_score ?? 90}%
                     </p>
                   </div>
@@ -327,23 +331,24 @@ export const ContentGeneratorModal: React.FC<ContentGeneratorModalProps> = ({
                 <button
                   type="button"
                   onClick={() => setGeneratedItem(null)}
-                  className="text-xs font-semibold text-emerald-700 hover:underline"
+                  className="text-xs font-semibold text-brand-accent hover:underline"
                 >
                   Regenerate
                 </button>
               </div>
 
               {/* Platform Preview Tabs */}
-              <div className="border border-[#EAECF0] rounded-xl overflow-hidden bg-white shadow-xs">
-                <div className="flex border-b border-[#EAECF0] bg-[#F9FAFB] px-4 gap-4">
+              <div className="border border-border rounded-xl overflow-hidden bg-surface shadow-2xs">
+                <div className="flex border-b border-border bg-background-subtle px-4 gap-4">
                   {generatedItem.variants?.map((v) => (
                     <button
                       key={v.platform}
+                      type="button"
                       onClick={() => setPreviewPlatform(v.platform)}
-                      className={`py-3 text-xs font-bold capitalize border-b-2 transition-all ${
+                      className={`py-3 text-xs font-bold capitalize border-b-2 transition-all outline-hidden focus-visible:ring-2 focus-visible:ring-focus-ring ${
                         previewPlatform === v.platform
-                          ? 'border-[#6257E8] text-[#6257E8]'
-                          : 'border-transparent text-[#667085] hover:text-[#101828]'
+                          ? 'border-brand-accent text-foreground'
+                          : 'border-transparent text-foreground-secondary hover:text-foreground'
                       }`}
                     >
                       {v.platform}
@@ -353,9 +358,9 @@ export const ContentGeneratorModal: React.FC<ContentGeneratorModalProps> = ({
 
                 <div className="p-5 space-y-4">
                   {activeVariant ? (
-                    <div className="grid grid-cols-3 gap-5">
-                      <div className="col-span-2 space-y-3">
-                        <div className="whitespace-pre-line text-xs text-[#344054] leading-relaxed font-sans bg-[#F9FAFB] p-4 rounded-xl border border-[#EAECF0]">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                      <div className="md:col-span-2 space-y-3">
+                        <div className="whitespace-pre-line text-xs text-foreground leading-relaxed font-sans bg-background-subtle p-4 rounded-xl border border-border">
                           {activeVariant.caption}
                         </div>
 
@@ -364,7 +369,7 @@ export const ContentGeneratorModal: React.FC<ContentGeneratorModalProps> = ({
                             {activeVariant.hashtags.map((h, i) => (
                               <span
                                 key={i}
-                                className="px-2 py-0.5 bg-[#F2F4F7] text-[#6257E8] text-[11px] font-mono rounded-md"
+                                className="px-2 py-0.5 bg-background-subtle border border-border text-foreground text-[11px] font-mono rounded-md"
                               >
                                 {h}
                               </span>
@@ -373,19 +378,19 @@ export const ContentGeneratorModal: React.FC<ContentGeneratorModalProps> = ({
                         )}
 
                         {activeVariant.cta_text && (
-                          <div className="text-xs text-[#475467] font-medium">
-                            CTA: <strong className="font-semibold text-[#101828]">{activeVariant.cta_text}</strong>
+                          <div className="text-xs text-foreground-secondary font-medium">
+                            CTA: <strong className="font-semibold text-foreground">{activeVariant.cta_text}</strong>
                           </div>
                         )}
                       </div>
 
                       {/* Creative Graphic Preview */}
                       <div>
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-[#667085] block mb-2">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-foreground-muted block mb-2">
                           Composited Creative
                         </span>
                         {activeVariant.media_urls && activeVariant.media_urls.length > 0 ? (
-                          <div className="rounded-xl overflow-hidden border border-[#EAECF0] shadow-sm">
+                          <div className="rounded-xl overflow-hidden border border-border shadow-2xs">
                             <img
                               src={activeVariant.media_urls[0]}
                               alt="Generated Creative"
@@ -393,7 +398,7 @@ export const ContentGeneratorModal: React.FC<ContentGeneratorModalProps> = ({
                             />
                           </div>
                         ) : (
-                          <div className="p-6 bg-[#F9FAFB] border border-dashed border-[#D0D5DD] rounded-xl text-center text-xs text-[#98A2B3]">
+                          <div className="p-6 bg-background-subtle border border-dashed border-border rounded-xl text-center text-xs text-foreground-muted">
                             No creative generated
                           </div>
                         )}
@@ -407,23 +412,24 @@ export const ContentGeneratorModal: React.FC<ContentGeneratorModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-[#EAECF0] bg-[#F9FAFB] flex items-center justify-end gap-3">
-          <button
+        <div className="px-6 py-4 border-t border-border bg-background-subtle flex items-center justify-end gap-3">
+          <Button
             type="button"
+            variant="outline"
             onClick={onClose}
-            className="px-4 py-2 text-xs font-semibold text-[#344054] bg-white border border-[#D0D5DD] rounded-lg hover:bg-[#F2F4F7]"
           >
             Cancel
-          </button>
+          </Button>
           {generatedItem && (
-            <button
+            <Button
               type="button"
+              variant="default"
               onClick={handleSaveAndFinish}
-              className="flex items-center gap-1.5 px-5 py-2 text-xs font-semibold text-white bg-[#6257E8] rounded-lg hover:bg-[#5246D6] shadow-xs"
+              className="gap-1.5"
             >
               <Check className="w-4 h-4" />
               <span>Save & View in Content Studio</span>
-            </button>
+            </Button>
           )}
         </div>
       </div>

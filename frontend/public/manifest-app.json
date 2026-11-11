@@ -1,0 +1,30 @@
+{
+  "name": "AutoCanvas Studio — Operations Workspace",
+  "short_name": "AC Studio",
+  "description": "Multi-tenant brand workspace, creative editor, publishing calendar, and social intelligence by DevCenterPoint.",
+  "start_url": "/?view=workspace&source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0b0d11",
+  "theme_color": "#0b0d11",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/brand/symbol-dark.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "32x32 48x48 64x64",
+      "type": "image/svg+xml"
+    }
+  ],
+  "categories": ["productivity", "social", "design"],
+  "developer": {
+    "name": "DevCenterPoint",
+    "url": "https://devcenterpoint.com"
+  }
+}
+

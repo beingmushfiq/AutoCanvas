@@ -4,9 +4,11 @@ namespace App\Modules\ContentProduction\Models;
 
 use App\Core\Concerns\HasTenantScope;
 use App\Core\Concerns\HasUlid;
+use App\Modules\Publishing\Models\PublishingDispatch;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ContentVariant extends Model
@@ -27,6 +29,9 @@ class ContentVariant extends Model
         'creative_document',
         'quality_score',
         'platform_options',
+        'publishing_status',
+        'scheduled_at',
+        'published_at',
     ];
 
     protected function casts(): array
@@ -38,11 +43,18 @@ class ContentVariant extends Model
             'platform_options' => 'array',
             'character_count' => 'integer',
             'quality_score' => 'integer',
+            'scheduled_at' => 'datetime',
+            'published_at' => 'datetime',
         ];
     }
 
     public function contentItem(): BelongsTo
     {
         return $this->belongsTo(ContentItem::class);
+    }
+
+    public function dispatches(): HasMany
+    {
+        return $this->hasMany(PublishingDispatch::class, 'content_variant_id');
     }
 }

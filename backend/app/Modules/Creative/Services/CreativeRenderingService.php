@@ -3,19 +3,15 @@
 namespace App\Modules\Creative\Services;
 
 use App\Modules\Brand\Models\Brand;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
+use App\Modules\Creative\Models\CreativeDocument;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class CreativeRenderingService
 {
-    protected string $rendererUrl;
-
-    public function __construct()
-    {
-        $this->rendererUrl = env('RENDERER_URL', 'http://127.0.0.1:3001');
-    }
+    public function __construct(
+        protected ChromiumRendererClient $chromiumClient
+    ) {}
 
     /**
      * Get system-supported creative templates.
@@ -55,19 +51,21 @@ class CreativeRenderingService
     }
 
     /**
-     * Render creative document to public storage.
+     * Render creative document to public storage and persist CreativeDocument record.
      */
     public function render(Brand $brand, array $options): array
     {
         $templateId = $options['template_id'] ?? 'minimal_corporate_v1';
         $width = (int) ($options['width'] ?? 1080);
         $height = (int) ($options['height'] ?? 1080);
+        $aspectRatio = $options['aspect_ratio'] ?? '1:1';
 
         $headline = $options['headline'] ?? $brand->name;
         $supportingText = $options['supporting_text'] ?? null;
         $cta = $options['call_to_action'] ?? ($brand->profile?->primary_cta ?? 'Learn More');
+        $name = $options['name'] ?? ($headline ?: 'Untitled Creative');
 
-        $doc = [
+        $docPayload = [
             'width' => $width,
             'height' => $height,
             'backgroundColor' => $options['background_color'] ?? ($brand->visualIdentity?->primary_color ?? '#101828'),
@@ -85,53 +83,122 @@ class CreativeRenderingService
             'templateId' => $templateId,
         ];
 
-        $filename = 'creative_'.Str::ulid();
+        $filename = 'creative_' . Str::ulid();
         $relativeDir = "brands/{$brand->id}/creatives";
 
-        try {
-            // Attempt HTTP call to Node.js / Playwright rendering daemon
-            $response = Http::timeout(6)->post("{$this->rendererUrl}/render", $doc);
+        // 1. Attempt rendering via Playwright Chromium daemon
+        $imageBytes = $this->chromiumClient->render($docPayload);
+        $engine = 'playwright_chromium';
+        $format = 'png';
 
-            if ($response->successful()) {
-                $imagePath = "{$relativeDir}/{$filename}.png";
-                Storage::disk('public')->put($imagePath, $response->body());
-
-                return [
-                    'success' => true,
-                    'file_path' => $imagePath,
-                    'file_url' => Storage::disk('public')->url($imagePath),
-                    'format' => 'png',
-                    'width' => $width,
-                    'height' => $height,
-                    'renderer' => 'playwright_chromium',
-                    'creative_document' => $doc,
-                ];
-            }
-        } catch (\Exception $e) {
-            Log::warning("[CreativeRenderingService] Renderer daemon offline at {$this->rendererUrl}, generating SVG fallback: ".$e->getMessage());
+        if ($imageBytes !== null) {
+            $imagePath = "{$relativeDir}/{$filename}.png";
+            Storage::disk('public')->put($imagePath, $imageBytes);
+            $assetUrl = Storage::disk('public')->url($imagePath);
+        } else {
+            // 2. Graceful deterministic SVG fallback
+            $engine = 'deterministic_svg_fallback';
+            $format = 'svg';
+            $svgContent = $this->composeFallbackSvg($docPayload);
+            $imagePath = "{$relativeDir}/{$filename}.svg";
+            Storage::disk('public')->put($imagePath, $svgContent);
+            $assetUrl = Storage::disk('public')->url($imagePath);
         }
 
-        // Graceful deterministic SVG fallback
-        $svgContent = $this->composeFallbackSvg($doc);
-        $svgPath = "{$relativeDir}/{$filename}.svg";
-        Storage::disk('public')->put($svgPath, $svgContent);
+        // 3. Persist or update CreativeDocument model
+        $creativeDoc = CreativeDocument::create([
+            'organization_id' => $brand->organization_id,
+            'workspace_id' => $brand->workspace_id,
+            'brand_id' => $brand->id,
+            'content_item_id' => $options['content_item_id'] ?? null,
+            'content_variant_id' => $options['content_variant_id'] ?? null,
+            'name' => $name,
+            'template_id' => $templateId,
+            'aspect_ratio' => $aspectRatio,
+            'width' => $width,
+            'height' => $height,
+            'layers' => $options['layers'] ?? [
+                'headline' => ['text' => $headline],
+                'supporting' => ['text' => $supportingText],
+                'cta' => ['text' => $cta],
+            ],
+            'background_config' => [
+                'color' => $docPayload['backgroundColor'],
+            ],
+            'rendered_asset_url' => $assetUrl,
+            'render_status' => 'rendered',
+            'render_engine' => $engine,
+        ]);
 
         return [
             'success' => true,
-            'file_path' => $svgPath,
-            'file_url' => Storage::disk('public')->url($svgPath),
-            'format' => 'svg',
+            'document_id' => $creativeDoc->id,
+            'file_path' => $imagePath,
+            'file_url' => $assetUrl,
+            'format' => $format,
             'width' => $width,
             'height' => $height,
-            'renderer' => 'deterministic_svg_fallback',
-            'creative_document' => $doc,
+            'renderer' => $engine,
+            'creative_document' => $docPayload,
+            'model' => $creativeDoc,
         ];
+    }
+
+    /**
+     * Re-render an existing CreativeDocument.
+     */
+    public function renderDocument(CreativeDocument $document): CreativeDocument
+    {
+        $brand = $document->brand;
+        $docPayload = [
+            'width' => $document->width,
+            'height' => $document->height,
+            'backgroundColor' => $document->background_config['color'] ?? '#101828',
+            'brand' => [
+                'name' => $brand->name,
+                'logoUrl' => $brand->visualIdentity?->primary_logo_url,
+                'primaryColor' => $brand->visualIdentity?->secondary_color ?? '#6257E8',
+                'secondaryColor' => $brand->visualIdentity?->accent_colors[0] ?? '#24A0A8',
+            ],
+            'content' => [
+                'headline' => $document->layers['headline']['text'] ?? $document->name,
+                'supportingText' => $document->layers['supporting']['text'] ?? null,
+                'callToAction' => $document->layers['cta']['text'] ?? 'Learn More',
+            ],
+            'templateId' => $document->template_id,
+        ];
+
+        $filename = 'creative_' . Str::ulid();
+        $relativeDir = "brands/{$brand->id}/creatives";
+
+        $imageBytes = $this->chromiumClient->render($docPayload);
+
+        if ($imageBytes !== null) {
+            $imagePath = "{$relativeDir}/{$filename}.png";
+            Storage::disk('public')->put($imagePath, $imageBytes);
+            $assetUrl = Storage::disk('public')->url($imagePath);
+            $engine = 'playwright_chromium';
+        } else {
+            $imagePath = "{$relativeDir}/{$filename}.svg";
+            $svgContent = $this->composeFallbackSvg($docPayload);
+            Storage::disk('public')->put($imagePath, $svgContent);
+            $assetUrl = Storage::disk('public')->url($imagePath);
+            $engine = 'deterministic_svg_fallback';
+        }
+
+        $document->update([
+            'rendered_asset_url' => $assetUrl,
+            'render_status' => 'rendered',
+            'render_engine' => $engine,
+        ]);
+
+        return $document;
     }
 
     /**
      * Generate valid, standalone SVG creative fallback.
      */
-    protected function composeFallbackSvg(array $doc): string
+    public function composeFallbackSvg(array $doc): string
     {
         $w = $doc['width'];
         $h = $doc['height'];

@@ -14,6 +14,8 @@ class SyncFeedsCommand extends Command
      */
     protected $signature = 'research:sync-feeds {--limit=20 : Maximum number of feeds to sync}';
 
+    protected $aliases = ['feeds:sync'];
+
     /**
      * The console command description.
      *
@@ -36,3 +38,4 @@ class SyncFeedsCommand extends Command
         return Command::SUCCESS;
     }
 }
+

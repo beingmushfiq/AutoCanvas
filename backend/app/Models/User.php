@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Core\Concerns\HasUlid;
+use App\Core\Security\PermissionRegistry;
 use App\Modules\Organization\Models\Organization;
 use App\Modules\Organization\Models\OrganizationMember;
 use App\Modules\Workspace\Models\Workspace;
@@ -80,6 +81,18 @@ class User extends Authenticatable
             ->withTimestamps();
     }
 
+    public function userRoles(): HasMany
+    {
+        return $this->hasMany(UserRole::class);
+    }
+
+    public function roles(): BelongsToMany
+    {
+        return $this->belongsToMany(Role::class, 'user_roles', 'user_id', 'role_id')
+            ->withPivot('organization_id')
+            ->withTimestamps();
+    }
+
     public function isMemberOfOrganization(string $organizationId): bool
     {
         return $this->organizations()->where('organizations.id', $organizationId)->exists();
@@ -88,5 +101,37 @@ class User extends Authenticatable
     public function isMemberOfWorkspace(string $workspaceId): bool
     {
         return $this->workspaces()->where('workspaces.id', $workspaceId)->exists();
+    }
+
+    /**
+     * Check if user has a specific permission in the specified or current tenant scope.
+     */
+    public function hasPermission(string $permission, ?string $organizationId = null): bool
+    {
+        return app(PermissionRegistry::class)->hasPermission($this, $permission, $organizationId);
+    }
+
+    /**
+     * Check if user has a platform system-level permission.
+     */
+    public function hasSystemPermission(string $permission): bool
+    {
+        return app(PermissionRegistry::class)->hasPermission($this, $permission, null);
+    }
+
+    /**
+     * Assign a named role to this user.
+     */
+    public function assignRole(string $roleName, ?string $organizationId = null): UserRole
+    {
+        return app(PermissionRegistry::class)->assignRole($this, $roleName, $organizationId);
+    }
+
+    /**
+     * Revoke a named role from this user.
+     */
+    public function revokeRole(string $roleName, ?string $organizationId = null): bool
+    {
+        return app(PermissionRegistry::class)->revokeRole($this, $roleName, $organizationId);
     }
 }

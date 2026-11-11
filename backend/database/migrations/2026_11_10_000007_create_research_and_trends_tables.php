@@ -167,3 +167,4 @@ return new class extends Migration
         Schema::dropIfExists('rss_feeds');
     }
 };
+

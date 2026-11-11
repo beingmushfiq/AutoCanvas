@@ -223,3 +223,4 @@ class TrendOpportunityTest extends TestCase
         ];
     }
 }
+

@@ -9,12 +9,23 @@ import {
   Save,
   ShieldCheck,
   ShieldAlert,
+  AlertTriangle,
 } from 'lucide-react'
 import {
   apiClient,
   type ContentItem,
   type ContentVariant,
 } from '../../lib/api/client'
+import { Button } from '../../components/ui/button'
+import { Badge } from '../../components/ui/badge'
+
+const PLATFORM_LIMITS: Record<string, number> = {
+  twitter: 280,
+  x: 280,
+  linkedin: 3000,
+  instagram: 2200,
+  facebook: 63206,
+}
 
 interface PostDetailModalProps {
   isOpen: boolean
@@ -126,40 +137,46 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
 
   if (!isOpen || !item) return null
 
+  const charLimit = PLATFORM_LIMITS[selectedPlatform.toLowerCase()] || 3000
+  const charCount = caption.length
+  const isOverLimit = charCount > charLimit
+  const isNearLimit = charCount > charLimit * 0.9 && !isOverLimit
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 animate-in fade-in duration-150">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-4xl border border-[#EAECF0] overflow-hidden flex flex-col max-h-[92vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-150">
+      <div className="bg-surface rounded-2xl shadow-xl w-full max-w-4xl border border-border overflow-hidden flex flex-col max-h-[92vh]">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#EAECF0] bg-[#F9FAFB]">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-background-subtle">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-[#6257E8]/10 text-[#6257E8] flex items-center justify-center font-bold text-xs">
+            <div className="w-8 h-8 rounded-lg bg-surface border border-border text-brand-accent flex items-center justify-center font-bold text-xs shadow-2xs">
               QA
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-base font-bold text-[#101828] truncate max-w-md">{item.title}</h3>
-                <span
-                  className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                <h3 className="text-base font-bold text-foreground truncate max-w-md">{item.title}</h3>
+                <Badge
+                  variant={
                     item.status === 'approved'
-                      ? 'bg-emerald-100 text-emerald-800'
+                      ? 'success'
                       : item.status === 'review'
-                      ? 'bg-amber-100 text-amber-800'
+                      ? 'warning'
                       : item.status === 'rejected'
-                      ? 'bg-rose-100 text-rose-800'
-                      : 'bg-gray-100 text-gray-800'
-                  }`}
+                      ? 'danger'
+                      : 'secondary'
+                  }
                 >
                   {item.status}
-                </span>
+                </Badge>
               </div>
-              <p className="text-xs text-[#667085] mt-0.5">
+              <p className="text-xs text-foreground-secondary mt-0.5">
                 {item.pillar?.name ? `Pillar: ${item.pillar.name} • ` : ''}Quality Score: {item.overall_quality_score}/100
               </p>
             </div>
           </div>
           <button
+            type="button"
             onClick={onClose}
-            className="p-1 rounded-lg text-[#98A2B3] hover:text-[#344054] hover:bg-[#F2F4F7]"
+            className="p-1 rounded-lg text-foreground-muted hover:text-foreground hover:bg-surface-raised transition-colors outline-hidden focus-visible:ring-2 focus-visible:ring-focus-ring"
           >
             <X className="w-5 h-5" />
           </button>
@@ -168,35 +185,36 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
         {/* Content Body */}
         <div className="p-6 overflow-y-auto space-y-5">
           {error && (
-            <div className="p-3 text-xs bg-rose-50 text-rose-700 rounded-lg border border-rose-200">
+            <div className="p-3 text-xs bg-status-danger-bg text-status-danger rounded-xl border border-status-danger font-semibold">
               {error}
             </div>
           )}
 
           {/* Rejection Notice Banner if applicable */}
           {item.status === 'rejected' && item.review_feedback && (
-            <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-xl flex items-start gap-3">
-              <XCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
-              <div className="text-xs text-rose-900">
+            <div className="p-3.5 bg-status-danger-bg border border-status-danger text-status-danger rounded-xl flex items-start gap-3">
+              <XCircle className="w-4 h-4 shrink-0 mt-0.5" />
+              <div className="text-xs">
                 <strong className="font-semibold">Reviewer Revision Feedback:</strong>
-                <p className="mt-0.5 text-rose-800">{item.review_feedback}</p>
+                <p className="mt-0.5">{item.review_feedback}</p>
               </div>
             </div>
           )}
 
-          <div className="grid grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Left 2 Cols: Platform Copy Editor */}
-            <div className="col-span-2 space-y-4">
+            <div className="md:col-span-2 space-y-4">
               {/* Channel Selector */}
-              <div className="flex border-b border-[#EAECF0] gap-4">
+              <div className="flex border-b border-border gap-4">
                 {item.variants?.map((v) => (
                   <button
                     key={v.platform}
+                    type="button"
                     onClick={() => handleSelectPlatform(v.platform)}
-                    className={`py-2 text-xs font-bold capitalize border-b-2 transition-all ${
+                    className={`py-2 text-xs font-bold capitalize border-b-2 transition-all outline-hidden focus-visible:ring-2 focus-visible:ring-focus-ring ${
                       selectedPlatform === v.platform
-                        ? 'border-[#6257E8] text-[#6257E8]'
-                        : 'border-transparent text-[#667085] hover:text-[#101828]'
+                        ? 'border-brand-accent text-foreground'
+                        : 'border-transparent text-foreground-secondary hover:text-foreground'
                     }`}
                   >
                     {v.platform}
@@ -204,46 +222,68 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
                 ))}
               </div>
 
-              {/* Caption Editor */}
+              {/* Caption Editor with Live Character Limit Warning */}
               {editingVariant && (
                 <div className="space-y-3">
                   <div>
                     <div className="flex items-center justify-between mb-1">
-                      <label className="text-xs font-semibold text-[#344054]">
+                      <label className="text-xs font-semibold text-foreground">
                         Platform Native Caption ({selectedPlatform})
                       </label>
-                      <span className="text-[11px] text-[#667085]">
-                        {caption.length} characters
-                      </span>
+                      <div className="flex items-center gap-1.5 text-[11px] font-mono">
+                        <span
+                          className={`font-semibold ${
+                            isOverLimit
+                              ? 'text-status-danger'
+                              : isNearLimit
+                              ? 'text-status-warning'
+                              : 'text-foreground-secondary'
+                          }`}
+                        >
+                          {charCount} / {charLimit}
+                        </span>
+                        {isOverLimit && (
+                          <span className="flex items-center gap-0.5 text-status-danger font-semibold text-[10px]">
+                            <AlertTriangle className="w-3 h-3" /> Exceeds limit
+                          </span>
+                        )}
+                      </div>
                     </div>
                     <textarea
                       rows={8}
                       value={caption}
                       onChange={(e) => setCaption(e.target.value)}
-                      className="w-full p-3 text-xs border border-[#D0D5DD] rounded-xl focus:ring-2 focus:ring-[#6257E8] leading-relaxed"
+                      className={`w-full p-3 text-xs bg-surface border rounded-xl leading-relaxed text-foreground placeholder:text-foreground-muted outline-hidden focus:ring-2 ${
+                        isOverLimit
+                          ? 'border-status-danger focus:ring-status-danger'
+                          : 'border-border focus:ring-focus-ring'
+                      }`}
                     />
                   </div>
 
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
                     <div className="flex flex-wrap gap-1.5 max-w-sm">
                       {editingVariant.hashtags?.map((tag, i) => (
                         <span
                           key={i}
-                          className="px-2 py-0.5 bg-[#F2F4F7] text-[#6257E8] text-[11px] font-mono rounded"
+                          className="px-2 py-0.5 bg-background-subtle border border-border text-foreground text-[11px] font-mono rounded"
                         >
                           {tag}
                         </span>
                       ))}
                     </div>
 
-                    <button
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
                       onClick={handleSaveVariant}
                       disabled={savingVariant}
-                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-[#344054] bg-[#F2F4F7] hover:bg-[#EAECF0] rounded-lg transition-colors"
+                      className="gap-1.5"
                     >
                       {savingVariant ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
                       <span>Save Copy</span>
-                    </button>
+                    </Button>
                   </div>
                 </div>
               )}
@@ -252,15 +292,16 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
             {/* Right 1 Col: Creative & QA Report */}
             <div className="space-y-4">
               {/* Creative Graphic */}
-              <div className="bg-[#F9FAFB] p-3.5 rounded-xl border border-[#EAECF0] space-y-2.5">
+              <div className="bg-background-subtle p-3.5 rounded-2xl border border-border space-y-2.5">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#667085]">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-foreground-muted">
                     Creative Visual
                   </span>
                   {editingVariant && (
                     <button
+                      type="button"
                       onClick={() => onOpenCreativeEditor(editingVariant.id, item.title)}
-                      className="text-[11px] font-semibold text-[#6257E8] hover:underline flex items-center gap-1"
+                      className="text-[11px] font-semibold text-brand-accent hover:underline flex items-center gap-1"
                     >
                       <Palette className="w-3 h-3" />
                       <span>Edit Graphic</span>
@@ -269,7 +310,7 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
                 </div>
 
                 {editingVariant?.media_urls && editingVariant.media_urls.length > 0 ? (
-                  <div className="rounded-lg overflow-hidden border border-[#EAECF0] shadow-xs">
+                  <div className="rounded-xl overflow-hidden border border-border shadow-2xs">
                     <img
                       src={editingVariant.media_urls[0]}
                       alt="Creative Graphic"
@@ -277,50 +318,50 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
                     />
                   </div>
                 ) : (
-                  <div className="p-6 bg-white border border-dashed border-[#D0D5DD] rounded-lg text-center text-xs text-[#98A2B3]">
+                  <div className="p-6 bg-surface border border-dashed border-border rounded-xl text-center text-xs text-foreground-muted">
                     No creative attached
                   </div>
                 )}
               </div>
 
               {/* QA & Policy Meter */}
-              <div className="bg-[#F9FAFB] p-3.5 rounded-xl border border-[#EAECF0] space-y-2">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#667085]">
+              <div className="bg-background-subtle p-3.5 rounded-2xl border border-border space-y-2">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-foreground-muted">
                   Automated QA Breakdown
                 </span>
 
                 <div className="space-y-1.5 text-xs">
                   <div className="flex justify-between">
-                    <span className="text-[#667085]">Brand Alignment:</span>
-                    <span className="font-semibold text-[#101828]">
+                    <span className="text-foreground-secondary">Brand Alignment:</span>
+                    <span className="font-semibold text-foreground">
                       {item.qa_report?.brand_alignment_score ?? 90}%
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-[#667085]">Platform Fit:</span>
-                    <span className="font-semibold text-[#101828]">
+                    <span className="text-foreground-secondary">Platform Fit:</span>
+                    <span className="font-semibold text-foreground">
                       {item.qa_report?.platform_fit_score ?? 90}%
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-[#667085]">Readability:</span>
-                    <span className="font-semibold text-[#101828]">
+                    <span className="text-foreground-secondary">Readability:</span>
+                    <span className="font-semibold text-foreground">
                       {item.qa_report?.readability_score ?? 88}%
                     </span>
                   </div>
                 </div>
 
-                <div className="pt-2 border-t border-[#EAECF0] flex items-center gap-1.5 text-[11px] text-[#344054]">
+                <div className="pt-2 border-t border-border flex items-center gap-1.5 text-[11px]">
                   {item.risk_level === 'low' ? (
-                    <>
-                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                      <span className="text-emerald-700 font-semibold">Low Risk / Safe to Publish</span>
-                    </>
+                    <div className="flex items-center gap-1 text-status-success font-semibold">
+                      <ShieldCheck className="w-3.5 h-3.5" />
+                      <span>Low Risk / Safe to Publish</span>
+                    </div>
                   ) : (
-                    <>
-                      <ShieldAlert className="w-3.5 h-3.5 text-amber-600" />
-                      <span className="text-amber-700 font-semibold">Risk: {item.risk_level.toUpperCase()}</span>
-                    </>
+                    <div className="flex items-center gap-1 text-status-warning font-semibold">
+                      <ShieldAlert className="w-3.5 h-3.5" />
+                      <span>Risk: {item.risk_level.toUpperCase()}</span>
+                    </div>
                   )}
                 </div>
               </div>
@@ -329,8 +370,8 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
 
           {/* Rejection Prompt Form */}
           {showRejectBox && (
-            <div className="p-4 bg-rose-50 border border-rose-200 rounded-xl space-y-3">
-              <label className="block text-xs font-semibold text-rose-900">
+            <div className="p-4 bg-status-danger-bg border border-status-danger rounded-2xl space-y-3">
+              <label className="block text-xs font-semibold text-status-danger">
                 Reason for Rejection / Revision Notes:
               </label>
               <textarea
@@ -338,73 +379,83 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({
                 value={rejectFeedback}
                 onChange={(e) => setRejectFeedback(e.target.value)}
                 placeholder="Specify what needs to be changed before approval..."
-                className="w-full p-2.5 text-xs border border-rose-300 rounded-lg focus:ring-2 focus:ring-rose-500 bg-white"
+                className="w-full p-2.5 text-xs border border-status-danger/40 rounded-xl bg-surface text-foreground placeholder:text-foreground-muted outline-hidden focus:ring-2 focus:ring-status-danger"
               />
               <div className="flex justify-end gap-2">
-                <button
+                <Button
                   type="button"
+                  variant="outline"
+                  size="sm"
                   onClick={() => setShowRejectBox(false)}
-                  className="px-3 py-1.5 text-xs font-semibold text-rose-800 hover:bg-rose-100 rounded-lg"
                 >
                   Cancel
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
+                  variant="destructive"
+                  size="sm"
                   onClick={handleReject}
                   disabled={actionLoading || !rejectFeedback.trim()}
-                  className="px-4 py-1.5 bg-rose-600 text-white text-xs font-semibold rounded-lg hover:bg-rose-700 disabled:opacity-50"
                 >
                   Confirm Rejection
-                </button>
+                </Button>
               </div>
             </div>
           )}
         </div>
 
         {/* Footer Actions */}
-        <div className="px-6 py-4 border-t border-[#EAECF0] bg-white flex items-center justify-between">
-          <div className="text-xs text-[#667085]">
+        <div className="px-6 py-4 border-t border-border bg-surface flex items-center justify-between">
+          <div className="text-xs text-foreground-muted font-mono">
             Created {new Date(item.created_at).toLocaleDateString()}
           </div>
 
           <div className="flex items-center gap-3">
             {item.status === 'draft' && (
-              <button
+              <Button
+                type="button"
+                variant="default"
                 onClick={handleSubmitReview}
                 disabled={actionLoading}
-                className="flex items-center gap-1.5 px-4 py-2 bg-[#6257E8] text-white text-xs font-semibold rounded-lg hover:bg-[#5246D6] disabled:opacity-50 shadow-xs"
+                className="gap-1.5"
               >
                 {actionLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
                 <span>Submit for Approval</span>
-              </button>
+              </Button>
             )}
 
             {item.status === 'review' && !showRejectBox && (
               <>
-                <button
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="sm"
                   onClick={() => setShowRejectBox(true)}
                   disabled={actionLoading}
-                  className="flex items-center gap-1 px-4 py-2 text-xs font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-lg transition-colors border border-rose-200"
+                  className="gap-1"
                 >
                   <XCircle className="w-3.5 h-3.5" />
                   <span>Reject with Feedback</span>
-                </button>
+                </Button>
 
-                <button
+                <Button
+                  type="button"
+                  variant="default"
+                  size="sm"
                   onClick={handleApprove}
                   disabled={actionLoading}
-                  className="flex items-center gap-1.5 px-5 py-2 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg shadow-xs transition-colors"
+                  className="gap-1.5 bg-status-success text-interactive-primary-fg hover:opacity-90"
                 >
                   {actionLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <CheckCircle2 className="w-3.5 h-3.5" />}
                   <span>Approve Post</span>
-                </button>
+                </Button>
               </>
             )}
 
             {item.status === 'approved' && (
-              <span className="flex items-center gap-1 text-xs font-semibold text-emerald-700">
+              <span className="flex items-center gap-1 text-xs font-semibold text-status-success">
                 <CheckCircle2 className="w-4 h-4" />
-                <span>Ready for Publishing (Phase 5)</span>
+                <span>Ready for Publishing (Idempotent Redis Lock)</span>
               </span>
             )}
           </div>

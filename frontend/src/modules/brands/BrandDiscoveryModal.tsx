@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { X, Sparkles, Wand2, Check, Loader2, ArrowRight } from 'lucide-react'
 import { apiClient, type ApiResponse, type BrandDiscoverySuggestion } from '../../lib/api/client'
+import { Button } from '../../components/ui/button'
 
 interface BrandDiscoveryModalProps {
   isOpen: boolean
@@ -79,22 +80,23 @@ export const BrandDiscoveryModal: React.FC<BrandDiscoveryModalProps> = ({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 animate-in fade-in duration-150">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl border border-[#EAECF0] overflow-hidden flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-150">
+      <div className="bg-surface rounded-2xl shadow-xl w-full max-w-2xl border border-border overflow-hidden flex flex-col max-h-[90vh]">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#EAECF0] bg-gradient-to-r from-[#6257E8]/5 to-indigo-50/50">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-background-subtle">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-[#6257E8] text-white flex items-center justify-center shadow-xs">
+            <div className="w-8 h-8 rounded-lg bg-surface border border-border text-brand-accent flex items-center justify-center shadow-2xs">
               <Sparkles className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-[#101828]">AI Brand Discovery Assistant</h3>
-              <p className="text-xs text-[#667085]">Synthesize identity, mission, colors, and tone from raw materials</p>
+              <h3 className="text-base font-bold text-foreground">AI Brand Discovery Assistant</h3>
+              <p className="text-xs text-foreground-secondary">Synthesize identity, mission, colors, and tone from raw materials</p>
             </div>
           </div>
           <button
+            type="button"
             onClick={onClose}
-            className="p-1 rounded-lg text-[#98A2B3] hover:text-[#344054] hover:bg-[#F2F4F7]"
+            className="p-1 rounded-lg text-foreground-muted hover:text-foreground hover:bg-surface-raised transition-colors outline-hidden focus-visible:ring-2 focus-visible:ring-focus-ring"
           >
             <X className="w-5 h-5" />
           </button>
@@ -103,17 +105,17 @@ export const BrandDiscoveryModal: React.FC<BrandDiscoveryModalProps> = ({
         {/* Modal Body */}
         <div className="p-6 overflow-y-auto space-y-5">
           {error && (
-            <div className="p-3 text-xs bg-rose-50 text-rose-700 rounded-lg border border-rose-200">
+            <div className="p-3 text-xs bg-status-danger-bg text-status-danger rounded-lg border border-status-danger font-semibold">
               {error}
             </div>
           )}
 
           {!suggestion ? (
             <div className="space-y-3">
-              <label className="block text-xs font-semibold text-[#344054]">
+              <label className="block text-xs font-semibold text-foreground">
                 Brand Reference Material or Notes
               </label>
-              <p className="text-xs text-[#667085]">
+              <p className="text-xs text-foreground-secondary">
                 Paste your company overview, pitch deck notes, website 'About Us' copy, or brand guidelines. If left blank, the AI will synthesize from existing knowledge sources.
               </p>
               <textarea
@@ -121,14 +123,15 @@ export const BrandDiscoveryModal: React.FC<BrandDiscoveryModalProps> = ({
                 value={referenceText}
                 onChange={(e) => setReferenceText(e.target.value)}
                 placeholder="Paste brand guidelines, mission notes, or about us text here..."
-                className="w-full p-3 text-xs border border-[#D0D5DD] rounded-xl focus:outline-hidden focus:ring-2 focus:ring-[#6257E8]"
+                className="w-full p-3 text-xs bg-surface border border-border rounded-xl text-foreground placeholder:text-foreground-muted outline-hidden focus:ring-2 focus:ring-focus-ring"
               />
 
-              <button
+              <Button
                 type="button"
                 onClick={handleAnalyze}
                 disabled={analyzing}
-                className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-[#6257E8] text-white text-xs font-semibold rounded-xl hover:bg-[#5246D6] disabled:opacity-50 shadow-xs transition-colors"
+                variant="default"
+                className="w-full gap-2 py-2.5"
               >
                 {analyzing ? (
                   <>
@@ -141,53 +144,54 @@ export const BrandDiscoveryModal: React.FC<BrandDiscoveryModalProps> = ({
                     <span>Run AI Discovery Analysis</span>
                   </>
                 )}
-              </button>
+              </Button>
             </div>
           ) : (
             <div className="space-y-4">
-              <div className="p-3.5 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-between">
-                <div className="flex items-center gap-2 text-xs font-semibold text-emerald-800">
-                  <Check className="w-4 h-4 text-emerald-600" />
+              <div className="p-3.5 bg-status-success-bg border border-status-success text-status-success rounded-xl flex items-center justify-between">
+                <div className="flex items-center gap-2 text-xs font-semibold">
+                  <Check className="w-4 h-4 shrink-0" />
                   <span>AI Discovery Completed Successfully</span>
                 </div>
                 <button
+                  type="button"
                   onClick={() => setSuggestion(null)}
-                  className="text-xs text-emerald-700 hover:underline"
+                  className="text-xs underline hover:opacity-80"
                 >
                   Analyze different text
                 </button>
               </div>
 
               {/* Synthesized Output Display */}
-              <div className="space-y-3 border border-[#EAECF0] rounded-xl p-4 bg-[#F9FAFB]">
+              <div className="space-y-3 border border-border rounded-xl p-4 bg-background-subtle">
                 <div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#667085]">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-foreground-muted">
                     Synthesized Positioning
                   </span>
-                  <p className="text-xs font-medium text-[#101828] mt-0.5">{suggestion.positioning}</p>
+                  <p className="text-xs font-medium text-foreground mt-0.5">{suggestion.positioning}</p>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3 pt-2 border-t border-[#EAECF0]">
+                <div className="grid grid-cols-2 gap-3 pt-2 border-t border-border">
                   <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#667085]">Mission</span>
-                    <p className="text-xs text-[#344054] mt-0.5">{suggestion.mission}</p>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-foreground-muted">Mission</span>
+                    <p className="text-xs text-foreground-secondary mt-0.5">{suggestion.mission}</p>
                   </div>
                   <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#667085]">Vision</span>
-                    <p className="text-xs text-[#344054] mt-0.5">{suggestion.vision}</p>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-foreground-muted">Vision</span>
+                    <p className="text-xs text-foreground-secondary mt-0.5">{suggestion.vision}</p>
                   </div>
                 </div>
 
-                <div className="pt-2 border-t border-[#EAECF0]">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#667085]">
+                <div className="pt-2 border-t border-border">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-foreground-muted">
                     Tone & Voice
                   </span>
-                  <p className="text-xs text-[#344054] mt-0.5">{suggestion.tone}</p>
+                  <p className="text-xs text-foreground-secondary mt-0.5">{suggestion.tone}</p>
                   <div className="flex flex-wrap gap-1.5 mt-2">
                     {suggestion.personality_traits?.map((trait, idx) => (
                       <span
                         key={idx}
-                        className="px-2 py-0.5 text-[11px] font-medium bg-white border border-[#D0D5DD] text-[#344054] rounded-md"
+                        className="px-2 py-0.5 text-[11px] font-medium bg-surface border border-border text-foreground rounded-md"
                       >
                         {trait}
                       </span>
@@ -195,29 +199,29 @@ export const BrandDiscoveryModal: React.FC<BrandDiscoveryModalProps> = ({
                   </div>
                 </div>
 
-                <div className="pt-2 border-t border-[#EAECF0] flex items-center justify-between">
+                <div className="pt-2 border-t border-border flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="flex items-center gap-1.5">
-                      <span className="text-[10px] font-bold text-[#667085]">Primary:</span>
+                      <span className="text-[10px] font-bold text-foreground-muted">Primary:</span>
                       <div
-                        className="w-4 h-4 rounded-full border border-gray-300"
+                        className="w-4 h-4 rounded-full border border-border"
                         style={{ backgroundColor: suggestion.primary_color }}
                       />
-                      <span className="text-xs font-mono">{suggestion.primary_color}</span>
+                      <span className="text-xs font-mono text-foreground">{suggestion.primary_color}</span>
                     </div>
 
                     <div className="flex items-center gap-1.5">
-                      <span className="text-[10px] font-bold text-[#667085]">Secondary:</span>
+                      <span className="text-[10px] font-bold text-foreground-muted">Secondary:</span>
                       <div
-                        className="w-4 h-4 rounded-full border border-gray-300"
+                        className="w-4 h-4 rounded-full border border-border"
                         style={{ backgroundColor: suggestion.secondary_color }}
                       />
-                      <span className="text-xs font-mono">{suggestion.secondary_color}</span>
+                      <span className="text-xs font-mono text-foreground">{suggestion.secondary_color}</span>
                     </div>
                   </div>
 
-                  <div className="text-xs font-medium text-[#344054]">
-                    Font: <strong className="font-semibold">{suggestion.primary_font}</strong>
+                  <div className="text-xs font-medium text-foreground-secondary">
+                    Font: <strong className="font-semibold text-foreground">{suggestion.primary_font}</strong>
                   </div>
                 </div>
               </div>
@@ -227,28 +231,28 @@ export const BrandDiscoveryModal: React.FC<BrandDiscoveryModalProps> = ({
 
         {/* Footer */}
         {suggestion && (
-          <div className="p-4 border-t border-[#EAECF0] bg-[#F9FAFB] flex items-center justify-end gap-3">
-            <button
+          <div className="p-4 border-t border-border bg-background-subtle flex items-center justify-end gap-3">
+            <Button
               type="button"
+              variant="outline"
               onClick={onClose}
               disabled={applying}
-              className="px-4 py-2 text-xs font-semibold text-[#344054] bg-white border border-[#D0D5DD] rounded-lg hover:bg-[#F2F4F7]"
             >
               Discard
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
+              variant="default"
               onClick={handleApply}
               disabled={applying}
-              className="flex items-center gap-2 px-5 py-2 text-xs font-semibold text-white bg-[#6257E8] rounded-lg hover:bg-[#5246D6] disabled:opacity-50 shadow-xs"
+              className="gap-2"
             >
               {applying ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <ArrowRight className="w-3.5 h-3.5" />}
               <span>Apply to Brand Profile</span>
-            </button>
+            </Button>
           </div>
         )}
       </div>
     </div>
   )
 }
-

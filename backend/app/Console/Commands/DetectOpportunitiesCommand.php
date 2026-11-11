@@ -16,6 +16,8 @@ class DetectOpportunitiesCommand extends Command
      */
     protected $signature = 'research:detect-opportunities {--brand= : Optional brand ID to target}';
 
+    protected $aliases = ['trends:detect'];
+
     /**
      * The console command description.
      *
@@ -54,3 +56,4 @@ class DetectOpportunitiesCommand extends Command
         return Command::SUCCESS;
     }
 }
+

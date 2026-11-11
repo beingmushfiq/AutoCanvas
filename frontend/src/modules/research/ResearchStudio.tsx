@@ -17,6 +17,7 @@ import {
 import { OpportunitiesRadar } from './OpportunitiesRadar'
 import { FeedsManager } from './FeedsManager'
 import { CompetitorManager } from './CompetitorManager'
+import { EmptyState } from '../../components/ui/empty-state'
 
 interface ResearchStudioProps {
   onNavigateToContent?: () => void
@@ -76,21 +77,19 @@ export const ResearchStudio: React.FC<ResearchStudioProps> = ({ onNavigateToCont
   if (loading && brands.length === 0) {
     return (
       <div className="flex h-96 items-center justify-center">
-        <RefreshCw className="w-6 h-6 animate-spin text-[#6257E8]" />
+        <RefreshCw className="w-6 h-6 animate-spin text-brand-accent" />
       </div>
     )
   }
 
   if (brands.length === 0) {
     return (
-      <div className="bg-white rounded-xl border border-[#EAECF0] p-12 text-center max-w-lg mx-auto mt-12">
-        <div className="w-12 h-12 rounded-xl bg-[#F4F3FF] text-[#6257E8] flex items-center justify-center mx-auto mb-3">
-          <Layers className="w-6 h-6" />
-        </div>
-        <h3 className="text-base font-bold text-[#101828]">No Brands Registered</h3>
-        <p className="text-xs text-[#667085] mt-1 mb-4">
-          Create your first brand profile in Brand Studio before launching the Research & Trend Discovery Engine.
-        </p>
+      <div className="max-w-lg mx-auto mt-12">
+        <EmptyState
+          icon={Layers}
+          title="No Brands Registered"
+          description="Create your first brand profile in Brand Studio before launching the Research & Trend Discovery Engine."
+        />
       </div>
     )
   }
@@ -98,48 +97,50 @@ export const ResearchStudio: React.FC<ResearchStudioProps> = ({ onNavigateToCont
   return (
     <div className="space-y-6">
       {/* Top Header & Brand Switcher */}
-      <div className="bg-white rounded-xl border border-[#EAECF0] p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-surface rounded-2xl border border-border p-5 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-purple-50 text-[#6257E8] border border-purple-200/60">
+            <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-background-subtle text-brand-accent border border-border">
               MOD-04 & MOD-05
             </span>
-            <span className="text-xs text-[#667085]">Research & Trend Discovery</span>
+            <span className="text-xs text-foreground-secondary">Research & Trend Discovery</span>
           </div>
-          <h2 className="text-xl font-bold text-[#101828] mt-1">Intelligence & Opportunity Radar</h2>
+          <h2 className="text-xl font-bold text-foreground mt-1">Intelligence & Opportunity Radar</h2>
         </div>
 
         <div className="flex items-center gap-3">
           {/* Brand Switcher Dropdown */}
           <div className="relative">
             <button
+              type="button"
               onClick={() => setShowBrandMenu(!showBrandMenu)}
-              className="flex items-center gap-2 px-3 py-2 rounded-lg border border-[#D0D5DD] bg-white text-xs font-semibold text-[#344054] hover:bg-gray-50 shadow-xs transition-colors"
+              className="flex items-center gap-2 px-3 py-2 rounded-xl border border-border bg-surface text-xs font-semibold text-foreground hover:bg-surface-raised shadow-2xs transition-colors outline-hidden focus-visible:ring-2 focus-visible:ring-focus-ring"
             >
-              <Building2 className="w-4 h-4 text-[#6257E8]" />
+              <Building2 className="w-4 h-4 text-brand-accent" />
               <span className="max-w-[140px] truncate">{activeBrand?.name || 'Select Brand'}</span>
-              <ChevronDown className="w-3.5 h-3.5 text-[#667085]" />
+              <ChevronDown className="w-3.5 h-3.5 text-foreground-muted" />
             </button>
 
             {showBrandMenu && (
-              <div className="absolute right-0 mt-1.5 w-56 rounded-xl bg-white border border-[#EAECF0] shadow-lg py-1.5 z-30">
-                <div className="px-3 py-1.5 text-[10px] font-bold text-[#667085] uppercase tracking-wider">
+              <div className="absolute right-0 mt-1.5 w-56 rounded-xl bg-surface-overlay border border-border shadow-lg py-1.5 z-30">
+                <div className="px-3 py-1.5 text-[10px] font-bold text-foreground-muted uppercase tracking-wider">
                   Select Active Brand
                 </div>
                 {brands.map((b) => (
                   <button
                     key={b.id}
+                    type="button"
                     onClick={() => handleBrandChange(b.id)}
                     className={`w-full px-3 py-2 text-left text-xs flex items-center justify-between transition-colors ${
                       b.id === activeBrandId
-                        ? 'bg-[#F4F3FF] text-[#6257E8] font-semibold'
-                        : 'text-[#344054] hover:bg-gray-50'
+                        ? 'bg-background-subtle text-foreground font-semibold'
+                        : 'text-foreground-secondary hover:bg-background-subtle hover:text-foreground'
                     }`}
                   >
                     <span className="truncate">{b.name}</span>
                     <span
-                      className="w-2.5 h-2.5 rounded-full shrink-0"
-                      style={{ backgroundColor: b.primary_color || '#6257E8' }}
+                      className="w-2.5 h-2.5 rounded-full shrink-0 border border-border/40"
+                      style={{ backgroundColor: b.primary_color || 'var(--brand-primary)' }}
                     />
                   </button>
                 ))}
@@ -148,9 +149,11 @@ export const ResearchStudio: React.FC<ResearchStudioProps> = ({ onNavigateToCont
           </div>
 
           <button
+            type="button"
             onClick={() => activeBrandId && fetchOpportunities(activeBrandId)}
-            className="p-2 rounded-lg border border-[#D0D5DD] hover:bg-gray-50 text-[#344054] transition-colors"
+            className="p-2 rounded-xl border border-border hover:bg-surface-raised text-foreground-secondary hover:text-foreground transition-colors outline-hidden focus-visible:ring-2 focus-visible:ring-focus-ring"
             title="Refresh Intelligence"
+            aria-label="Refresh Intelligence"
           >
             <RefreshCw className="w-4 h-4" />
           </button>
@@ -158,36 +161,38 @@ export const ResearchStudio: React.FC<ResearchStudioProps> = ({ onNavigateToCont
       </div>
 
       {error && (
-        <div className="p-3 rounded-lg bg-rose-50 border border-rose-200 text-xs text-rose-700">
+        <div className="p-3 rounded-xl bg-status-danger-bg border border-status-danger text-xs text-status-danger font-semibold">
           {error}
         </div>
       )}
 
       {/* Sub-Navigation Tabs */}
-      <div className="flex border-b border-[#EAECF0] gap-6 text-xs font-semibold">
+      <div className="flex border-b border-border gap-6 text-xs font-semibold">
         <button
+          type="button"
           onClick={() => setActiveTab('opportunities')}
-          className={`pb-3 flex items-center gap-2 border-b-2 transition-all ${
+          className={`pb-3 flex items-center gap-2 border-b-2 transition-all outline-hidden focus-visible:ring-2 focus-visible:ring-focus-ring ${
             activeTab === 'opportunities'
-              ? 'border-[#6257E8] text-[#6257E8]'
-              : 'border-transparent text-[#667085] hover:text-[#101828]'
+              ? 'border-brand-accent text-foreground'
+              : 'border-transparent text-foreground-secondary hover:text-foreground'
           }`}
         >
           <Sparkles className="w-4 h-4" />
           <span>Opportunities Radar</span>
           {opportunities.length > 0 && (
-            <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-[#6257E8] text-white font-bold">
+            <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-interactive-primary text-interactive-primary-fg font-bold">
               {opportunities.length}
             </span>
           )}
         </button>
 
         <button
+          type="button"
           onClick={() => setActiveTab('feeds')}
-          className={`pb-3 flex items-center gap-2 border-b-2 transition-all ${
+          className={`pb-3 flex items-center gap-2 border-b-2 transition-all outline-hidden focus-visible:ring-2 focus-visible:ring-focus-ring ${
             activeTab === 'feeds'
-              ? 'border-[#6257E8] text-[#6257E8]'
-              : 'border-transparent text-[#667085] hover:text-[#101828]'
+              ? 'border-brand-accent text-foreground'
+              : 'border-transparent text-foreground-secondary hover:text-foreground'
           }`}
         >
           <Rss className="w-4 h-4" />
@@ -195,11 +200,12 @@ export const ResearchStudio: React.FC<ResearchStudioProps> = ({ onNavigateToCont
         </button>
 
         <button
+          type="button"
           onClick={() => setActiveTab('competitors')}
-          className={`pb-3 flex items-center gap-2 border-b-2 transition-all ${
+          className={`pb-3 flex items-center gap-2 border-b-2 transition-all outline-hidden focus-visible:ring-2 focus-visible:ring-focus-ring ${
             activeTab === 'competitors'
-              ? 'border-[#6257E8] text-[#6257E8]'
-              : 'border-transparent text-[#667085] hover:text-[#101828]'
+              ? 'border-brand-accent text-foreground'
+              : 'border-transparent text-foreground-secondary hover:text-foreground'
           }`}
         >
           <Users2 className="w-4 h-4" />

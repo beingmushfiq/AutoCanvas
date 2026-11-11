@@ -62,3 +62,4 @@ class RssFeed extends Model
         return $this->hasMany(FeedArticle::class);
     }
 }
+

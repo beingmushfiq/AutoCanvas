@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { Plus, Trash2, Brain, Loader2, CheckCircle2, Lightbulb, AlertCircle, Award } from 'lucide-react'
 import { apiClient, type ApiResponse, type BrandMemoryItem } from '../../../lib/api/client'
+import { Button } from '../../../components/ui/button'
+import { Input } from '../../../components/ui/input'
+import { Badge } from '../../../components/ui/badge'
 
 interface MemoryTabProps {
   brandId: string
@@ -78,37 +81,37 @@ export const MemoryTab: React.FC<MemoryTabProps> = ({ brandId }) => {
     switch (cat) {
       case 'approved_fact':
         return (
-          <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-800">
+          <Badge variant="success" className="gap-1">
             <CheckCircle2 className="w-3 h-3" />
             <span>Approved Fact</span>
-          </span>
+          </Badge>
         )
       case 'successful_style':
         return (
-          <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-indigo-100 text-indigo-800">
+          <Badge variant="secondary" className="gap-1">
             <Award className="w-3 h-3" />
             <span>Successful Style</span>
-          </span>
+          </Badge>
         )
       case 'failed_experiment':
         return (
-          <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-rose-100 text-rose-800">
+          <Badge variant="danger" className="gap-1">
             <AlertCircle className="w-3 h-3" />
             <span>Failed Pattern</span>
-          </span>
+          </Badge>
         )
       case 'audience_insight':
         return (
-          <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-amber-100 text-amber-800">
+          <Badge variant="warning" className="gap-1">
             <Lightbulb className="w-3 h-3" />
             <span>Audience Insight</span>
-          </span>
+          </Badge>
         )
       default:
         return (
-          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-gray-100 text-gray-800">
+          <Badge variant="secondary">
             Milestone
-          </span>
+          </Badge>
         )
     }
   }
@@ -116,50 +119,51 @@ export const MemoryTab: React.FC<MemoryTabProps> = ({ brandId }) => {
   return (
     <div className="space-y-6 max-w-4xl">
       {successMsg && (
-        <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl flex items-center gap-2 text-xs font-semibold">
-          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+        <div className="p-3 bg-status-success-bg border border-status-success text-status-success rounded-xl flex items-center gap-2 text-xs font-semibold">
+          <CheckCircle2 className="w-4 h-4 shrink-0" />
           <span>{successMsg}</span>
         </div>
       )}
 
       {error && (
-        <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 rounded-xl text-xs">
+        <div className="p-3 bg-status-danger-bg border border-status-danger text-status-danger rounded-xl text-xs font-semibold">
           {error}
         </div>
       )}
 
       {/* Header Bar */}
-      <div className="bg-white p-6 rounded-xl border border-[#EAECF0] shadow-xs flex items-center justify-between">
+      <div className="bg-surface p-6 rounded-2xl border border-border shadow-2xs flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h3 className="text-sm font-bold text-[#101828]">Long-term Brand Memory & Facts</h3>
-          <p className="text-xs text-[#667085] mt-0.5">
+          <h3 className="text-sm font-bold text-foreground">Long-term Brand Memory & Facts</h3>
+          <p className="text-xs text-foreground-secondary mt-0.5">
             Verified corporate truths, learned performance patterns, and audience findings retained across sessions.
           </p>
         </div>
-        <button
+        <Button
           type="button"
           onClick={() => setShowAddForm(!showAddForm)}
-          className="flex items-center gap-1.5 px-3.5 py-2 bg-[#6257E8] text-white text-xs font-semibold rounded-lg hover:bg-[#5246D6] transition-colors shadow-xs"
+          variant="default"
+          className="gap-1.5"
         >
           <Plus className="w-3.5 h-3.5" />
           <span>Record Memory Entry</span>
-        </button>
+        </Button>
       </div>
 
       {/* Add Memory Form */}
       {showAddForm && (
-        <form onSubmit={handleAdd} className="bg-white p-6 rounded-xl border border-[#EAECF0] shadow-xs space-y-4">
-          <h4 className="text-xs font-bold uppercase tracking-wider text-[#344054]">
+        <form onSubmit={handleAdd} className="bg-surface p-6 rounded-2xl border border-border shadow-2xs space-y-4">
+          <h4 className="text-xs font-bold uppercase tracking-wider text-foreground-muted">
             New Verified Brand Memory
           </h4>
 
           <div className="grid grid-cols-3 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-[#344054] mb-1">Category</label>
+              <label className="block text-xs font-semibold text-foreground mb-1">Category</label>
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value as any)}
-                className="w-full px-3 py-2 text-xs border border-[#D0D5DD] rounded-lg"
+                className="w-full px-3 py-2 text-xs bg-surface text-foreground border border-border rounded-xl outline-hidden focus:ring-2 focus:ring-focus-ring"
               >
                 <option value="approved_fact">Approved Truth / Fact</option>
                 <option value="successful_style">Successful Style / Pattern</option>
@@ -170,46 +174,48 @@ export const MemoryTab: React.FC<MemoryTabProps> = ({ brandId }) => {
             </div>
 
             <div className="col-span-2">
-              <label className="block text-xs font-semibold text-[#344054] mb-1">Title</label>
-              <input
+              <label className="block text-xs font-semibold text-foreground mb-1">Title</label>
+              <Input
                 type="text"
                 required
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="e.g. Free Tier Fair Use Policy Statement"
-                className="w-full px-3 py-2 text-xs border border-[#D0D5DD] rounded-lg focus:ring-2 focus:ring-[#6257E8]"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-[#344054] mb-1">Memory Content</label>
+            <label className="block text-xs font-semibold text-foreground mb-1">Memory Content</label>
             <textarea
               rows={3}
               required
               value={content}
               onChange={(e) => setContent(e.target.value)}
               placeholder="State the verified fact or performance takeaway with crystal clarity..."
-              className="w-full px-3 py-2 text-xs border border-[#D0D5DD] rounded-lg focus:ring-2 focus:ring-[#6257E8]"
+              className="w-full px-3 py-2 text-xs bg-surface border border-border rounded-xl text-foreground placeholder:text-foreground-muted outline-hidden focus:ring-2 focus:ring-focus-ring"
             />
           </div>
 
           <div className="flex justify-end gap-2">
-            <button
+            <Button
               type="button"
+              variant="outline"
+              size="sm"
               onClick={() => setShowAddForm(false)}
-              className="px-3.5 py-1.5 text-xs font-semibold text-[#344054] hover:bg-[#F2F4F7] rounded-lg"
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
               disabled={submitting}
-              className="flex items-center gap-1.5 px-4 py-1.5 bg-[#6257E8] text-white text-xs font-semibold rounded-lg hover:bg-[#5246D6] disabled:opacity-50"
+              variant="default"
+              size="sm"
+              className="gap-1.5"
             >
               {submitting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />}
               <span>Save Entry</span>
-            </button>
+            </Button>
           </div>
         </form>
       )}
@@ -217,31 +223,31 @@ export const MemoryTab: React.FC<MemoryTabProps> = ({ brandId }) => {
       {/* Memory Entries List */}
       <div className="space-y-3">
         {loading ? (
-          <div className="p-8 text-center text-xs text-[#667085] bg-white rounded-xl border border-[#EAECF0]">
-            <Loader2 className="w-5 h-5 animate-spin mx-auto mb-2 text-[#6257E8]" />
+          <div className="p-8 text-center text-xs text-foreground-secondary bg-surface rounded-2xl border border-border">
+            <Loader2 className="w-5 h-5 animate-spin mx-auto mb-2 text-brand-accent" />
             Loading brand memory entries...
           </div>
         ) : memories.length === 0 ? (
-          <div className="p-8 text-center text-xs text-[#667085] bg-white rounded-xl border border-[#EAECF0]">
-            <Brain className="w-8 h-8 text-[#98A2B3] mx-auto mb-2" />
+          <div className="p-8 text-center text-xs text-foreground-secondary bg-surface rounded-2xl border border-border">
+            <Brain className="w-8 h-8 text-foreground-muted mx-auto mb-2" />
             No brand memories recorded yet. Record verified facts and performance findings to guide future content generation.
           </div>
         ) : (
           memories.map((entry) => (
             <div
               key={entry.id}
-              className="p-4 bg-white rounded-xl border border-[#EAECF0] shadow-xs flex items-start justify-between gap-4 hover:border-[#D0D5DD] transition-all"
+              className="p-4 bg-surface rounded-2xl border border-border shadow-2xs flex items-start justify-between gap-4 hover:border-brand-accent/40 transition-all"
             >
               <div className="space-y-1.5 flex-1">
                 <div className="flex items-center gap-2.5">
                   {getCategoryBadge(entry.category)}
-                  <h4 className="text-xs font-bold text-[#101828]">{entry.title}</h4>
+                  <h4 className="text-xs font-bold text-foreground">{entry.title}</h4>
                 </div>
-                <p className="text-xs text-[#475467] leading-relaxed">{entry.content}</p>
-                <div className="flex items-center gap-3 pt-1 text-[11px] text-[#98A2B3]">
+                <p className="text-xs text-foreground-secondary leading-relaxed">{entry.content}</p>
+                <div className="flex items-center gap-3 pt-1 text-[11px] text-foreground-muted">
                   <span>Confidence: {(entry.confidence_score * 100).toFixed(0)}%</span>
                   <span>•</span>
-                  <span>{new Date(entry.created_at).toLocaleDateString()}</span>
+                  <span className="font-mono">{new Date(entry.created_at).toLocaleDateString()}</span>
                 </div>
               </div>
 
@@ -249,7 +255,8 @@ export const MemoryTab: React.FC<MemoryTabProps> = ({ brandId }) => {
                 type="button"
                 onClick={() => handleDelete(entry.id)}
                 title="Delete memory entry"
-                className="text-[#98A2B3] hover:text-rose-600 p-1.5 rounded-lg hover:bg-rose-50 transition-colors"
+                aria-label="Delete memory entry"
+                className="text-foreground-muted hover:text-status-danger p-1.5 rounded-lg hover:bg-status-danger-bg transition-colors outline-hidden focus-visible:ring-2 focus-visible:ring-focus-ring"
               >
                 <Trash2 className="w-4 h-4" />
               </button>
@@ -260,4 +267,3 @@ export const MemoryTab: React.FC<MemoryTabProps> = ({ brandId }) => {
     </div>
   )
 }
-

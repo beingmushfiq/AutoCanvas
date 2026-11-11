@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import { Save, Loader2, CheckCircle2, Plus, Trash2 } from 'lucide-react'
 import { apiClient, type BrandVisualData } from '../../../lib/api/client'
+import { Button } from '../../../components/ui/button'
+import { Input } from '../../../components/ui/input'
 
 interface VisualTabProps {
   brandId: string
@@ -14,12 +16,12 @@ export const VisualTab: React.FC<VisualTabProps> = ({ brandId, initialVisual, on
   const [error, setError] = useState<string | null>(null)
 
   const [primaryColor, setPrimaryColor] = useState(initialVisual?.primary_color || '#101828')
-  const [secondaryColor, setSecondaryColor] = useState(initialVisual?.secondary_color || '#6257E8')
+  const [secondaryColor, setSecondaryColor] = useState(initialVisual?.secondary_color || '#F59E0B')
   const [accentColors, setAccentColors] = useState<string[]>(initialVisual?.accent_colors || ['#F59E0B', '#10B981'])
-  const [newAccent, setNewAccent] = useState('#EC4899')
+  const [newAccent, setNewAccent] = useState('#6366F1')
 
-  const [primaryFont, setPrimaryFont] = useState(initialVisual?.primary_font || 'Inter')
-  const [secondaryFont, setSecondaryFont] = useState(initialVisual?.secondary_font || 'Plus Jakarta Sans')
+  const [primaryFont, setPrimaryFont] = useState(initialVisual?.primary_font || 'Geist')
+  const [secondaryFont, setSecondaryFont] = useState(initialVisual?.secondary_font || 'Inter')
   const [exclusionsText, setExclusionsText] = useState((initialVisual?.visual_exclusions || []).join('\n'))
 
   const handleAddAccent = () => {
@@ -63,21 +65,21 @@ export const VisualTab: React.FC<VisualTabProps> = ({ brandId, initialVisual, on
   return (
     <form onSubmit={handleSave} className="space-y-6 max-w-4xl">
       {successMsg && (
-        <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl flex items-center gap-2 text-xs font-semibold">
-          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+        <div className="p-3 bg-status-success-bg border border-status-success text-status-success rounded-xl flex items-center gap-2 text-xs font-semibold">
+          <CheckCircle2 className="w-4 h-4 shrink-0" />
           <span>{successMsg}</span>
         </div>
       )}
 
       {error && (
-        <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 rounded-xl text-xs">
+        <div className="p-3 bg-status-danger-bg border border-status-danger text-status-danger rounded-xl text-xs font-semibold">
           {error}
         </div>
       )}
 
       {/* Live Brand Palette Preview */}
-      <div className="bg-white p-6 rounded-xl border border-[#EAECF0] shadow-xs">
-        <h3 className="text-sm font-bold text-[#101828] mb-3">Live Visual Preview</h3>
+      <div className="bg-surface p-6 rounded-2xl border border-border shadow-2xs">
+        <h3 className="text-sm font-bold text-foreground mb-3">Live Visual Preview</h3>
         <div
           className="p-6 rounded-xl text-white transition-all shadow-sm"
           style={{ backgroundColor: primaryColor }}
@@ -109,62 +111,63 @@ export const VisualTab: React.FC<VisualTabProps> = ({ brandId, initialVisual, on
       </div>
 
       {/* Color System */}
-      <div className="bg-white p-6 rounded-xl border border-[#EAECF0] shadow-xs space-y-4">
-        <h3 className="text-sm font-bold text-[#101828]">Color Foundation</h3>
+      <div className="bg-surface p-6 rounded-2xl border border-border shadow-2xs space-y-4">
+        <h3 className="text-sm font-bold text-foreground">Color Foundation</h3>
 
         <div className="grid grid-cols-2 gap-6">
           <div>
-            <label className="block text-xs font-semibold text-[#344054] mb-1.5">Primary Brand Color</label>
+            <label className="block text-xs font-semibold text-foreground mb-1.5">Primary Brand Color</label>
             <div className="flex items-center gap-3">
               <input
                 type="color"
                 value={primaryColor}
                 onChange={(e) => setPrimaryColor(e.target.value)}
-                className="w-10 h-10 rounded-lg border border-gray-300 cursor-pointer p-0.5"
+                className="w-10 h-10 rounded-lg border border-border cursor-pointer p-0.5 bg-surface"
               />
-              <input
+              <Input
                 type="text"
                 value={primaryColor}
                 onChange={(e) => setPrimaryColor(e.target.value)}
-                className="w-32 px-3 py-2 text-xs font-mono border border-[#D0D5DD] rounded-lg"
+                className="w-32 font-mono"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-[#344054] mb-1.5">Secondary Brand Color</label>
+            <label className="block text-xs font-semibold text-foreground mb-1.5">Secondary Brand Color</label>
             <div className="flex items-center gap-3">
               <input
                 type="color"
                 value={secondaryColor}
                 onChange={(e) => setSecondaryColor(e.target.value)}
-                className="w-10 h-10 rounded-lg border border-gray-300 cursor-pointer p-0.5"
+                className="w-10 h-10 rounded-lg border border-border cursor-pointer p-0.5 bg-surface"
               />
-              <input
+              <Input
                 type="text"
                 value={secondaryColor}
                 onChange={(e) => setSecondaryColor(e.target.value)}
-                className="w-32 px-3 py-2 text-xs font-mono border border-[#D0D5DD] rounded-lg"
+                className="w-32 font-mono"
               />
             </div>
           </div>
         </div>
 
         {/* Accent Colors */}
-        <div className="pt-3 border-t border-[#EAECF0]">
-          <label className="block text-xs font-semibold text-[#344054] mb-2">Accent Palette</label>
+        <div className="pt-3 border-t border-border">
+          <label className="block text-xs font-semibold text-foreground mb-2">Accent Palette</label>
           <div className="flex flex-wrap items-center gap-2 mb-3">
             {accentColors.map((color, idx) => (
               <div
                 key={idx}
-                className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-[#EAECF0] bg-[#F9FAFB] text-xs font-mono"
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-border bg-background-subtle text-xs font-mono text-foreground"
               >
-                <div className="w-3.5 h-3.5 rounded-full border border-black/10" style={{ backgroundColor: color }} />
+                <div className="w-3.5 h-3.5 rounded-full border border-border" style={{ backgroundColor: color }} />
                 <span>{color}</span>
                 <button
                   type="button"
                   onClick={() => handleRemoveAccent(color)}
-                  className="text-gray-400 hover:text-rose-600 ml-1"
+                  aria-label={`Remove accent color ${color}`}
+                  className="text-foreground-muted hover:text-status-danger ml-1"
                 >
                   <Trash2 className="w-3 h-3" />
                 </button>
@@ -177,40 +180,43 @@ export const VisualTab: React.FC<VisualTabProps> = ({ brandId, initialVisual, on
               type="color"
               value={newAccent}
               onChange={(e) => setNewAccent(e.target.value)}
-              className="w-8 h-8 rounded border border-gray-300 cursor-pointer p-0.5"
+              className="w-8 h-8 rounded border border-border cursor-pointer p-0.5 bg-surface"
             />
-            <input
+            <Input
               type="text"
               value={newAccent}
               onChange={(e) => setNewAccent(e.target.value)}
-              className="w-28 px-2.5 py-1.5 text-xs font-mono border border-[#D0D5DD] rounded-lg"
+              className="w-28 font-mono"
             />
-            <button
+            <Button
               type="button"
+              variant="outline"
+              size="sm"
               onClick={handleAddAccent}
-              className="flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-[#344054] bg-[#F2F4F7] hover:bg-[#EAECF0] rounded-lg transition-colors"
+              className="gap-1"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>Add Accent</span>
-            </button>
+            </Button>
           </div>
         </div>
       </div>
 
       {/* Typography System */}
-      <div className="bg-white p-6 rounded-xl border border-[#EAECF0] shadow-xs space-y-4">
-        <h3 className="text-sm font-bold text-[#101828]">Typography Hierarchy</h3>
+      <div className="bg-surface p-6 rounded-2xl border border-border shadow-2xs space-y-4">
+        <h3 className="text-sm font-bold text-foreground">Typography Hierarchy</h3>
 
         <div className="grid grid-cols-2 gap-6">
           <div>
-            <label className="block text-xs font-semibold text-[#344054] mb-1">
+            <label className="block text-xs font-semibold text-foreground mb-1">
               Primary Font (Headlines & Display)
             </label>
             <select
               value={primaryFont}
               onChange={(e) => setPrimaryFont(e.target.value)}
-              className="w-full px-3 py-2 text-xs border border-[#D0D5DD] rounded-lg"
+              className="w-full px-3 py-2 text-xs bg-surface text-foreground border border-border rounded-xl outline-hidden focus:ring-2 focus:ring-focus-ring"
             >
+              <option value="Geist">Geist (Modern Sans)</option>
               <option value="Inter">Inter (Clean Modern Sans)</option>
               <option value="Plus Jakarta Sans">Plus Jakarta Sans (Contemporary)</option>
               <option value="Playfair Display">Playfair Display (Editorial Serif)</option>
@@ -221,16 +227,17 @@ export const VisualTab: React.FC<VisualTabProps> = ({ brandId, initialVisual, on
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-[#344054] mb-1">
+            <label className="block text-xs font-semibold text-foreground mb-1">
               Secondary Font (Body & Subheadings)
             </label>
             <select
               value={secondaryFont}
               onChange={(e) => setSecondaryFont(e.target.value)}
-              className="w-full px-3 py-2 text-xs border border-[#D0D5DD] rounded-lg"
+              className="w-full px-3 py-2 text-xs bg-surface text-foreground border border-border rounded-xl outline-hidden focus:ring-2 focus:ring-focus-ring"
             >
-              <option value="Plus Jakarta Sans">Plus Jakarta Sans</option>
               <option value="Inter">Inter</option>
+              <option value="Plus Jakarta Sans">Plus Jakarta Sans</option>
+              <option value="Geist">Geist</option>
               <option value="Roboto">Roboto</option>
               <option value="Open Sans">Open Sans</option>
               <option value="Source Sans Pro">Source Sans Pro</option>
@@ -240,9 +247,9 @@ export const VisualTab: React.FC<VisualTabProps> = ({ brandId, initialVisual, on
       </div>
 
       {/* Visual Exclusions */}
-      <div className="bg-white p-6 rounded-xl border border-[#EAECF0] shadow-xs space-y-3">
-        <h3 className="text-sm font-bold text-[#101828]">Visual Exclusions & Design Don'ts</h3>
-        <p className="text-xs text-[#667085]">
+      <div className="bg-surface p-6 rounded-2xl border border-border shadow-2xs space-y-3">
+        <h3 className="text-sm font-bold text-foreground">Visual Exclusions & Design Don'ts</h3>
+        <p className="text-xs text-foreground-secondary">
           Styles, effects, or visual elements that the creative rendering engine should never generate.
         </p>
         <textarea
@@ -250,22 +257,22 @@ export const VisualTab: React.FC<VisualTabProps> = ({ brandId, initialVisual, on
           value={exclusionsText}
           onChange={(e) => setExclusionsText(e.target.value)}
           placeholder="No 3D glassy gradients&#10;No stock photos with generic handshakes&#10;No neon lime on white backgrounds"
-          className="w-full px-3 py-2 text-xs border border-[#D0D5DD] rounded-lg font-mono focus:ring-2 focus:ring-[#6257E8]"
+          className="w-full px-3 py-2 text-xs bg-surface border border-border rounded-xl text-foreground font-mono placeholder:text-foreground-muted outline-hidden focus:ring-2 focus:ring-focus-ring"
         />
       </div>
 
       {/* Submit Button */}
       <div className="flex justify-end">
-        <button
+        <Button
           type="submit"
           disabled={saving}
-          className="flex items-center gap-2 px-6 py-2.5 bg-[#6257E8] text-white text-xs font-semibold rounded-xl hover:bg-[#5246D6] disabled:opacity-50 shadow-xs"
+          variant="default"
+          className="gap-2 px-6"
         >
           {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
           <span>Save Visual Identity</span>
-        </button>
+        </Button>
       </div>
     </form>
   )
 }
-

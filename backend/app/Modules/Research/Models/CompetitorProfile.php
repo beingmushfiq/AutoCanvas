@@ -58,3 +58,4 @@ class CompetitorProfile extends Model
         return $this->hasMany(CompetitorPost::class);
     }
 }
+

@@ -116,4 +116,47 @@ class CompetitorTrackerService
             'platform_distribution' => $platformCounts,
         ];
     }
+
+    /**
+     * Identify strategic gaps and market whitespace where competitors are inactive.
+     */
+    public function analyzeCompetitorGaps(Brand $brand): array
+    {
+        $insights = $this->getInsights($brand);
+        $competitorThemes = array_column($insights['top_themes'] ?? [], 'theme');
+        $competitorThemeSet = array_map(function ($t) {
+            return strtolower(str_replace(['_', '-'], ' ', $t));
+        }, $competitorThemes);
+
+        $pillars = $brand->contentPillars()->where('status', 'active')->get();
+        $gaps = [];
+
+        foreach ($pillars as $pillar) {
+            $normalizedPillar = strtolower(str_replace(['_', '-'], ' ', $pillar->name));
+            $isCoveredByCompetitor = false;
+            foreach ($competitorThemeSet as $theme) {
+                if (stripos($normalizedPillar, $theme) !== false || stripos($theme, $normalizedPillar) !== false) {
+                    $isCoveredByCompetitor = true;
+                    break;
+                }
+            }
+
+            if (!$isCoveredByCompetitor) {
+                $gaps[] = [
+                    'pillar_id' => $pillar->id,
+                    'pillar_name' => $pillar->name,
+                    'strategic_advantage' => 'Competitors have zero observed activity in this theme. High differentiation opportunity.',
+                    'recommended_action' => 'Prioritize thought leadership campaigns addressing ' . $pillar->name,
+                ];
+            }
+        }
+
+        return [
+            'brand_id' => $brand->id,
+            'total_gaps_identified' => count($gaps),
+            'whitespace_opportunities' => $gaps,
+            'competitor_saturated_themes' => $insights['top_themes'],
+        ];
+    }
 }
+

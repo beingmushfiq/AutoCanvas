@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import { X, Sparkles, Building2, Globe, Loader2 } from 'lucide-react'
 import { apiClient, type ApiResponse } from '../../lib/api/client'
+import { Button } from '../../components/ui/button'
+import { Input } from '../../components/ui/input'
 
 interface BrandWizardModalProps {
   isOpen: boolean
@@ -17,8 +19,8 @@ export const BrandWizardModal: React.FC<BrandWizardModalProps> = ({ isOpen, onCl
   const [websiteUrl, setWebsiteUrl] = useState('')
   const [businessDescription, setBusinessDescription] = useState('')
   const [primaryColor, setPrimaryColor] = useState('#101828')
-  const [secondaryColor, setSecondaryColor] = useState('#6257E8')
-  const [primaryFont, setPrimaryFont] = useState('Inter')
+  const [secondaryColor, setSecondaryColor] = useState('#F59E0B')
+  const [primaryFont, setPrimaryFont] = useState('Geist')
 
   if (!isOpen) return null
 
@@ -50,22 +52,23 @@ export const BrandWizardModal: React.FC<BrandWizardModalProps> = ({ isOpen, onCl
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 animate-in fade-in duration-150">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg border border-[#EAECF0] overflow-hidden flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-150">
+      <div className="bg-surface rounded-2xl shadow-xl w-full max-w-lg border border-border overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#EAECF0] bg-[#F9FAFB]">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-background-subtle">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-[#6257E8]/10 text-[#6257E8] flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-surface border border-border text-brand-accent flex items-center justify-center shadow-2xs">
               <Sparkles className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-[#101828]">Create New Brand</h3>
-              <p className="text-xs text-[#667085]">Establish identity, visual foundation, and positioning</p>
+              <h3 className="text-base font-bold text-foreground">Create New Brand</h3>
+              <p className="text-xs text-foreground-secondary">Establish identity, visual foundation, and positioning</p>
             </div>
           </div>
           <button
+            type="button"
             onClick={onClose}
-            className="p-1 rounded-lg text-[#98A2B3] hover:text-[#344054] hover:bg-[#F2F4F7] transition-colors"
+            className="p-1 rounded-lg text-foreground-muted hover:text-foreground hover:bg-surface-raised transition-colors outline-hidden focus-visible:ring-2 focus-visible:ring-focus-ring"
           >
             <X className="w-5 h-5" />
           </button>
@@ -74,133 +77,134 @@ export const BrandWizardModal: React.FC<BrandWizardModalProps> = ({ isOpen, onCl
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {error && (
-            <div className="p-3 text-xs bg-rose-50 text-rose-700 rounded-lg border border-rose-200">
+            <div className="p-3 text-xs bg-status-danger-bg text-status-danger rounded-lg border border-status-danger font-semibold">
               {error}
             </div>
           )}
 
           <div>
-            <label className="block text-xs font-semibold text-[#344054] mb-1">
-              Brand Name <span className="text-rose-500">*</span>
+            <label className="block text-xs font-semibold text-foreground mb-1">
+              Brand Name <span className="text-status-danger">*</span>
             </label>
             <div className="relative">
-              <Building2 className="w-4 h-4 text-[#98A2B3] absolute left-3 top-2.5" />
-              <input
+              <Building2 className="w-4 h-4 text-foreground-muted absolute left-3 top-2.5" />
+              <Input
                 type="text"
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g. Acme Studio"
-                className="w-full pl-9 pr-3 py-2 text-xs border border-[#D0D5DD] rounded-lg focus:outline-hidden focus:ring-2 focus:ring-[#6257E8] focus:border-[#6257E8]"
+                className="pl-9"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-[#344054] mb-1">Industry</label>
-              <input
+              <label className="block text-xs font-semibold text-foreground mb-1">Industry</label>
+              <Input
                 type="text"
                 value={industry}
                 onChange={(e) => setIndustry(e.target.value)}
                 placeholder="e.g. SaaS / E-commerce"
-                className="w-full px-3 py-2 text-xs border border-[#D0D5DD] rounded-lg focus:outline-hidden focus:ring-2 focus:ring-[#6257E8]"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-[#344054] mb-1">Website URL</label>
+              <label className="block text-xs font-semibold text-foreground mb-1">Website URL</label>
               <div className="relative">
-                <Globe className="w-4 h-4 text-[#98A2B3] absolute left-3 top-2.5" />
-                <input
+                <Globe className="w-4 h-4 text-foreground-muted absolute left-3 top-2.5" />
+                <Input
                   type="url"
                   value={websiteUrl}
                   onChange={(e) => setWebsiteUrl(e.target.value)}
                   placeholder="https://example.com"
-                  className="w-full pl-9 pr-3 py-2 text-xs border border-[#D0D5DD] rounded-lg focus:outline-hidden focus:ring-2 focus:ring-[#6257E8]"
+                  className="pl-9"
                 />
               </div>
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-[#344054] mb-1">Business Description</label>
+            <label className="block text-xs font-semibold text-foreground mb-1">Business Description</label>
             <textarea
               rows={2}
               value={businessDescription}
               onChange={(e) => setBusinessDescription(e.target.value)}
               placeholder="What does this brand do, who is it for, and what problem does it solve?"
-              className="w-full px-3 py-2 text-xs border border-[#D0D5DD] rounded-lg focus:outline-hidden focus:ring-2 focus:ring-[#6257E8]"
+              className="w-full px-3 py-2 text-xs bg-surface border border-border rounded-xl text-foreground placeholder:text-foreground-muted outline-hidden focus:ring-2 focus:ring-focus-ring"
             />
           </div>
 
           {/* Visual Defaults */}
-          <div className="pt-2 border-t border-[#EAECF0]">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-[#667085]">
+          <div className="pt-2 border-t border-border">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-foreground-muted">
               Visual Seed Colors & Font
             </span>
             <div className="grid grid-cols-3 gap-3 mt-2">
               <div>
-                <label className="block text-[11px] font-medium text-[#475467] mb-1">Primary Color</label>
+                <label className="block text-[11px] font-medium text-foreground-secondary mb-1">Primary Color</label>
                 <div className="flex items-center gap-2">
                   <input
                     type="color"
                     value={primaryColor}
                     onChange={(e) => setPrimaryColor(e.target.value)}
-                    className="w-8 h-8 rounded border border-gray-300 cursor-pointer p-0.5"
+                    className="w-8 h-8 rounded border border-border cursor-pointer p-0.5 bg-surface"
                   />
-                  <span className="text-xs font-mono text-[#344054]">{primaryColor}</span>
+                  <span className="text-xs font-mono text-foreground">{primaryColor}</span>
                 </div>
               </div>
 
               <div>
-                <label className="block text-[11px] font-medium text-[#475467] mb-1">Secondary Color</label>
+                <label className="block text-[11px] font-medium text-foreground-secondary mb-1">Secondary Color</label>
                 <div className="flex items-center gap-2">
                   <input
                     type="color"
                     value={secondaryColor}
                     onChange={(e) => setSecondaryColor(e.target.value)}
-                    className="w-8 h-8 rounded border border-gray-300 cursor-pointer p-0.5"
+                    className="w-8 h-8 rounded border border-border cursor-pointer p-0.5 bg-surface"
                   />
-                  <span className="text-xs font-mono text-[#344054]">{secondaryColor}</span>
+                  <span className="text-xs font-mono text-foreground">{secondaryColor}</span>
                 </div>
               </div>
 
               <div>
-                <label className="block text-[11px] font-medium text-[#475467] mb-1">Font Family</label>
+                <label className="block text-[11px] font-medium text-foreground-secondary mb-1">Font Family</label>
                 <select
                   value={primaryFont}
                   onChange={(e) => setPrimaryFont(e.target.value)}
-                  className="w-full px-2 py-1.5 text-xs border border-[#D0D5DD] rounded-lg"
+                  className="w-full px-2 py-1.5 text-xs bg-surface text-foreground border border-border rounded-xl outline-hidden focus:ring-2 focus:ring-focus-ring"
                 >
-                  <option value="Inter">Inter (Sans)</option>
+                  <option value="Geist">Geist (Modern Sans)</option>
+                  <option value="Inter">Inter</option>
                   <option value="Plus Jakarta Sans">Plus Jakarta Sans</option>
                   <option value="Playfair Display">Playfair Display (Serif)</option>
                   <option value="Space Grotesk">Space Grotesk (Tech)</option>
-                  <option value="Outfit">Outfit (Modern)</option>
+                  <option value="Outfit">Outfit</option>
                 </select>
               </div>
             </div>
           </div>
 
           {/* Actions */}
-          <div className="pt-4 border-t border-[#EAECF0] flex items-center justify-end gap-3">
-            <button
+          <div className="pt-4 border-t border-border flex items-center justify-end gap-3">
+            <Button
               type="button"
+              variant="outline"
               onClick={onClose}
               disabled={loading}
-              className="px-4 py-2 text-xs font-semibold text-[#344054] bg-white border border-[#D0D5DD] rounded-lg hover:bg-[#F2F4F7]"
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
+              variant="default"
               disabled={loading}
-              className="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-[#6257E8] rounded-lg hover:bg-[#5246D6] disabled:opacity-50 shadow-xs"
+              className="gap-1.5"
             >
               {loading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
               <span>Create Brand</span>
-            </button>
+            </Button>
           </div>
         </form>
       </div>

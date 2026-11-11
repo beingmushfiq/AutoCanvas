@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { X, Plus, Trash2, PieChart, Loader2, CheckCircle2 } from 'lucide-react'
 import { apiClient, type ApiResponse, type ContentPillar } from '../../lib/api/client'
+import { Button } from '../../components/ui/button'
+import { Input } from '../../components/ui/input'
+import { Badge } from '../../components/ui/badge'
 
 interface PillarsManagerModalProps {
   isOpen: boolean
@@ -27,7 +30,7 @@ export const PillarsManagerModal: React.FC<PillarsManagerModalProps> = ({
   const [description, setDescription] = useState('')
   const [targetAudience, setTargetAudience] = useState('')
   const [weight, setWeight] = useState(25)
-  const [colorTag, setColorTag] = useState('#6257E8')
+  const [colorTag, setColorTag] = useState('#F59E0B')
 
   const fetchPillars = async () => {
     try {
@@ -93,22 +96,23 @@ export const PillarsManagerModal: React.FC<PillarsManagerModalProps> = ({
   const totalWeight = pillars.reduce((sum, p) => sum + p.weight_percentage, 0)
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 animate-in fade-in duration-150">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-xl border border-[#EAECF0] overflow-hidden flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-150">
+      <div className="bg-surface rounded-2xl shadow-xl w-full max-w-xl border border-border overflow-hidden flex flex-col max-h-[90vh]">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#EAECF0] bg-[#F9FAFB]">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-background-subtle">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-[#6257E8]/10 text-[#6257E8] flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-surface border border-border text-brand-accent flex items-center justify-center shadow-2xs">
               <PieChart className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-[#101828]">Content Pillars & Strategy</h3>
-              <p className="text-xs text-[#667085]">Distribution weights & editorial focus</p>
+              <h3 className="text-base font-bold text-foreground">Content Pillars & Strategy</h3>
+              <p className="text-xs text-foreground-secondary">Distribution weights & editorial focus</p>
             </div>
           </div>
           <button
+            type="button"
             onClick={onClose}
-            className="p-1 rounded-lg text-[#98A2B3] hover:text-[#344054] hover:bg-[#F2F4F7]"
+            className="p-1 rounded-lg text-foreground-muted hover:text-foreground hover:bg-surface-raised transition-colors outline-hidden focus-visible:ring-2 focus-visible:ring-focus-ring"
           >
             <X className="w-5 h-5" />
           </button>
@@ -117,27 +121,27 @@ export const PillarsManagerModal: React.FC<PillarsManagerModalProps> = ({
         {/* Body */}
         <div className="p-6 overflow-y-auto space-y-5">
           {successMsg && (
-            <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl flex items-center gap-2 text-xs font-semibold">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+            <div className="p-3 bg-status-success-bg border border-status-success text-status-success rounded-xl flex items-center gap-2 text-xs font-semibold">
+              <CheckCircle2 className="w-4 h-4 shrink-0" />
               <span>{successMsg}</span>
             </div>
           )}
 
           {error && (
-            <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 rounded-xl text-xs">
+            <div className="p-3 bg-status-danger-bg border border-status-danger text-status-danger rounded-xl text-xs font-semibold">
               {error}
             </div>
           )}
 
           {/* Distribution Balance Bar */}
-          <div className="bg-[#F9FAFB] p-4 rounded-xl border border-[#EAECF0] space-y-2">
+          <div className="bg-background-subtle p-4 rounded-xl border border-border space-y-2">
             <div className="flex items-center justify-between text-xs font-semibold">
-              <span className="text-[#344054]">Pillar Distribution Mix</span>
-              <span className={totalWeight === 100 ? 'text-emerald-600' : 'text-amber-600'}>
+              <span className="text-foreground">Pillar Distribution Mix</span>
+              <span className={totalWeight === 100 ? 'text-status-success' : 'text-status-warning font-mono'}>
                 Total Weight: {totalWeight}%
               </span>
             </div>
-            <div className="h-3 w-full bg-[#EAECF0] rounded-full overflow-hidden flex">
+            <div className="h-3 w-full bg-surface border border-border rounded-full overflow-hidden flex">
               {pillars.map((p) => (
                 <div
                   key={p.id}
@@ -151,80 +155,80 @@ export const PillarsManagerModal: React.FC<PillarsManagerModalProps> = ({
 
           {/* Add Pillar Form */}
           {showAdd ? (
-            <form onSubmit={handleCreate} className="p-4 rounded-xl border border-[#D0D5DD] bg-white space-y-3">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-[#344054]">
+            <form onSubmit={handleCreate} className="p-4 rounded-xl border border-border bg-surface space-y-3">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-foreground-muted">
                 New Content Pillar
               </h4>
 
               <div className="grid grid-cols-3 gap-3">
                 <div className="col-span-2">
-                  <label className="block text-xs font-semibold text-[#344054] mb-1">Pillar Name *</label>
-                  <input
+                  <label className="block text-xs font-semibold text-foreground mb-1">Pillar Name *</label>
+                  <Input
                     type="text"
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="e.g. Thought Leadership"
-                    className="w-full px-3 py-1.5 text-xs border border-[#D0D5DD] rounded-lg focus:ring-2 focus:ring-[#6257E8]"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-[#344054] mb-1">Weight (%)</label>
-                  <input
+                  <label className="block text-xs font-semibold text-foreground mb-1">Weight (%)</label>
+                  <Input
                     type="number"
                     min="1"
                     max="100"
                     value={weight}
                     onChange={(e) => setWeight(parseInt(e.target.value) || 1)}
-                    className="w-full px-3 py-1.5 text-xs border border-[#D0D5DD] rounded-lg"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-[#344054] mb-1">Description</label>
-                <input
+                <label className="block text-xs font-semibold text-foreground mb-1">Description</label>
+                <Input
                   type="text"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Objective, theme, and key angles..."
-                  className="w-full px-3 py-1.5 text-xs border border-[#D0D5DD] rounded-lg"
                 />
               </div>
 
               <div className="flex items-center justify-between pt-1">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-medium text-[#475467]">Color:</span>
+                  <span className="text-xs font-medium text-foreground-secondary">Color:</span>
                   <input
                     type="color"
                     value={colorTag}
                     onChange={(e) => setColorTag(e.target.value)}
-                    className="w-6 h-6 rounded cursor-pointer border border-gray-300"
+                    className="w-6 h-6 rounded cursor-pointer border border-border bg-surface p-0.5"
                   />
                 </div>
 
                 <div className="flex gap-2">
-                  <button
+                  <Button
                     type="button"
+                    variant="outline"
+                    size="sm"
                     onClick={() => setShowAdd(false)}
-                    className="px-3 py-1.5 text-xs font-semibold text-[#344054] hover:bg-[#F2F4F7] rounded-lg"
                   >
                     Cancel
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     type="submit"
                     disabled={saving}
-                    className="px-4 py-1.5 bg-[#6257E8] text-white text-xs font-semibold rounded-lg hover:bg-[#5246D6] disabled:opacity-50"
+                    variant="default"
+                    size="sm"
                   >
                     {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : 'Save Pillar'}
-                  </button>
+                  </Button>
                 </div>
               </div>
             </form>
           ) : (
             <button
+              type="button"
               onClick={() => setShowAdd(true)}
-              className="w-full py-2 border-2 border-dashed border-[#D0D5DD] rounded-xl text-xs font-semibold text-[#6257E8] hover:bg-[#6257E8]/5 flex items-center justify-center gap-1.5 transition-colors"
+              className="w-full py-2.5 border-2 border-dashed border-border rounded-xl text-xs font-semibold text-brand-accent hover:bg-brand-accent/5 flex items-center justify-center gap-1.5 transition-colors outline-hidden focus-visible:ring-2 focus-visible:ring-focus-ring"
             >
               <Plus className="w-4 h-4" />
               <span>Add New Content Pillar</span>
@@ -234,34 +238,34 @@ export const PillarsManagerModal: React.FC<PillarsManagerModalProps> = ({
           {/* Pillars List */}
           <div className="space-y-2">
             {loading ? (
-              <div className="p-8 text-center text-xs text-[#667085]">
-                <Loader2 className="w-5 h-5 animate-spin mx-auto mb-2 text-[#6257E8]" />
+              <div className="p-8 text-center text-xs text-foreground-secondary">
+                <Loader2 className="w-5 h-5 animate-spin mx-auto mb-2 text-brand-accent" />
                 Loading pillars...
               </div>
             ) : pillars.length === 0 ? (
-              <div className="p-6 text-center text-xs text-[#667085] bg-[#F9FAFB] rounded-xl">
+              <div className="p-6 text-center text-xs text-foreground-secondary bg-background-subtle rounded-xl border border-border">
                 No content pillars created yet. Add pillars above to guide content planning distribution.
               </div>
             ) : (
               pillars.map((p) => (
                 <div
                   key={p.id}
-                  className="p-3 bg-white border border-[#EAECF0] rounded-xl flex items-center justify-between shadow-xs hover:border-[#D0D5DD] transition-all"
+                  className="p-3 bg-surface border border-border rounded-xl flex items-center justify-between shadow-2xs hover:border-brand-accent/40 transition-all"
                 >
                   <div className="flex items-center gap-3">
                     <div
-                      className="w-3.5 h-3.5 rounded-full shrink-0"
+                      className="w-3.5 h-3.5 rounded-full shrink-0 border border-border/40"
                       style={{ backgroundColor: p.color_tag }}
                     />
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-[#101828]">{p.name}</span>
-                        <span className="text-[10px] px-1.5 py-0.2 bg-[#F2F4F7] text-[#475467] rounded font-semibold">
+                        <span className="text-xs font-bold text-foreground">{p.name}</span>
+                        <Badge variant="secondary" className="font-mono">
                           {p.weight_percentage}%
-                        </span>
+                        </Badge>
                       </div>
                       {p.description && (
-                        <p className="text-[11px] text-[#667085] mt-0.5 truncate max-w-sm">
+                        <p className="text-[11px] text-foreground-secondary mt-0.5 truncate max-w-sm">
                           {p.description}
                         </p>
                       )}
@@ -269,12 +273,14 @@ export const PillarsManagerModal: React.FC<PillarsManagerModalProps> = ({
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] text-[#98A2B3]">
+                    <span className="text-[10px] text-foreground-muted font-mono">
                       {p.content_items_count ?? 0} posts
                     </span>
                     <button
+                      type="button"
                       onClick={() => handleDelete(p.id, p.name)}
-                      className="p-1.5 text-gray-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition-colors"
+                      aria-label={`Delete pillar ${p.name}`}
+                      className="p-1.5 text-foreground-muted hover:text-status-danger rounded-lg hover:bg-status-danger-bg transition-colors outline-hidden focus-visible:ring-2 focus-visible:ring-focus-ring"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -288,4 +294,3 @@ export const PillarsManagerModal: React.FC<PillarsManagerModalProps> = ({
     </div>
   )
 }
-

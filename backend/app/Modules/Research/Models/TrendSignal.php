@@ -58,3 +58,4 @@ class TrendSignal extends Model
         return $this->hasMany(ContentOpportunity::class);
     }
 }
+

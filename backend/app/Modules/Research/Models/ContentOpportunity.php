@@ -81,3 +81,4 @@ class ContentOpportunity extends Model
         return $this->belongsTo(ContentItem::class, 'converted_content_item_id');
     }
 }
+

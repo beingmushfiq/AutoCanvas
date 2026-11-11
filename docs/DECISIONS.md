@@ -33,3 +33,30 @@
 - **Decision:** Adopt shared-database, shared-schema with explicit `organization_id` foreign keys on every tenant-owned table, enforced at runtime by an Eloquent Global Scope (`HasTenantScope`).
 - **Consequences:** Simplifies schema migrations and cross-tenant platform analytics while maintaining strict data isolation verified by automated unit tests.
 
+---
+
+## ADR-005: Frontend Design System, UI/UX Toolkit & Permissive Stack Selection
+- **Status:** Accepted (2026-11-10)
+- **Context:** AutoCanvas requires a memorable, distinctive, high-craft user interface that avoids generic "AI UI" tropes (purple-on-white gradients, default frameworks, unstyled chatbot layouts) while respecting strict commercial licensing constraints and supporting complex multi-channel operational workflows.
+- **Decision:**
+  1. **Design Intelligence Foundation**: Standardize on `UI/UX Pro Max` (`NEXTLEVELBUILDER`) for systematic, searchable UX guidelines, design tokens, color harmonies, and chart archetypes, combined with `Frontend Design` (Anthropic) for aesthetic discipline, intentional typography, non-generic layouts, and an explicit aesthetic stance: **Industrial Kinetic / Editorial Studio Operations**.
+  2. **Permissively Licensed Implementation Stack**:
+     - **Component Primitives**: `shadcn/ui` + `Radix UI` accessible headless primitives (Dialog, Tooltip, Dropdown Menu).
+     - **Styling & Tokens**: `Tailwind CSS v4` with `@theme` custom properties supporting Obsidian Slate Dark mode and Clean Light mode, plus Comfortable vs. Compact density.
+     - **Iconography**: `Lucide React` for consistent, restrained system iconography.
+     - **Motion**: `Motion for React` (`motion`) for purposeful entrance and state transitions.
+     - **Creative Canvas Editor**: `React Konva` (100% MIT-licensed), explicitly avoiding `tldraw` due to commercial SDK licensing restrictions.
+     - **Publishing Calendar**: `FullCalendar` MIT-core (`dayGridMonth`), avoiding proprietary premium scheduler modules.
+     - **Data Grids & Tables**: `TanStack Table` for sortable, filterable publishing queues and audit trails.
+     - **Telemetry & Visualizations**: `Recharts` for real operational data (publishing cadence, multi-channel reach, worker health).
+     - **Global Command Palette**: `cmdk` mounted globally with `⌘K` / `Ctrl+K` keyboard shortcuts.
+  3. **Typography Standard**:
+     - `Geist Sans`: Primary Latin application typography.
+     - `Geist Mono`: Technical metadata, identifiers, and numerical telemetry.
+     - `Noto Sans Bengali`: Multilingual Bangla content and script fallback. All fonts licensed under SIL Open Font License.
+  4. **Progressive Complexity & Accessibility**:
+     - User persona toggle (`Business Owner` vs `Agency Pro`) to prevent UI overwhelm while enabling power users.
+     - Full keyboard accessibility (WCAG 2.2 AA compliant focus rings, contrast ratios, and non-drag alternatives).
+- **Consequences:** Eliminates third-party commercial license liabilities, delivers an ownable and high-craft brand aesthetic, ensures WCAG 2.2 AA accessibility compliance, and guarantees zero dependency friction across developer environments.
+
+

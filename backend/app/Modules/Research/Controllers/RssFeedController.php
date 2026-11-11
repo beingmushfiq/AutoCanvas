@@ -155,3 +155,4 @@ class RssFeedController extends Controller
         ]);
     }
 }
+

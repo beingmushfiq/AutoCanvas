@@ -76,6 +76,16 @@ class Organization extends Model
         return $this->hasMany(AuditLog::class);
     }
 
+    public function invoices(): HasMany
+    {
+        return $this->hasMany(\App\Modules\Billing\Models\Invoice::class);
+    }
+
+    public function paymentTransactions(): HasMany
+    {
+        return $this->hasMany(\App\Modules\Billing\Models\PaymentTransaction::class);
+    }
+
     public function getRoleOf(User $user): ?string
     {
         $member = $this->members()->where('user_id', $user->id)->first();
