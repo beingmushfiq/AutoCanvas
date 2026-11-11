@@ -1072,7 +1072,7 @@ export const MasterControlDashboard: React.FC<MasterControlDashboardProps> = ({ 
                   <History className="w-4 h-4 text-foreground-muted" />
                 </div>
 
-                <div className="space-y-3 max-h-[500px] overflow-y-auto pr-1">
+                <div className="space-y-3 max-h-125 overflow-y-auto pr-1">
                   {activePromptGroup?.versions && activePromptGroup.versions.length > 0 ? (
                     activePromptGroup.versions.map((ver) => (
                       <div
