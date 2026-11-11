@@ -164,3 +164,4 @@ export const SuspendTenantModal: React.FC<SuspendTenantModalProps> = ({
     </AnimatePresence>
   )
 }
+

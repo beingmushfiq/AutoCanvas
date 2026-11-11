@@ -174,3 +174,4 @@ SVG;
         $this->assertStringContainsString('<circle', $storedContent);
     }
 }
+
