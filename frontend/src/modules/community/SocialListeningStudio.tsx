@@ -18,6 +18,7 @@ import { Badge } from '../../components/ui/badge'
 import { Card } from '../../components/ui/card'
 import { EmptyState } from '../../components/ui/empty-state'
 import { apiClient, type BrandSummary } from '../../lib/api/client'
+import { useAuth } from '../auth/AuthContext'
 import { appToast } from '../../lib/toast'
 
 export interface MentionItem {
@@ -100,9 +101,10 @@ const DEFAULT_MENTIONS: MentionItem[] = [
 ]
 
 export const SocialListeningStudio: React.FC = () => {
+  const { isAuthenticated } = useAuth()
   const [brands, setBrands] = useState<BrandSummary[]>([])
   const [selectedBrandId, setSelectedBrandId] = useState<string>('')
-  const [mentions] = useState<MentionItem[]>(DEFAULT_MENTIONS)
+  const [mentions, setMentions] = useState<MentionItem[]>(!isAuthenticated ? DEFAULT_MENTIONS : [])
   const [sentimentFilter, setSentimentFilter] = useState<'all' | 'positive' | 'neutral' | 'critical'>('all')
   const [platformFilter, setPlatformFilter] = useState<'all' | 'twitter' | 'linkedin' | 'reddit' | 'news'>('all')
   const [searchQuery, setSearchQuery] = useState('')
@@ -132,6 +134,78 @@ export const SocialListeningStudio: React.FC = () => {
     }
     loadBrands()
   }, [])
+
+  // In authenticated mode, fetch live inbox conversations and ingested articles for real brand signals
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setMentions(DEFAULT_MENTIONS)
+      return
+    }
+
+    if (!selectedBrandId) {
+      setMentions([])
+      return
+    }
+
+    let isMounted = true
+    async function loadLiveMentions() {
+      try {
+        const [convRes, artRes] = await Promise.all([
+          apiClient.getInboxConversations(selectedBrandId).catch(() => ({ data: [] })),
+          apiClient.get<{ success: boolean; data: any[] }>(`/brands/${selectedBrandId}/articles`).catch(() => ({ data: [] })),
+        ])
+
+        if (!isMounted) return
+
+        const liveMentions: MentionItem[] = []
+
+        if (convRes.data && Array.isArray(convRes.data)) {
+          convRes.data.forEach((c: any) => {
+            liveMentions.push({
+              id: `conv-${c.id}`,
+              source: (c.platform === 'linkedin' || c.platform === 'twitter' || c.platform === 'reddit' ? c.platform : 'twitter') as any,
+              author_name: c.participant_name || 'Social User',
+              author_handle: c.participant_handle || 'user',
+              content: c.last_message_snippet || 'New direct message or interaction received.',
+              timestamp: c.last_message_at ? new Date(c.last_message_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'recently',
+              sentiment: (c.sentiment || 'neutral') as any,
+              reach_score: 80,
+              engagement_count: c.unread_count || 1,
+              matched_keyword: trackedKeywords[0] || 'Brand Community',
+              is_urgent: c.is_escalated,
+            })
+          })
+        }
+
+        if (artRes.data && Array.isArray(artRes.data)) {
+          artRes.data.forEach((a: any) => {
+            liveMentions.push({
+              id: `art-${a.id}`,
+              source: 'news' as const,
+              author_name: a.source_name || a.source_domain || 'News Publisher',
+              author_handle: a.source_domain || 'wire',
+              content: a.title + (a.summary ? ` — ${a.summary}` : ''),
+              timestamp: a.published_at ? new Date(a.published_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'recently',
+              sentiment: (a.sentiment || 'positive') as any,
+              reach_score: 90,
+              engagement_count: 35,
+              matched_keyword: a.keyword || trackedKeywords[0] || 'News Wire',
+            })
+          })
+        }
+
+        setMentions(liveMentions)
+      } catch (err) {
+        console.error('Failed to load live mentions:', err)
+        if (isMounted) setMentions([])
+      }
+    }
+
+    loadLiveMentions()
+    return () => {
+      isMounted = false
+    }
+  }, [selectedBrandId, isAuthenticated, trackedKeywords])
 
   // Filter mentions
   const filteredMentions = useMemo(() => {
@@ -194,10 +268,16 @@ export const SocialListeningStudio: React.FC = () => {
         <div>
           <div className="flex items-center gap-3">
             <h2 className="text-xl font-bold text-foreground">Social Listening & Brand Radar</h2>
-            <Badge variant="outline" className="border-border text-foreground-secondary text-xs">
-              <Radio className="w-3.5 h-3.5 mr-1 text-status-success animate-pulse" />
-              Live Ingestion Active
-            </Badge>
+            {!isAuthenticated ? (
+              <Badge variant="outline" className="border-brand-accent/50 text-brand-accent text-xs">
+                DEMO PREVIEW
+              </Badge>
+            ) : (
+              <Badge variant="outline" className="border-border text-foreground-secondary text-xs">
+                <Radio className="w-3.5 h-3.5 mr-1 text-status-success animate-pulse" />
+                Live Ingestion Active
+              </Badge>
+            )}
           </div>
           <p className="text-sm text-foreground-secondary mt-1">
             Real-time keyword sentiment analysis, competitor share of voice, and brand conversation monitoring across social platforms.
@@ -436,7 +516,13 @@ export const SocialListeningStudio: React.FC = () => {
         </div>
 
         {/* Mentions Cards Stream */}
-        {filteredMentions.length === 0 ? (
+        {mentions.length === 0 ? (
+          <EmptyState
+            icon={Radio}
+            title="No Brand Mentions or Signals Captured Yet"
+            description="Social listening continuously monitors connected networks, brand keywords, and news streams. Connect your social channels or configure RSS ingestion to capture live mentions."
+          />
+        ) : filteredMentions.length === 0 ? (
           <EmptyState
             icon={Filter}
             title="No Matching Mentions"

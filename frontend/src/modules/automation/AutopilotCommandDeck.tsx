@@ -26,6 +26,7 @@ import {
 } from '../../lib/api/client'
 import { EmptyState } from '../../components/ui/empty-state'
 import { appToast } from '../../lib/toast'
+import { useAuth } from '../auth/AuthContext'
 
 interface AutopilotCommandDeckProps {
   currentBrandId?: string
@@ -167,12 +168,15 @@ const DEMO_BRAND: BrandSummary = {
 }
 
 export const AutopilotCommandDeck: React.FC<AutopilotCommandDeckProps> = ({ currentBrandId }) => {
-  const [brands, setBrands] = useState<BrandSummary[]>([DEMO_BRAND])
-  const [selectedBrandId, setSelectedBrandId] = useState<string>(currentBrandId || 'demo-brand-1')
-  const [radar, setRadar] = useState<AutopilotRadarData | null>(DEMO_RADAR)
-  const [cadence, setCadence] = useState<BrandCadenceSettingData | null>(DEMO_CADENCE)
-  const [discoveredSources, setDiscoveredSources] = useState<DiscoveredSourceItem[]>(DEMO_SOURCES)
-  const [fingerprints, setFingerprints] = useState<ContentFingerprintItem[]>(DEMO_FINGERPRINTS)
+  const { isAuthenticated } = useAuth()
+  const [brands, setBrands] = useState<BrandSummary[]>(!isAuthenticated ? [DEMO_BRAND] : [])
+  const [selectedBrandId, setSelectedBrandId] = useState<string>(
+    currentBrandId || (!isAuthenticated ? 'demo-brand-1' : '')
+  )
+  const [radar, setRadar] = useState<AutopilotRadarData | null>(!isAuthenticated ? DEMO_RADAR : null)
+  const [cadence, setCadence] = useState<BrandCadenceSettingData | null>(!isAuthenticated ? DEMO_CADENCE : null)
+  const [discoveredSources, setDiscoveredSources] = useState<DiscoveredSourceItem[]>(!isAuthenticated ? DEMO_SOURCES : [])
+  const [fingerprints, setFingerprints] = useState<ContentFingerprintItem[]>(!isAuthenticated ? DEMO_FINGERPRINTS : [])
   const [loading, setLoading] = useState<boolean>(false)
   const [triggering, setTriggering] = useState<boolean>(false)
   const [savingCadence, setSavingCadence] = useState<boolean>(false)
@@ -192,15 +196,23 @@ export const AutopilotCommandDeck: React.FC<AutopilotCommandDeckProps> = ({ curr
             if (!selectedBrandId || selectedBrandId === 'demo-brand-1') {
               setSelectedBrandId(res.data[0].id)
             }
-          } else {
+          } else if (!isAuthenticated) {
             setBrands([DEMO_BRAND])
             setSelectedBrandId('demo-brand-1')
+          } else {
+            setBrands([])
+            setSelectedBrandId('')
           }
         }
       } catch {
         if (isMounted) {
-          setBrands([DEMO_BRAND])
-          setSelectedBrandId('demo-brand-1')
+          if (!isAuthenticated) {
+            setBrands([DEMO_BRAND])
+            setSelectedBrandId('demo-brand-1')
+          } else {
+            setBrands([])
+            setSelectedBrandId('')
+          }
         }
       }
     }
@@ -208,7 +220,7 @@ export const AutopilotCommandDeck: React.FC<AutopilotCommandDeckProps> = ({ curr
     return () => {
       isMounted = false
     }
-  }, [selectedBrandId])
+  }, [selectedBrandId, isAuthenticated])
 
   // Load radar & cadence data for active brand
   const loadAutopilotData = useCallback(async () => {
@@ -219,7 +231,7 @@ export const AutopilotCommandDeck: React.FC<AutopilotCommandDeckProps> = ({ curr
 
     setLoading(true)
     try {
-      if (selectedBrandId === 'demo-brand-1') {
+      if (selectedBrandId === 'demo-brand-1' || !isAuthenticated) {
         setRadar(DEMO_RADAR)
         setCadence(DEMO_CADENCE)
         setDiscoveredSources(DEMO_SOURCES)
@@ -228,25 +240,25 @@ export const AutopilotCommandDeck: React.FC<AutopilotCommandDeckProps> = ({ curr
       }
 
       const [radarRes, cadenceRes, sourcesRes, fpsRes] = await Promise.all([
-        apiClient.getAutopilotRadar(selectedBrandId).catch(() => ({ data: DEMO_RADAR })),
-        apiClient.getAutopilotCadence(selectedBrandId).catch(() => ({ data: DEMO_CADENCE })),
-        apiClient.getDiscoveredSources(selectedBrandId).catch(() => ({ data: { data: DEMO_SOURCES } })),
-        apiClient.getContentFingerprints(selectedBrandId).catch(() => ({ data: { data: DEMO_FINGERPRINTS } })),
+        apiClient.getAutopilotRadar(selectedBrandId).catch(() => ({ data: null })),
+        apiClient.getAutopilotCadence(selectedBrandId).catch(() => ({ data: null })),
+        apiClient.getDiscoveredSources(selectedBrandId).catch(() => ({ data: { data: [] } })),
+        apiClient.getContentFingerprints(selectedBrandId).catch(() => ({ data: { data: [] } })),
       ])
 
-      setRadar(radarRes.data || DEMO_RADAR)
-      setCadence(cadenceRes.data || DEMO_CADENCE)
-      setDiscoveredSources(sourcesRes.data?.data || DEMO_SOURCES)
-      setFingerprints(fpsRes.data?.data || DEMO_FINGERPRINTS)
+      setRadar(radarRes.data || null)
+      setCadence(cadenceRes.data || null)
+      setDiscoveredSources(sourcesRes.data?.data || [])
+      setFingerprints(fpsRes.data?.data || [])
     } catch {
-      setRadar(DEMO_RADAR)
-      setCadence(DEMO_CADENCE)
-      setDiscoveredSources(DEMO_SOURCES)
-      setFingerprints(DEMO_FINGERPRINTS)
+      setRadar(null)
+      setCadence(null)
+      setDiscoveredSources([])
+      setFingerprints([])
     } finally {
       setLoading(false)
     }
-  }, [selectedBrandId])
+  }, [selectedBrandId, isAuthenticated])
 
   useEffect(() => {
     loadAutopilotData()
@@ -494,7 +506,7 @@ export const AutopilotCommandDeck: React.FC<AutopilotCommandDeckProps> = ({ curr
           </div>
           <div className="mt-2 flex items-baseline gap-2">
             <span className="text-2xl font-bold tracking-tight text-foreground font-mono">
-              {radar?.pulse.fingerprints_registered ?? 48}
+              {radar?.pulse.fingerprints_registered ?? (!isAuthenticated ? 48 : fingerprints.length)}
             </span>
             <span className="text-xs text-foreground-muted">Exact Match & Semantic Memory</span>
           </div>

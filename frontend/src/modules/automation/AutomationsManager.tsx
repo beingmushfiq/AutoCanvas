@@ -15,6 +15,7 @@ import { Button } from '../../components/ui/button'
 import { Badge } from '../../components/ui/badge'
 import { Card } from '../../components/ui/card'
 import { apiClient, type BrandSummary } from '../../lib/api/client'
+import { useAuth } from '../auth/AuthContext'
 import { appToast } from '../../lib/toast'
 
 interface AutomationsManagerProps {
@@ -86,9 +87,12 @@ const DEFAULT_RULES: AutomationRule[] = [
 ]
 
 export const AutomationsManager: React.FC<AutomationsManagerProps> = ({ onNavigateToRadar }) => {
+  const { isAuthenticated } = useAuth()
   const [brands, setBrands] = useState<BrandSummary[]>([])
   const [selectedBrandId, setSelectedBrandId] = useState<string>('')
   const [rules, setRules] = useState<AutomationRule[]>(DEFAULT_RULES)
+  const [totalDispatches, setTotalDispatches] = useState<number>(!isAuthenticated ? 2095 : 0)
+  const [successfulDispatches, setSuccessfulDispatches] = useState<number>(!isAuthenticated ? 2091 : 0)
   const [isPaused, setIsPaused] = useState<boolean>(false)
   const [isTogglingCircuit, setIsTogglingCircuit] = useState<boolean>(false)
   const [isTriggering, setIsTriggering] = useState<boolean>(false)
@@ -97,9 +101,10 @@ export const AutomationsManager: React.FC<AutomationsManagerProps> = ({ onNaviga
   useEffect(() => {
     async function loadInitial() {
       try {
-        const [brandsRes, cbRes] = await Promise.all([
-          apiClient.getBrands(),
+        const [brandsRes, cbRes, dispatchesRes] = await Promise.all([
+          apiClient.getBrands().catch(() => ({ data: [] })),
           apiClient.getCircuitBreakerStatus().catch(() => null),
+          apiClient.getDispatches().catch(() => ({ data: [] })),
         ])
         if (brandsRes.data && brandsRes.data.length > 0) {
           setBrands(brandsRes.data)
@@ -108,12 +113,53 @@ export const AutomationsManager: React.FC<AutomationsManagerProps> = ({ onNaviga
         if (cbRes?.data) {
           setIsPaused(cbRes.data.paused)
         }
+
+        if (isAuthenticated) {
+          const dispatches = dispatchesRes.data || []
+          const pubCount = dispatches.filter((d: any) => d.status === 'published').length
+          setTotalDispatches(dispatches.length)
+          setSuccessfulDispatches(pubCount)
+
+          // Set authentic rule execution counts
+          setRules(
+            DEFAULT_RULES.map((rule) => {
+              if (rule.id === 'rule-1' || rule.id === 'rule-3') {
+                return {
+                  ...rule,
+                  execution_count: dispatches.length,
+                  last_executed_at: dispatches.length > 0 ? 'Recently' : 'Standing By',
+                }
+              }
+              if (rule.id === 'rule-2') {
+                const retried = dispatches.filter((d: any) => d.attempts > 1).length
+                return {
+                  ...rule,
+                  execution_count: retried,
+                  last_executed_at: retried > 0 ? 'Recently' : 'Standing By',
+                }
+              }
+              if (rule.id === 'rule-5') {
+                const scheduled = dispatches.filter((d: any) => d.status === 'queued').length
+                return {
+                  ...rule,
+                  execution_count: scheduled,
+                  last_executed_at: scheduled > 0 ? 'Queued' : 'Standing By',
+                }
+              }
+              return {
+                ...rule,
+                execution_count: 0,
+                last_executed_at: 'Standing By',
+              }
+            })
+          )
+        }
       } catch (err) {
         console.error('Failed to load automations data:', err)
       }
     }
     loadInitial()
-  }, [])
+  }, [isAuthenticated])
 
   // Emergency Circuit Breaker Toggle
   const handleToggleCircuitBreaker = async () => {
@@ -178,10 +224,16 @@ export const AutomationsManager: React.FC<AutomationsManagerProps> = ({ onNaviga
         <div>
           <div className="flex items-center gap-3">
             <h2 className="text-xl font-bold text-foreground">Workflow Automation Center</h2>
-            <Badge variant="outline" className="border-border text-foreground-secondary text-xs">
-              <Bot className="w-3.5 h-3.5 mr-1 text-brand-accent" />
-              Autonomous Operations Engine
-            </Badge>
+            {!isAuthenticated ? (
+              <Badge variant="outline" className="border-brand-accent/50 text-brand-accent text-xs">
+                DEMO PREVIEW
+              </Badge>
+            ) : (
+              <Badge variant="outline" className="border-border text-foreground-secondary text-xs">
+                <Bot className="w-3.5 h-3.5 mr-1 text-brand-accent" />
+                Autonomous Operations Engine
+              </Badge>
+            )}
           </div>
           <p className="text-sm text-foreground-secondary mt-1">
             Configure automated news scouring, first-comment dispatches, anti-repetition guards, and emergency kill switches.
@@ -307,8 +359,14 @@ export const AutomationsManager: React.FC<AutomationsManagerProps> = ({ onNaviga
             <span>Execution Success Rate</span>
             <CheckCircle2 className="w-4 h-4 text-status-success" />
           </div>
-          <div className="text-2xl font-bold text-foreground">99.8%</div>
-          <p className="text-xs text-foreground-secondary">2,095 successful jobs (30d)</p>
+          <div className="text-2xl font-bold text-foreground">
+            {totalDispatches > 0 ? `${((successfulDispatches / totalDispatches) * 100).toFixed(1)}%` : (!isAuthenticated ? '99.8%' : '100%')}
+          </div>
+          <p className="text-xs text-foreground-secondary">
+            {totalDispatches > 0
+              ? `${successfulDispatches} successful dispatches`
+              : (!isAuthenticated ? '2,095 successful jobs (30d)' : '0 dispatches queued yet')}
+          </p>
         </Card>
 
         <Card className="p-5 rounded-2xl bg-surface border border-border space-y-2">

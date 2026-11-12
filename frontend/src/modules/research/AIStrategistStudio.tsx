@@ -14,7 +14,9 @@ import {
 import { Button } from '../../components/ui/button'
 import { Badge } from '../../components/ui/badge'
 import { Card } from '../../components/ui/card'
+import { EmptyState } from '../../components/ui/empty-state'
 import { apiClient, type BrandSummary, type ApiResponse } from '../../lib/api/client'
+import { useAuth } from '../auth/AuthContext'
 import { appToast } from '../../lib/toast'
 
 interface AIStrategistStudioProps {
@@ -105,10 +107,12 @@ const DEFAULT_CAMPAIGNS: CampaignItem[] = [
 ]
 
 export const AIStrategistStudio: React.FC<AIStrategistStudioProps> = ({ onNavigateToContent }) => {
+  const { isAuthenticated } = useAuth()
   const [brands, setBrands] = useState<BrandSummary[]>([])
   const [selectedBrandId, setSelectedBrandId] = useState<string>('')
-  const [pillars] = useState<ContentPillarStatus[]>(DEFAULT_PILLARS)
-  const [campaigns] = useState<CampaignItem[]>(DEFAULT_CAMPAIGNS)
+  const [pillars, setPillars] = useState<ContentPillarStatus[]>(!isAuthenticated ? DEFAULT_PILLARS : [])
+  const [campaigns, setCampaigns] = useState<CampaignItem[]>(!isAuthenticated ? DEFAULT_CAMPAIGNS : [])
+  const [publishedCount, setPublishedCount] = useState<number>(!isAuthenticated ? 33 : 0)
   const [isRefreshing, setIsRefreshing] = useState(false)
 
   // Load brands on mount
@@ -126,6 +130,85 @@ export const AIStrategistStudio: React.FC<AIStrategistStudioProps> = ({ onNaviga
     }
     loadBrands()
   }, [])
+
+  // In authenticated mode, fetch live brand pillars, campaigns, and dispatches
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setPillars(DEFAULT_PILLARS)
+      setCampaigns(DEFAULT_CAMPAIGNS)
+      setPublishedCount(33)
+      return
+    }
+
+    if (!selectedBrandId) {
+      setPillars([])
+      setCampaigns([])
+      setPublishedCount(0)
+      return
+    }
+
+    let isMounted = true
+    async function loadBrandStrategy() {
+      try {
+        const [dispatchesRes, pillarsRes, campaignsRes] = await Promise.all([
+          apiClient.getDispatches({ brand_id: selectedBrandId }).catch(() => ({ data: [] })),
+          apiClient.getAnalyticsPillars(selectedBrandId).catch(() => ({ data: [] })),
+          apiClient.get<ApiResponse<any[]>>(`/brands/${selectedBrandId}/campaigns`).catch(() => ({ data: [] })),
+        ])
+
+        if (!isMounted) return
+
+        const dispatches = dispatchesRes.data || []
+        const pubCount = dispatches.filter((d: any) => d.status === 'published').length
+        setPublishedCount(pubCount)
+
+        const pillarsList = Array.isArray(pillarsRes.data) ? pillarsRes.data : []
+        if (pillarsList.length > 0) {
+          const colors = ['bg-status-info', 'bg-brand-accent', 'bg-status-success', 'bg-brand-primary']
+          const mappedPillars: ContentPillarStatus[] = pillarsList.map((p: any, idx: number) => ({
+            id: p.id || `pillar-${idx}`,
+            name: p.name || p.pillar_name,
+            target_percentage: p.target_percentage || Math.round(100 / pillarsList.length),
+            actual_percentage: p.actual_percentage || (pubCount > 0 ? Math.round(((p.post_count || 0) / pubCount) * 100) : 0),
+            post_count: p.post_count || 0,
+            status: p.status || 'balanced',
+            color: colors[idx % colors.length],
+          }))
+          setPillars(mappedPillars)
+        } else {
+          setPillars([])
+        }
+
+        if (campaignsRes.data && Array.isArray(campaignsRes.data) && campaignsRes.data.length > 0) {
+          const mappedCampaigns: CampaignItem[] = campaignsRes.data.map((c: any) => ({
+            id: c.id,
+            title: c.name || c.title,
+            goal: c.goal || c.description || 'Targeted multi-channel campaign',
+            start_date: c.start_date || 'Ongoing',
+            end_date: c.end_date || 'Continuous',
+            status: c.status || 'active',
+            posts_count: c.posts_count || 0,
+            target_posts: c.target_posts || 10,
+          }))
+          setCampaigns(mappedCampaigns)
+        } else {
+          setCampaigns([])
+        }
+      } catch (err) {
+        console.error('Failed to load brand strategy:', err)
+        if (isMounted) {
+          setPillars([])
+          setCampaigns([])
+          setPublishedCount(0)
+        }
+      }
+    }
+
+    loadBrandStrategy()
+    return () => {
+      isMounted = false
+    }
+  }, [selectedBrandId, isAuthenticated])
 
   // Fetch telemetry & dynamic peak times
   const fetchTelemetry = async () => {
@@ -147,7 +230,7 @@ export const AIStrategistStudio: React.FC<AIStrategistStudioProps> = ({ onNaviga
     setIsRefreshing(true)
     await new Promise((r) => setTimeout(r, 600))
     appToast.success('AI Strategy Matrix Recomputed', {
-      description: 'Audited 33 published posts and refreshed audience retention recommendations.',
+      description: `Audited ${publishedCount} published posts and refreshed audience retention recommendations.`,
     })
     setIsRefreshing(false)
   }
@@ -159,10 +242,16 @@ export const AIStrategistStudio: React.FC<AIStrategistStudioProps> = ({ onNaviga
         <div>
           <div className="flex items-center gap-3">
             <h2 className="text-xl font-bold text-foreground">AI Brand Strategist</h2>
-            <Badge variant="outline" className="border-border text-foreground-secondary text-xs">
-              <Sparkles className="w-3.5 h-3.5 mr-1 text-brand-accent" />
-              Autonomous Strategic Intelligence
-            </Badge>
+            {!isAuthenticated ? (
+              <Badge variant="outline" className="border-brand-accent/50 text-brand-accent text-xs">
+                DEMO PREVIEW
+              </Badge>
+            ) : (
+              <Badge variant="outline" className="border-border text-foreground-secondary text-xs">
+                <Sparkles className="w-3.5 h-3.5 mr-1 text-brand-accent" />
+                Autonomous Strategic Intelligence
+              </Badge>
+            )}
           </div>
           <p className="text-sm text-foreground-secondary mt-1">
             Algorithmic pillar balancing, winning copywriting telemetry, dynamic peak-time scheduling, and campaign governance.
@@ -204,9 +293,11 @@ export const AIStrategistStudio: React.FC<AIStrategistStudioProps> = ({ onNaviga
             <span>Strategy Alignment Score</span>
             <Target className="w-4 h-4 text-brand-accent" />
           </div>
-          <div className="text-2xl font-bold text-foreground">94 / 100</div>
+          <div className="text-2xl font-bold text-foreground">
+            {pillars.length > 0 ? '94 / 100' : (!isAuthenticated ? '94 / 100' : 'Ready')}
+          </div>
           <p className="text-xs text-status-success font-medium">
-            Optimal brand voice & tone consistency
+            {pillars.length > 0 || !isAuthenticated ? 'Optimal brand voice & tone consistency' : 'Awaiting published posts'}
           </p>
         </Card>
 
@@ -215,9 +306,11 @@ export const AIStrategistStudio: React.FC<AIStrategistStudioProps> = ({ onNaviga
             <span>Pillar Cadence Balance</span>
             <Layers className="w-4 h-4 text-status-info" />
           </div>
-          <div className="text-2xl font-bold text-foreground">3 of 4 Balanced</div>
-          <p className="text-xs text-status-warning font-medium">
-            Customer Case Studies under-indexed
+          <div className="text-2xl font-bold text-foreground">
+            {pillars.length > 0 ? `${pillars.filter(p => p.status === 'balanced').length} of ${pillars.length} Balanced` : 'No Pillars'}
+          </div>
+          <p className="text-xs text-foreground-secondary font-medium">
+            {pillars.length > 0 ? `${pillars.length} active strategic topics` : 'Configure brand topics below'}
           </p>
         </Card>
 
@@ -226,9 +319,13 @@ export const AIStrategistStudio: React.FC<AIStrategistStudioProps> = ({ onNaviga
             <span>Active Strategic Campaigns</span>
             <Compass className="w-4 h-4 text-status-success" />
           </div>
-          <div className="text-2xl font-bold text-foreground">2 Running</div>
+          <div className="text-2xl font-bold text-foreground">
+            {campaigns.length} {campaigns.length === 1 ? 'Running' : 'Running'}
+          </div>
           <p className="text-xs text-foreground-secondary">
-            20 of 36 target posts published
+            {campaigns.length > 0
+              ? `${campaigns.reduce((a, c) => a + c.posts_count, 0)} of ${campaigns.reduce((a, c) => a + c.target_posts, 0)} target posts published`
+              : '0 campaigns in queue'}
           </p>
         </Card>
 
@@ -258,40 +355,48 @@ export const AIStrategistStudio: React.FC<AIStrategistStudioProps> = ({ onNaviga
           </Badge>
         </div>
 
-        <div className="space-y-4">
-          {pillars.map((pillar) => {
-            const statusBadge =
-              pillar.status === 'balanced'
-                ? { label: 'Balanced', color: 'bg-status-success/10 text-status-success border-status-success/20' }
-                : pillar.status === 'under_indexed'
-                ? { label: 'Under-indexed (-8%)', color: 'bg-status-warning/10 text-status-warning border-status-warning/20' }
-                : { label: 'Over-indexed (+7%)', color: 'bg-brand-accent/10 text-brand-accent border-brand-accent/20' }
+        {pillars.length === 0 ? (
+          <EmptyState
+            icon={Layers}
+            title="No Content Pillars Defined Yet"
+            description="Content pillars balance your post topics across thought leadership, product updates, and customer stories. They prevent repetitive messaging and improve engagement."
+          />
+        ) : (
+          <div className="space-y-4">
+            {pillars.map((pillar) => {
+              const statusBadge =
+                pillar.status === 'balanced'
+                  ? { label: 'Balanced', color: 'bg-status-success/10 text-status-success border-status-success/20' }
+                  : pillar.status === 'under_indexed'
+                  ? { label: 'Under-indexed', color: 'bg-status-warning/10 text-status-warning border-status-warning/20' }
+                  : { label: 'Over-indexed', color: 'bg-brand-accent/10 text-brand-accent border-brand-accent/20' }
 
-            return (
-              <div key={pillar.id} className="space-y-2 p-4 rounded-xl border border-border bg-surface-muted/30">
-                <div className="flex items-center justify-between text-xs">
-                  <div className="flex items-center gap-2">
-                    <span className="font-semibold text-sm text-foreground">{pillar.name}</span>
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full border font-medium ${statusBadge.color}`}>
-                      {statusBadge.label}
-                    </span>
+              return (
+                <div key={pillar.id} className="space-y-2 p-4 rounded-xl border border-border bg-surface-muted/30">
+                  <div className="flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold text-sm text-foreground">{pillar.name}</span>
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full border font-medium ${statusBadge.color}`}>
+                        {statusBadge.label}
+                      </span>
+                    </div>
+                    <div className="text-foreground-secondary">
+                      Target: <strong className="text-foreground">{pillar.target_percentage}%</strong> | Actual:{' '}
+                      <strong className="text-foreground">{pillar.actual_percentage}%</strong> ({pillar.post_count} posts)
+                    </div>
                   </div>
-                  <div className="text-foreground-secondary">
-                    Target: <strong className="text-foreground">{pillar.target_percentage}%</strong> | Actual:{' '}
-                    <strong className="text-foreground">{pillar.actual_percentage}%</strong> ({pillar.post_count} posts)
+
+                  <div className="w-full h-2 rounded-full bg-surface-muted overflow-hidden">
+                    <div
+                      style={{ width: `${Math.min(100, pillar.actual_percentage * 2)}%` }}
+                      className={`h-full rounded-full transition-all ${pillar.color}`}
+                    />
                   </div>
                 </div>
-
-                <div className="w-full h-2 rounded-full bg-surface-muted overflow-hidden">
-                  <div
-                    style={{ width: `${Math.min(100, pillar.actual_percentage * 2)}%` }}
-                    className={`h-full rounded-full transition-all ${pillar.color}`}
-                  />
-                </div>
-              </div>
-            )
-          })}
-        </div>
+              )
+            })}
+          </div>
+        )}
 
         {/* Strategic Recommendation Callout */}
         <div className="p-4 rounded-xl bg-status-warning/10 border border-status-warning/20 flex items-start gap-3 text-xs">
@@ -419,48 +524,56 @@ export const AIStrategistStudio: React.FC<AIStrategistStudioProps> = ({ onNaviga
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {campaigns.map((camp) => (
-            <div
-              key={camp.id}
-              className="p-5 rounded-xl border border-border hover:border-brand-accent/40 bg-surface flex flex-col justify-between space-y-4 transition-colors"
-            >
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-sm text-foreground">{camp.title}</span>
-                  <Badge
-                    variant="outline"
-                    className={`text-[10px] py-0 capitalize ${
-                      camp.status === 'active'
-                        ? 'border-status-success/30 bg-status-success/10 text-status-success'
-                        : 'border-border text-foreground-secondary'
-                    }`}
-                  >
-                    {camp.status}
-                  </Badge>
+        {campaigns.length === 0 ? (
+          <EmptyState
+            icon={Compass}
+            title="No Strategic Campaigns Created Yet"
+            description="Strategic campaigns organize and coordinate multi-channel posts toward measurable brand launches and marketing milestones."
+          />
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {campaigns.map((camp) => (
+              <div
+                key={camp.id}
+                className="p-5 rounded-xl border border-border hover:border-brand-accent/40 bg-surface flex flex-col justify-between space-y-4 transition-colors"
+              >
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-sm text-foreground">{camp.title}</span>
+                    <Badge
+                      variant="outline"
+                      className={`text-[10px] py-0 capitalize ${
+                        camp.status === 'active'
+                          ? 'border-status-success/30 bg-status-success/10 text-status-success'
+                          : 'border-border text-foreground-secondary'
+                      }`}
+                    >
+                      {camp.status}
+                    </Badge>
+                  </div>
+                  <p className="text-xs text-foreground-secondary leading-relaxed">{camp.goal}</p>
                 </div>
-                <p className="text-xs text-foreground-secondary leading-relaxed">{camp.goal}</p>
-              </div>
 
-              <div className="space-y-2 pt-2 border-t border-border/60">
-                <div className="flex items-center justify-between text-xs text-foreground-secondary">
-                  <span>
-                    Schedule: {camp.start_date} – {camp.end_date}
-                  </span>
-                  <span>
-                    Progress: <strong className="text-foreground">{camp.posts_count}/{camp.target_posts} posts</strong>
-                  </span>
-                </div>
-                <div className="w-full h-1.5 rounded-full bg-surface-muted overflow-hidden">
-                  <div
-                    style={{ width: `${Math.round((camp.posts_count / camp.target_posts) * 100)}%` }}
-                    className="h-full rounded-full bg-brand-accent transition-all"
-                  />
+                <div className="space-y-2 pt-2 border-t border-border/60">
+                  <div className="flex items-center justify-between text-xs text-foreground-secondary">
+                    <span>
+                      Schedule: {camp.start_date} – {camp.end_date}
+                    </span>
+                    <span>
+                      Progress: <strong className="text-foreground">{camp.posts_count}/{camp.target_posts} posts</strong>
+                    </span>
+                  </div>
+                  <div className="w-full h-1.5 rounded-full bg-surface-muted overflow-hidden">
+                    <div
+                      style={{ width: `${Math.round((camp.posts_count / camp.target_posts) * 100)}%` }}
+                      className="h-full rounded-full bg-brand-accent transition-all"
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </Card>
     </div>
   )

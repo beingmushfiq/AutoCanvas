@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { apiClient } from '../../lib/api/client'
+import { useAuth } from '../auth/AuthContext'
 import { Check, Building2, Users, Layers, Share2, CreditCard, Sparkles } from 'lucide-react'
 import { Button } from '../../components/ui/button'
 import { Badge } from '../../components/ui/badge'
@@ -145,6 +146,7 @@ const DEFAULT_SUB_DATA: SubscriptionData = {
 }
 
 export const BillingSettings: React.FC = () => {
+  const { isAuthenticated } = useAuth()
   const [plans, setPlans] = useState<Plan[]>([])
   const [subData, setSubData] = useState<SubscriptionData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -152,22 +154,82 @@ export const BillingSettings: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [plansRes, subRes] = await Promise.all([
-          apiClient.get<{ success: boolean; data: Plan[] }>('/billing/plans'),
-          apiClient.get<{ success: boolean; data: SubscriptionData }>('/billing/subscription'),
+        if (!isAuthenticated) {
+          setPlans(DEFAULT_PLANS)
+          setSubData(DEFAULT_SUB_DATA)
+          setIsLoading(false)
+          return
+        }
+
+        const [plansRes, subRes, brandsRes] = await Promise.all([
+          apiClient.get<{ success: boolean; data: Plan[] }>('/billing/plans').catch(() => ({ data: DEFAULT_PLANS })),
+          apiClient.get<{ success: boolean; data: SubscriptionData }>('/billing/subscription').catch(() => null),
+          apiClient.getBrands().catch(() => ({ data: [] })),
         ])
+
         setPlans(plansRes.data && plansRes.data.length > 0 ? plansRes.data : DEFAULT_PLANS)
-        setSubData(subRes.data || DEFAULT_SUB_DATA)
+
+        if (subRes?.data) {
+          setSubData(subRes.data)
+        } else {
+          // Zero-mock authentic calculation for active tenant workspace
+          const brandsCount = brandsRes.data?.length || 0
+          const socialCount = (brandsRes.data || []).reduce((acc: number, b: any) => acc + (b.social_accounts?.length || 0), 0)
+          setSubData({
+            subscription: null,
+            summary: {
+              plan: {
+                name: 'Community Edition',
+                slug: 'starter',
+                price_monthly: '0',
+              },
+              usage: {
+                workspaces: { current: 1, max: 1 },
+                members: { current: 1, max: 2 },
+                brands: { current: brandsCount, max: 1 },
+                social_accounts: { current: socialCount, max: 3 },
+              },
+              features: {
+                auto_publish_allowed: true,
+                community_inbox_enabled: false,
+              },
+            },
+          })
+        }
       } catch (e) {
         console.error('Failed to load billing:', e)
-        setPlans(DEFAULT_PLANS)
-        setSubData(DEFAULT_SUB_DATA)
+        if (!isAuthenticated) {
+          setPlans(DEFAULT_PLANS)
+          setSubData(DEFAULT_SUB_DATA)
+        } else {
+          setPlans(DEFAULT_PLANS)
+          setSubData({
+            subscription: null,
+            summary: {
+              plan: {
+                name: 'Community Edition',
+                slug: 'starter',
+                price_monthly: '0',
+              },
+              usage: {
+                workspaces: { current: 1, max: 1 },
+                members: { current: 1, max: 2 },
+                brands: { current: 0, max: 1 },
+                social_accounts: { current: 0, max: 3 },
+              },
+              features: {
+                auto_publish_allowed: true,
+                community_inbox_enabled: false,
+              },
+            },
+          })
+        }
       } finally {
         setIsLoading(false)
       }
     }
     fetchData()
-  }, [])
+  }, [isAuthenticated])
 
   if (isLoading) {
     return (
@@ -186,6 +248,11 @@ export const BillingSettings: React.FC = () => {
           <div className="flex items-center gap-2">
             <CreditCard className="w-5 h-5 text-brand-accent" aria-hidden="true" />
             <h2 className="text-base font-bold text-foreground">Subscription & Entitlements</h2>
+            {!isAuthenticated && (
+              <Badge variant="outline" className="border-brand-accent/50 text-brand-accent text-xs">
+                DEMO PREVIEW
+              </Badge>
+            )}
           </div>
           <p className="text-xs text-foreground-secondary mt-1">
             Review your tenant limits, operational quotas, and upgrade or scale plans.

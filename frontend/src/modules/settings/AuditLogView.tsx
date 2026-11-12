@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { apiClient } from '../../lib/api/client'
+import { useAuth } from '../auth/AuthContext'
 import { History, Clock, ShieldCheck, Terminal, User } from 'lucide-react'
 import { Badge } from '../../components/ui/badge'
 import { Card } from '../../components/ui/card'
@@ -59,23 +60,30 @@ const DEFAULT_AUDIT_LOGS: AuditItem[] = [
 ]
 
 export const AuditLogView: React.FC = () => {
+  const { isAuthenticated } = useAuth()
   const [logs, setLogs] = useState<AuditItem[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     const fetchLogs = async () => {
       try {
+        if (!isAuthenticated) {
+          setLogs(DEFAULT_AUDIT_LOGS)
+          setIsLoading(false)
+          return
+        }
+
         const res = await apiClient.get<{ success: boolean; data: AuditItem[] }>('/audit-logs')
-        setLogs(res.data && res.data.length > 0 ? res.data : DEFAULT_AUDIT_LOGS)
+        setLogs(res.data && Array.isArray(res.data) ? res.data : [])
       } catch (e) {
         console.error('Failed to load audit logs:', e)
-        setLogs(DEFAULT_AUDIT_LOGS)
+        setLogs([])
       } finally {
         setIsLoading(false)
       }
     }
     fetchLogs()
-  }, [])
+  }, [isAuthenticated])
 
   if (isLoading) {
     return (
@@ -92,6 +100,11 @@ export const AuditLogView: React.FC = () => {
           <div className="flex items-center gap-2">
             <History className="w-5 h-5 text-brand-accent" aria-hidden="true" />
             <h2 className="text-base font-bold text-foreground">Governance & Audit Trail</h2>
+            {!isAuthenticated && (
+              <Badge variant="outline" className="border-brand-accent/50 text-brand-accent text-xs">
+                DEMO PREVIEW
+              </Badge>
+            )}
           </div>
           <p className="text-xs text-foreground-secondary mt-1">
             Immutable chronological ledger of administrative events, role changes, and daemon dispatches.

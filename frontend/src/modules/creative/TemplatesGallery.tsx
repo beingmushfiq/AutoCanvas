@@ -9,7 +9,7 @@ import { Button } from '../../components/ui/button'
 import { Badge } from '../../components/ui/badge'
 import { Card } from '../../components/ui/card'
 import { EmptyState } from '../../components/ui/empty-state'
-import { apiClient, type BrandSummary } from '../../lib/api/client'
+import { apiClient, type BrandSummary, type ApiResponse } from '../../lib/api/client'
 import { appToast } from '../../lib/toast'
 
 interface TemplatesGalleryProps {
@@ -97,7 +97,7 @@ export const TemplatesGallery: React.FC<TemplatesGalleryProps> = ({
 }) => {
   const [brands, setBrands] = useState<BrandSummary[]>([])
   const [selectedBrandId, setSelectedBrandId] = useState<string>('')
-  const [templates] = useState<CreativeTemplateItem[]>(DEFAULT_TEMPLATES)
+  const [templates, setTemplates] = useState<CreativeTemplateItem[]>(DEFAULT_TEMPLATES)
   const [categoryFilter, setCategoryFilter] = useState<string>('all')
   const [ratioFilter, setRatioFilter] = useState<string>('all')
   const [searchQuery, setSearchQuery] = useState<string>('')
@@ -117,6 +117,31 @@ export const TemplatesGallery: React.FC<TemplatesGalleryProps> = ({
       }
     }
     loadBrands()
+  }, [])
+
+  // Load server-side Chromium creative templates
+  useEffect(() => {
+    async function loadTemplates() {
+      try {
+        const res = await apiClient.get<ApiResponse<any[]>>('/creative/templates')
+        if (res.data && Array.isArray(res.data) && res.data.length > 0) {
+          const apiTemplates: CreativeTemplateItem[] = res.data.map((t: any) => ({
+            id: t.id,
+            name: t.name,
+            category: t.category || 'General',
+            description: t.description || 'Deterministic SVG template.',
+            aspect_ratios: t.aspect_ratios || ['1:1', '4:5', '16:9'],
+            preview_kicker: t.preview_kicker || 'AUTOCANVAS DESIGN',
+            preview_headline: t.preview_headline || t.name,
+            preview_cta: t.preview_cta || 'Learn More',
+          }))
+          setTemplates(apiTemplates)
+        }
+      } catch (err) {
+        console.error('Failed to load server templates:', err)
+      }
+    }
+    loadTemplates()
   }, [])
 
   // Categories

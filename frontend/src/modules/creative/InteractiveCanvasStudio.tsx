@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { Stage, Layer, Rect, Text, Group, Circle } from 'react-konva'
 import {
   Download,
@@ -233,6 +234,7 @@ const PRESET_TEMPLATES: Record<
 type LayerKey = 'badge' | 'headline' | 'body' | 'cta' | 'watermark'
 
 export const InteractiveCanvasStudio: React.FC = () => {
+  const [searchParams] = useSearchParams()
   const [selectedTemplateKey, setSelectedTemplateKey] = useState<string>('executive_slate')
   const [aspectRatio, setAspectRatio] = useState<'1:1' | '1200:628' | '9:16'>('1:1')
   const [layers, setLayers] = useState<CanvasLayerConfig>(PRESET_TEMPLATES.executive_slate.layers)
@@ -243,6 +245,23 @@ export const InteractiveCanvasStudio: React.FC = () => {
   const [saving, setSaving] = useState(false)
   const [serverRendering, setServerRendering] = useState(false)
   const [statusMessage, setStatusMessage] = useState<string | null>(null)
+
+  useEffect(() => {
+    const tplParam = searchParams.get('template')
+    if (tplParam) {
+      const resolvedKey =
+        PRESET_TEMPLATES[tplParam]
+          ? tplParam
+          : tplParam.includes('editorial') || tplParam.includes('quote')
+          ? 'kinetic_emerald'
+          : tplParam.includes('bilingual')
+          ? 'bengali_bilingual'
+          : 'executive_slate'
+
+      setSelectedTemplateKey(resolvedKey)
+      setLayers(JSON.parse(JSON.stringify(PRESET_TEMPLATES[resolvedKey].layers)))
+    }
+  }, [searchParams])
 
   useEffect(() => {
     apiClient.get<{ data: { id: string; name: string }[] }>('/brands')

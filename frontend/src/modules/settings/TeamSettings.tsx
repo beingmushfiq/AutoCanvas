@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { apiClient } from '../../lib/api/client'
+import { useAuth } from '../auth/AuthContext'
 import { UserPlus, Mail, Shield, AlertCircle, CheckCircle2, Users, X } from 'lucide-react'
 import { Button } from '../../components/ui/button'
 import { Badge } from '../../components/ui/badge'
@@ -23,7 +24,44 @@ interface Invitation {
   expires_at: string
 }
 
+const DEMO_MEMBERS: Member[] = [
+  {
+    id: 'mem-1',
+    user_id: 'usr-1',
+    name: 'Sarah Connor',
+    email: 'sarah@autocanvas.io',
+    role: 'admin',
+    joined_at: new Date(Date.now() - 86400000 * 30).toISOString(),
+  },
+  {
+    id: 'mem-2',
+    user_id: 'usr-2',
+    name: 'Marcus Vance',
+    email: 'marcus@autocanvas.io',
+    role: 'editor',
+    joined_at: new Date(Date.now() - 86400000 * 12).toISOString(),
+  },
+  {
+    id: 'mem-3',
+    user_id: 'usr-3',
+    name: 'Elena Rostova',
+    email: 'elena@autocanvas.io',
+    role: 'designer',
+    joined_at: new Date(Date.now() - 86400000 * 5).toISOString(),
+  },
+]
+
+const DEMO_INVITATIONS: Invitation[] = [
+  {
+    id: 'inv-1',
+    email: 'partner-agency@creativeops.co',
+    role: 'manager',
+    expires_at: new Date(Date.now() + 86400000 * 7).toISOString(),
+  },
+]
+
 export const TeamSettings: React.FC = () => {
+  const { isAuthenticated, user } = useAuth()
   const [members, setMembers] = useState<Member[]>([])
   const [invitations, setInvitations] = useState<Invitation[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -35,50 +73,48 @@ export const TeamSettings: React.FC = () => {
 
   const fetchTeam = async () => {
     setIsLoading(true)
+    if (!isAuthenticated) {
+      setMembers(DEMO_MEMBERS)
+      setInvitations(DEMO_INVITATIONS)
+      setIsLoading(false)
+      return
+    }
+
     try {
       const res = await apiClient.get<{
         success: boolean
         data: { members: Member[]; invitations: Invitation[] }
       }>('/organization/members')
-      setMembers(res.data.members || [])
-      setInvitations(res.data.invitations || [])
+
+      if (res.data?.members && res.data.members.length > 0) {
+        setMembers(res.data.members)
+      } else {
+        // Authenticated user is the active organization owner/admin
+        setMembers([
+          {
+            id: user?.id || 'owner-1',
+            user_id: user?.id || 'usr-owner',
+            name: user?.name || 'Workspace Owner',
+            email: user?.email || '',
+            role: 'admin',
+            joined_at: new Date().toISOString(),
+          },
+        ])
+      }
+      setInvitations(res.data?.invitations || [])
     } catch (e) {
       console.error('Failed to load team:', e)
-      // Fallback mock team data if API server is not running in sandbox
       setMembers([
         {
-          id: 'mem-1',
-          user_id: 'usr-1',
-          name: 'Sarah Connor',
-          email: 'sarah@autocanvas.io',
+          id: user?.id || 'owner-1',
+          user_id: user?.id || 'usr-owner',
+          name: user?.name || 'Workspace Owner',
+          email: user?.email || '',
           role: 'admin',
-          joined_at: new Date(Date.now() - 86400000 * 30).toISOString(),
-        },
-        {
-          id: 'mem-2',
-          user_id: 'usr-2',
-          name: 'Marcus Vance',
-          email: 'marcus@autocanvas.io',
-          role: 'editor',
-          joined_at: new Date(Date.now() - 86400000 * 12).toISOString(),
-        },
-        {
-          id: 'mem-3',
-          user_id: 'usr-3',
-          name: 'Elena Rostova',
-          email: 'elena@autocanvas.io',
-          role: 'designer',
-          joined_at: new Date(Date.now() - 86400000 * 5).toISOString(),
+          joined_at: new Date().toISOString(),
         },
       ])
-      setInvitations([
-        {
-          id: 'inv-1',
-          email: 'partner-agency@creativeops.co',
-          role: 'manager',
-          expires_at: new Date(Date.now() + 86400000 * 7).toISOString(),
-        },
-      ])
+      setInvitations([])
     } finally {
       setIsLoading(false)
     }
@@ -86,7 +122,7 @@ export const TeamSettings: React.FC = () => {
 
   useEffect(() => {
     fetchTeam()
-  }, [])
+  }, [isAuthenticated, user?.id])
 
   const handleInvite = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -102,20 +138,24 @@ export const TeamSettings: React.FC = () => {
       setInviteEmail('')
       setShowInviteModal(false)
       fetchTeam()
-    } catch {
-      // In offline/mock mode, simulate invitation add
-      setInvitations([
-        ...invitations,
-        {
-          id: `inv-${Date.now()}`,
-          email: inviteEmail,
-          role: inviteRole,
-          expires_at: new Date(Date.now() + 86400000 * 7).toISOString(),
-        },
-      ])
-      setFeedback({ type: 'success', message: `Invitation dispatched to ${inviteEmail}` })
-      setInviteEmail('')
-      setShowInviteModal(false)
+    } catch (err: any) {
+      if (!isAuthenticated) {
+        // In demo mode, simulate invitation addition
+        setInvitations([
+          ...invitations,
+          {
+            id: `inv-${Date.now()}`,
+            email: inviteEmail,
+            role: inviteRole,
+            expires_at: new Date(Date.now() + 86400000 * 7).toISOString(),
+          },
+        ])
+        setFeedback({ type: 'success', message: `Invitation dispatched to ${inviteEmail} (Demo Preview)` })
+        setInviteEmail('')
+        setShowInviteModal(false)
+      } else {
+        setFeedback({ type: 'error', message: err.message || 'Failed to dispatch invitation' })
+      }
     } finally {
       setIsSubmitting(false)
     }
@@ -141,6 +181,11 @@ export const TeamSettings: React.FC = () => {
           <div className="flex items-center gap-2">
             <Users className="w-5 h-5 text-brand-accent" aria-hidden="true" />
             <h2 className="text-base font-bold text-foreground">Team & Access Control</h2>
+            {!isAuthenticated && (
+              <Badge variant="outline" className="border-brand-accent/50 text-brand-accent text-xs">
+                DEMO PREVIEW
+              </Badge>
+            )}
           </div>
           <p className="text-xs text-foreground-secondary mt-1">
             Manage organization collaborators, invite members, and configure role-based permissions.
