@@ -1,10 +1,15 @@
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
 import { ChevronDown } from 'lucide-react'
+import type { PublicCmsData } from '../../../lib/api/client'
 
 interface FaqItem {
   question: string
   answer: string
+}
+
+interface FaqSectionProps {
+  cmsFaq?: PublicCmsData['faq']
 }
 
 const FAQS: FaqItem[] = [
@@ -35,8 +40,10 @@ const FAQS: FaqItem[] = [
   },
 ]
 
-export const FaqSection: React.FC = () => {
+export const FaqSection: React.FC<FaqSectionProps> = ({ cmsFaq }) => {
   const [openIndex, setOpenIndex] = useState<number | null>(0)
+  const items = cmsFaq?.items && cmsFaq.items.length > 0 ? cmsFaq.items : FAQS
+  const title = cmsFaq?.section_title || 'Clear answers for busy teams.'
 
   return (
     <section id="faq" className="py-24 border-t border-border bg-background">
@@ -46,7 +53,7 @@ export const FaqSection: React.FC = () => {
             FREQUENTLY ASKED QUESTIONS
           </span>
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground mt-2">
-            Clear answers for busy teams.
+            {title}
           </h2>
           <p className="text-sm text-foreground-secondary mt-3 leading-relaxed">
             Everything you need to know about AutoCanvas publishing quality, safety, and privacy.
@@ -54,7 +61,7 @@ export const FaqSection: React.FC = () => {
         </div>
 
         <div className="space-y-4">
-          {FAQS.map((faq, index) => {
+          {items.map((faq, index) => {
             const isOpen = openIndex === index
             return (
               <div

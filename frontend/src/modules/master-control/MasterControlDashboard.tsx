@@ -931,6 +931,139 @@ export const MasterControlDashboard: React.FC<MasterControlDashboardProps> = ({ 
                   </div>
                 )}
 
+                {activeCmsBlockKey === 'seo' && (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between p-3 rounded-xl border border-border bg-background">
+                      <div>
+                        <div className="text-xs font-semibold text-foreground">Discovery Diagnostics</div>
+                        <div className="text-[11px] text-foreground-secondary">Verify public crawler discovery endpoints</div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <a
+                          href="/robots.txt"
+                          target="_blank"
+                          rel="noreferrer"
+                          className="px-2.5 py-1 rounded-lg border border-border bg-surface text-foreground hover:bg-surface-raised text-[11px] font-mono transition-colors"
+                        >
+                          View /robots.txt
+                        </a>
+                        <a
+                          href="/sitemap.xml"
+                          target="_blank"
+                          rel="noreferrer"
+                          className="px-2.5 py-1 rounded-lg border border-border bg-surface text-foreground hover:bg-surface-raised text-[11px] font-mono transition-colors"
+                        >
+                          View /sitemap.xml
+                        </a>
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="text-xs font-medium text-foreground-secondary">
+                          Global Meta Title
+                        </label>
+                        <span className="text-[10px] font-mono text-foreground-muted">
+                          {(cmsBlockForm.meta_title ?? '').length}/60 chars
+                        </span>
+                      </div>
+                      <input
+                        type="text"
+                        value={cmsBlockForm.meta_title ?? ''}
+                        onChange={(e) => setCmsBlockForm({ ...cmsBlockForm, meta_title: e.target.value })}
+                        placeholder="AutoCanvas — Autonomous Social Media Management"
+                        className="w-full px-3.5 py-2 rounded-xl border border-border bg-background text-foreground text-xs focus:ring-1 focus:ring-brand-accent outline-hidden"
+                      />
+                    </div>
+
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="text-xs font-medium text-foreground-secondary">
+                          Global Meta Description
+                        </label>
+                        <span className="text-[10px] font-mono text-foreground-muted">
+                          {(cmsBlockForm.meta_description ?? '').length}/160 chars
+                        </span>
+                      </div>
+                      <textarea
+                        rows={3}
+                        value={cmsBlockForm.meta_description ?? ''}
+                        onChange={(e) => setCmsBlockForm({ ...cmsBlockForm, meta_description: e.target.value })}
+                        placeholder="Enterprise-grade multi-tenant social media management platform..."
+                        className="w-full p-3.5 rounded-xl border border-border bg-background text-foreground text-xs focus:ring-1 focus:ring-brand-accent outline-hidden"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs font-medium text-foreground-secondary mb-1">
+                          Canonical URL
+                        </label>
+                        <input
+                          type="text"
+                          value={cmsBlockForm.canonical_url ?? ''}
+                          onChange={(e) => setCmsBlockForm({ ...cmsBlockForm, canonical_url: e.target.value })}
+                          placeholder="https://autocanvas.devcenterpoint.com"
+                          className="w-full px-3.5 py-2 rounded-xl border border-border bg-background text-foreground text-xs focus:ring-1 focus:ring-brand-accent outline-hidden"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-foreground-secondary mb-1">
+                          Robots Indexing Policy
+                        </label>
+                        <select
+                          value={cmsBlockForm.robots_policy ?? 'index, follow'}
+                          onChange={(e) => setCmsBlockForm({ ...cmsBlockForm, robots_policy: e.target.value })}
+                          className="w-full px-3.5 py-2 rounded-xl border border-border bg-background text-foreground text-xs focus:ring-1 focus:ring-brand-accent outline-hidden"
+                        >
+                          <option value="index, follow">index, follow (Allow public indexing)</option>
+                          <option value="noindex, nofollow">noindex, nofollow (Pause indexing)</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs font-medium text-foreground-secondary mb-1">
+                          OpenGraph Image URL
+                        </label>
+                        <input
+                          type="text"
+                          value={cmsBlockForm.og_image_url ?? ''}
+                          onChange={(e) => setCmsBlockForm({ ...cmsBlockForm, og_image_url: e.target.value })}
+                          placeholder="/brand/og-share.png"
+                          className="w-full px-3.5 py-2 rounded-xl border border-border bg-background text-foreground text-xs focus:ring-1 focus:ring-brand-accent outline-hidden"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-foreground-secondary mb-1">
+                          Twitter / X Handle
+                        </label>
+                        <input
+                          type="text"
+                          value={cmsBlockForm.twitter_handle ?? ''}
+                          onChange={(e) => setCmsBlockForm({ ...cmsBlockForm, twitter_handle: e.target.value })}
+                          placeholder="@devcenterpoint"
+                          className="w-full px-3.5 py-2 rounded-xl border border-border bg-background text-foreground text-xs focus:ring-1 focus:ring-brand-accent outline-hidden"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-medium text-foreground-secondary mb-1">
+                        Meta Keywords (Comma separated)
+                      </label>
+                      <input
+                        type="text"
+                        value={cmsBlockForm.meta_keywords ?? ''}
+                        onChange={(e) => setCmsBlockForm({ ...cmsBlockForm, meta_keywords: e.target.value })}
+                        placeholder="AI social media management, social media scheduling, multi-brand"
+                        className="w-full px-3.5 py-2 rounded-xl border border-border bg-background text-foreground text-xs focus:ring-1 focus:ring-brand-accent outline-hidden"
+                      />
+                    </div>
+                  </div>
+                )}
+
                 {/* Raw JSON Code Box for Fine-Grained Precision */}
                 <div className="pt-2">
                   <div className="flex items-center justify-between mb-1.5">
@@ -991,7 +1124,50 @@ export const MasterControlDashboard: React.FC<MasterControlDashboardProps> = ({ 
                     </div>
                   )}
 
-                  {activeCmsBlockKey !== 'hero' && (
+                  {activeCmsBlockKey === 'seo' && (
+                    <div className="p-6 rounded-xl border border-border bg-background space-y-4">
+                      <div>
+                        <span className="text-[11px] font-mono font-semibold uppercase text-brand-accent">
+                          Search Result Snippet Simulation
+                        </span>
+                        <div className="mt-2 p-4 rounded-xl border border-border bg-surface space-y-1">
+                          <div className="text-xs font-mono text-foreground-secondary truncate">
+                            {cmsBlockForm.canonical_url || 'https://autocanvas.devcenterpoint.com'}
+                          </div>
+                          <div className="text-base font-semibold text-foreground hover:underline cursor-pointer">
+                            {cmsBlockForm.meta_title || 'AutoCanvas — Autonomous Social Media Management'}
+                          </div>
+                          <div className="text-xs text-foreground-secondary line-clamp-2 leading-relaxed">
+                            {cmsBlockForm.meta_description || 'Enterprise-grade multi-tenant social media management platform featuring deterministic AI creative generation, multi-brand workspace isolation, and idempotent publishing.'}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div>
+                        <span className="text-[11px] font-mono font-semibold uppercase text-brand-accent">
+                          Social Sharing Card Preview
+                        </span>
+                        <div className="mt-2 rounded-xl border border-border bg-surface overflow-hidden">
+                          <div className="h-28 bg-surface-raised flex items-center justify-center border-b border-border text-foreground-muted text-xs font-mono">
+                            {cmsBlockForm.og_image_url || '/brand/og-share.png'}
+                          </div>
+                          <div className="p-3 space-y-1">
+                            <div className="text-[10px] uppercase font-mono text-foreground-muted">
+                              autocanvas.devcenterpoint.com
+                            </div>
+                            <div className="text-xs font-bold text-foreground">
+                              {cmsBlockForm.meta_title || 'AutoCanvas — Autonomous Social Media Management'}
+                            </div>
+                            <div className="text-[11px] text-foreground-secondary line-clamp-2">
+                              {cmsBlockForm.meta_description || 'The autonomous social operating system engineered by DevCenterPoint.'}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {activeCmsBlockKey !== 'hero' && activeCmsBlockKey !== 'seo' && (
                     <div className="p-6 rounded-xl border border-border bg-background space-y-3">
                       <h3 className="text-sm font-bold text-foreground">
                         {cmsBlockForm.section_title || `${activeCmsBlockKey} Section`}

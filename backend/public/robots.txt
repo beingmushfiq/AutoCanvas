@@ -1,2 +1,28 @@
+# AutoCanvas (DevCenterPoint) — Robots Exclusion Protocol
+# Compliant with RFC 9309 and search engine indexation boundaries
+
 User-agent: *
-Disallow:
+Allow: /
+Allow: /build/
+Allow: /brand/
+Allow: /favicon*
+Disallow: /api/
+Disallow: /workspace/
+Disallow: /master-control/
+Disallow: /storage/
+Disallow: /oauth/
+Disallow: /reset-password
+
+# Conversational AI Search Bots (Perplexity, ChatGPT, Claude, Gemini)
+User-agent: GPTBot
+User-agent: PerplexityBot
+User-agent: ClaudeBot
+User-agent: Google-Extended
+Allow: /
+Disallow: /api/
+Disallow: /workspace/
+Disallow: /master-control/
+Disallow: /storage/
+
+# XML Sitemap Reference
+Sitemap: https://autocanvas.devcenterpoint.com/sitemap.xml

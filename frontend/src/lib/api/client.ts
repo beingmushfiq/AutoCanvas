@@ -1107,6 +1107,19 @@ export interface PublicCmsData {
     section_title: string
     items: Array<{ question: string; answer: string }>
   }
+  seo?: {
+    meta_title: string
+    meta_description: string
+    meta_keywords?: string
+    canonical_url?: string
+    og_image_url?: string
+    twitter_handle?: string
+    robots_policy?: string
+    schema_organization_name?: string
+    schema_organization_url?: string
+    schema_logo_url?: string
+    social_profiles?: string[]
+  }
 }
 
 export interface CmsBlockItem {

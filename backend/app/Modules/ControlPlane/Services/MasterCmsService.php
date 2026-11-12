@@ -20,8 +20,17 @@ class MasterCmsService
     public function getPublicCmsData(): array
     {
         return Cache::remember(self::CACHE_KEY_PUBLIC_CMS, 3600, function () {
-            $blocks = CmsBlock::where('is_active', true)->get()->keyBy('block_key');
-            $theme = $this->getThemeOverrides();
+            try {
+                $blocks = CmsBlock::where('is_active', true)->get()->keyBy('block_key');
+            } catch (\Throwable) {
+                $blocks = collect();
+            }
+
+            try {
+                $theme = $this->getThemeOverrides();
+            } catch (\Throwable) {
+                $theme = null;
+            }
 
             return [
                 'branding' => [
@@ -43,6 +52,7 @@ class MasterCmsService
                 'comparison' => $blocks->get('comparison')?->content_json ?? $this->getFactoryComparison(),
                 'pricing' => $blocks->get('pricing')?->content_json ?? $this->getFactoryPricing(),
                 'faq' => $blocks->get('faq')?->content_json ?? $this->getFactoryFaq(),
+                'seo' => $blocks->get('seo')?->content_json ?? $this->getFactorySeo(),
             ];
         });
     }
@@ -204,6 +214,7 @@ class MasterCmsService
             'comparison' => ['title' => 'Deterministic vs. Generic Comparison', 'default' => $this->getFactoryComparison()],
             'pricing' => ['title' => 'Transparent Tier Pricing Matrix', 'default' => $this->getFactoryPricing()],
             'faq' => ['title' => 'Technical & Enterprise FAQs', 'default' => $this->getFactoryFaq()],
+            'seo' => ['title' => 'Search & Answer Engine Discovery (SEO/AEO/GEO)', 'default' => $this->getFactorySeo()],
         ];
 
         $result = [];
@@ -520,6 +531,26 @@ class MasterCmsService
                     'question' => 'Can I pay locally via bKash, Nagad, Rocket or Bank Wire?',
                     'answer' => 'Yes. AutoCanvas includes a dedicated local billing engine supporting instant offline transaction submissions for bKash, Nagad, Rocket, and direct Bangladeshi bank transfers with instant invoice generation.',
                 ],
+            ],
+        ];
+    }
+
+    public function getFactorySeo(): array
+    {
+        return [
+            'meta_title' => 'AutoCanvas — Autonomous Social Media Management & Creative Studio',
+            'meta_description' => 'Enterprise-grade multi-tenant social media management platform featuring deterministic AI creative generation, multi-brand workspace isolation, and idempotent cross-platform publishing.',
+            'meta_keywords' => 'AI social media management, multi-brand social publishing, social media scheduling, agency approval workflow, deterministic AI graphics, AutoCanvas, DevCenterPoint',
+            'canonical_url' => config('app.url', 'https://autocanvas.devcenterpoint.com'),
+            'og_image_url' => '/brand/og-share.png',
+            'twitter_handle' => '@devcenterpoint',
+            'robots_policy' => 'index, follow',
+            'schema_organization_name' => 'AutoCanvas',
+            'schema_organization_url' => config('app.url', 'https://autocanvas.devcenterpoint.com'),
+            'schema_logo_url' => '/brand/logo.svg',
+            'social_profiles' => [
+                'https://www.linkedin.com/company/devcenterpoint',
+                'https://twitter.com/devcenterpoint',
             ],
         ];
     }

@@ -1,0 +1,17 @@
+{
+  "version": "1.4.0",
+  "initialized_at": "2026-11-12T07:21:47.874Z",
+  "preset": "saas",
+  "installed_skills": [
+    "AI Search Visibility",
+    "Entity Optimization",
+    "AI Citations",
+    "Gap Analysis",
+    "Entity Coverage",
+    "Lead Generation",
+    "Schema Markup",
+    "SEO Orchestrator"
+  ],
+  "author": "Mushfiqur Rahman Aayan (@beingmushfiq)",
+  "maintainer": "DevCenterPoint (https://devcenterpoint.com)"
+}

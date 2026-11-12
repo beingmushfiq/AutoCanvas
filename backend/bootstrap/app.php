@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\EnsurePlatformAdmin;
+use App\Http\Middleware\EnsureRobotsIndexingHeaders;
 use App\Http\Middleware\EnsureTenantScope;
 use App\Http\Middleware\RequirePermission;
 use Illuminate\Foundation\Application;
@@ -16,6 +17,8 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->append(EnsureRobotsIndexingHeaders::class);
+
         $middleware->alias([
             'tenant' => EnsureTenantScope::class,
             'permission' => RequirePermission::class,

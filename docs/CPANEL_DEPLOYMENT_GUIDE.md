@@ -124,7 +124,7 @@ Open **Terminal** in cPanel:
 cd /home/devcente
 
 # 2. Clone your repository directly into AutoCanvas
-git clone <YOUR_GIT_REPOSITORY_URL> AutoCanvas
+git clone https://github.com/beingmushfiq/AutoCanvas
 
 # 3. Enter the repository
 cd /home/devcente/AutoCanvas
