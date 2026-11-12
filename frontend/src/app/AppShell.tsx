@@ -91,6 +91,18 @@ const BillingSettings = lazy(() =>
 const AuditLogView = lazy(() =>
   import('../modules/settings/AuditLogView').then((m) => ({ default: m.AuditLogView }))
 )
+const SocialListeningStudio = lazy(() =>
+  import('../modules/community/SocialListeningStudio').then((m) => ({ default: m.SocialListeningStudio }))
+)
+const AIStrategistStudio = lazy(() =>
+  import('../modules/research/AIStrategistStudio').then((m) => ({ default: m.AIStrategistStudio }))
+)
+const AutomationsManager = lazy(() =>
+  import('../modules/automation/AutomationsManager').then((m) => ({ default: m.AutomationsManager }))
+)
+const TemplatesGallery = lazy(() =>
+  import('../modules/creative/TemplatesGallery').then((m) => ({ default: m.TemplatesGallery }))
+)
 
 interface NavItemConfig {
   id: string
@@ -840,8 +852,21 @@ export const AppShell: React.FC<AppShellProps> = ({
                 {activeTab === 'inbox' && <SocialInboxStream />}
                 {activeTab === 'analytics' && <AnalyticsDashboard />}
                 {activeTab === 'autopilot' && <AutopilotCommandDeck />}
+                {activeTab === 'listening' && <SocialListeningStudio />}
+                {activeTab === 'strategist' && (
+                  <AIStrategistStudio onNavigateToContent={() => navigate('/workspace/content')} />
+                )}
+                {activeTab === 'automations' && (
+                  <AutomationsManager onNavigateToRadar={() => navigate('/workspace/radar')} />
+                )}
+                {activeTab === 'templates' && (
+                  <TemplatesGallery
+                    onSelectTemplate={(tplId) => navigate(`/workspace/creative?template=${tplId}`)}
+                    onGenerateContent={(tplId) => navigate(`/workspace/content?template=${tplId}`)}
+                  />
+                )}
 
-                {!['overview', 'creative', 'calendar', 'team', 'billing', 'audit', 'brands', 'knowledge', 'content', 'research', 'accounts', 'inbox', 'analytics', 'autopilot'].includes(activeTab) && (
+                {!['overview', 'creative', 'calendar', 'team', 'billing', 'audit', 'brands', 'knowledge', 'content', 'research', 'accounts', 'inbox', 'analytics', 'autopilot', 'listening', 'strategist', 'automations', 'templates'].includes(activeTab) && (
                   <EmptyState
                     icon={Sparkles}
                     title="Operational Workspace Ready"
