@@ -2,6 +2,7 @@
 
 namespace App\Modules\ControlPlane\Controllers;
 
+use App\Core\Security\SvgSanitizer;
 use App\Http\Controllers\Controller;
 use App\Modules\ControlPlane\Models\SystemChangeLog;
 use Illuminate\Http\JsonResponse;
@@ -31,20 +32,10 @@ class MasterAssetUploadController extends Controller
         // Perform SVG sanitization to neutralize stored XSS vulnerabilities
         if ($extension === 'svg' || $mime === 'image/svg+xml') {
             $content = file_get_contents($file->getRealPath());
-
-            // 1. Strip script tags
-            $content = preg_replace('/<script\b[^>]*>(.*?)<\/script>/is', '', $content);
-            // 2. Strip inline event handlers (onload, onclick, onerror, etc.)
-            $content = preg_replace('/\s*on[a-zA-Z]+\s*=\s*(["\']).*?\1/i', '', $content);
-            $content = preg_replace('/\s*on[a-zA-Z]+\s*=\s*[^>\s]+/i', '', $content);
-            // 3. Strip javascript: and data: text in href/src
-            $content = preg_replace('/href\s*=\s*(["\'])\s*javascript:[^"\']*\1/i', 'href=""', $content);
-            $content = preg_replace('/xlink:href\s*=\s*(["\'])\s*javascript:[^"\']*\1/i', 'xlink:href=""', $content);
-            // 4. Strip dangerous foreignObject, embed, and object tags
-            $content = preg_replace('/<(\/)?(foreignObject|embed|object|iframe|applet)\b[^>]*>/i', '', $content);
+            $sanitized = SvgSanitizer::sanitize($content);
 
             $path = "{$storageDir}/{$fileName}";
-            Storage::disk('public')->put($path, $content);
+            Storage::disk('public')->put($path, $sanitized);
         } else {
             $path = $file->storeAs($storageDir, $fileName, 'public');
         }

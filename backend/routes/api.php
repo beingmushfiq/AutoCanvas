@@ -66,15 +66,15 @@ Route::prefix('v1')->group(function () {
     Route::get('/billing/plans', [BillingController::class, 'plans']);
     Route::get('/cms/public-data', [MasterCmsController::class, 'publicData']);
 
-    // Public Agency Client Magic Review Links (Zero-login signed token)
-    Route::prefix('review')->group(function () {
+    // Public Agency Client Magic Review Links (Zero-login signed token, throttled against brute-force)
+    Route::prefix('review')->middleware('throttle:30,1')->group(function () {
         Route::get('/{token}', [ClientReviewController::class, 'show']);
         Route::post('/{token}/approve', [ClientReviewController::class, 'approve']);
         Route::post('/{token}/changes', [ClientReviewController::class, 'requestChanges']);
     });
 
-    // Public Payment Webhooks & IPNs
-    Route::prefix('webhooks')->group(function () {
+    // Public Payment Webhooks & IPNs (Throttled against flooding & abuse)
+    Route::prefix('webhooks')->middleware('throttle:60,1')->group(function () {
         Route::post('/bkash', [PaymentWebhookController::class, 'handleBkash']);
         Route::post('/sslcommerz', [PaymentWebhookController::class, 'handleSslCommerz']);
     });

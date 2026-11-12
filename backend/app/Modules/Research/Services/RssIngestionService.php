@@ -41,7 +41,8 @@ class RssIngestionService
         UrlSafetyValidator::assertSafeUrl($feed->url);
 
         try {
-            $request = Http::timeout(10)
+            $request = Http::withoutRedirecting()
+                ->timeout(10)
                 ->withUserAgent('AutoCanvas-ResearchBot/1.0 (+https://autocanvas.io)');
 
             if ($feed->etag) {
@@ -52,6 +53,26 @@ class RssIngestionService
             }
 
             $response = $request->get($feed->url);
+
+            // Handle HTTP redirects securely by validating destination against SSRF rules
+            if (in_array($response->status(), [301, 302, 307, 308], true)) {
+                $location = $response->header('Location');
+                if (! $location) {
+                    throw new Exception('HTTP redirect returned without Location header');
+                }
+                // Resolve relative redirect if needed
+                if (! str_starts_with($location, 'http://') && ! str_starts_with($location, 'https://')) {
+                    $parsedUrl = parse_url($feed->url);
+                    $location = ($parsedUrl['scheme'] ?? 'https') . '://' . ($parsedUrl['host'] ?? '') . '/' . ltrim($location, '/');
+                }
+                // Validate redirect destination against private IP / cloud metadata SSRF vectors
+                UrlSafetyValidator::assertSafeUrl($location);
+
+                $response = Http::withoutRedirecting()
+                    ->timeout(10)
+                    ->withUserAgent('AutoCanvas-ResearchBot/1.0 (+https://autocanvas.io)')
+                    ->get($location);
+            }
 
             if ($response->status() === 304) {
                 // Not modified since last fetch

@@ -4,6 +4,7 @@ use App\Http\Middleware\EnsurePlatformAdmin;
 use App\Http\Middleware\EnsureRobotsIndexingHeaders;
 use App\Http\Middleware\EnsureTenantScope;
 use App\Http\Middleware\RequirePermission;
+use App\Http\Middleware\SecurityHeadersMiddleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -18,6 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->append(EnsureRobotsIndexingHeaders::class);
+        $middleware->append(SecurityHeadersMiddleware::class);
 
         $middleware->alias([
             'tenant' => EnsureTenantScope::class,

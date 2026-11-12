@@ -22,6 +22,19 @@ class PaymentWebhookController extends Controller
      */
     public function handleBkash(Request $request): JsonResponse
     {
+        // 1. Cryptographic / Secret Webhook Authentication
+        if (! $this->verifyBkashSignature($request)) {
+            Log::warning('bKash Webhook Unauthorized: Invalid or missing webhook signature from IP: '.$request->ip());
+
+            return response()->json([
+                'success' => false,
+                'error' => [
+                    'code' => 'UNAUTHORIZED_WEBHOOK',
+                    'message' => 'Invalid or missing webhook authentication signature.',
+                ],
+            ], 401);
+        }
+
         $validated = $request->validate([
             'paymentID' => ['required', 'string'],
             'trxID' => ['required', 'string'],
@@ -46,6 +59,19 @@ class PaymentWebhookController extends Controller
         if ($transaction) {
             if ($transaction->status === 'verified') {
                 return response()->json(['message' => 'Transaction already processed.'], 200);
+            }
+
+            // 2. Strict Amount Integrity Verification
+            if ((float) $validated['amount'] !== (float) $transaction->amount) {
+                Log::warning("bKash Webhook Fraud Warning: Amount mismatch for trx {$trxRef}. Expected {$transaction->amount}, received {$validated['amount']}");
+
+                return response()->json([
+                    'success' => false,
+                    'error' => [
+                        'code' => 'AMOUNT_MISMATCH',
+                        'message' => 'Webhook amount does not match expected transaction amount.',
+                    ],
+                ], 422);
             }
 
             $transaction->update([
@@ -75,6 +101,19 @@ class PaymentWebhookController extends Controller
      */
     public function handleSslCommerz(Request $request): JsonResponse
     {
+        // 1. Cryptographic / Secret Webhook Authentication
+        if (! $this->verifySslCommerzSignature($request)) {
+            Log::warning('SSLCommerz IPN Unauthorized: Invalid or missing webhook signature from IP: '.$request->ip());
+
+            return response()->json([
+                'success' => false,
+                'error' => [
+                    'code' => 'UNAUTHORIZED_WEBHOOK',
+                    'message' => 'Invalid or missing webhook authentication signature.',
+                ],
+            ], 401);
+        }
+
         $validated = $request->validate([
             'tran_id' => ['required', 'string'],
             'val_id' => ['nullable', 'string'],
@@ -85,7 +124,7 @@ class PaymentWebhookController extends Controller
         $trxRef = strtoupper(trim($validated['tran_id']));
         Log::info("SSLCommerz IPN Received: tran_id={$trxRef}, status={$validated['status']}");
 
-        if (!in_array($validated['status'], ['VALID', 'VALIDATED'], true)) {
+        if (! in_array($validated['status'], ['VALID', 'VALIDATED'], true)) {
             return response()->json(['message' => 'SSLCommerz payment not valid, acknowledged.'], 200);
         }
 
@@ -96,6 +135,23 @@ class PaymentWebhookController extends Controller
             ->first();
 
         if ($transaction) {
+            if ($transaction->status === 'verified') {
+                return response()->json(['message' => 'Transaction already processed.'], 200);
+            }
+
+            // 2. Strict Amount Integrity Verification
+            if ((float) $validated['amount'] !== (float) $transaction->amount) {
+                Log::warning("SSLCommerz IPN Fraud Warning: Amount mismatch for trx {$trxRef}. Expected {$transaction->amount}, received {$validated['amount']}");
+
+                return response()->json([
+                    'success' => false,
+                    'error' => [
+                        'code' => 'AMOUNT_MISMATCH',
+                        'message' => 'IPN amount does not match expected transaction amount.',
+                    ],
+                ], 422);
+            }
+
             $transaction->update([
                 'status' => 'verified',
                 'gateway_payment_id' => $validated['val_id'] ?? null,
@@ -117,5 +173,41 @@ class PaymentWebhookController extends Controller
             'message' => 'SSLCommerz IPN processed successfully.',
         ]);
     }
-}
 
+    /**
+     * Verify bKash Webhook authorization signature or secret.
+     */
+    protected function verifyBkashSignature(Request $request): bool
+    {
+        $configuredSecret = config('services.bkash.webhook_secret') ?? env('BKASH_WEBHOOK_SECRET');
+        if (empty($configuredSecret)) {
+            return true;
+        }
+
+        $providedSecret = $request->header('X-Webhook-Secret')
+            ?? $request->header('X-BKASH-SIGNATURE')
+            ?? $request->bearerToken();
+
+        return hash_equals((string) $configuredSecret, (string) $providedSecret);
+    }
+
+    /**
+     * Verify SSLCommerz IPN authorization signature or secret.
+     */
+    protected function verifySslCommerzSignature(Request $request): bool
+    {
+        $configuredSecret = config('services.sslcommerz.webhook_secret')
+            ?? env('SSLCOMMERZ_WEBHOOK_SECRET')
+            ?? env('SSLCOMMERZ_STORE_PASSWD');
+
+        if (empty($configuredSecret)) {
+            return true;
+        }
+
+        $providedSecret = $request->header('X-Webhook-Secret')
+            ?? $request->input('verify_sign')
+            ?? $request->bearerToken();
+
+        return hash_equals((string) $configuredSecret, (string) $providedSecret);
+    }
+}

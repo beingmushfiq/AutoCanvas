@@ -2,6 +2,7 @@
 
 namespace App\Modules\Brand\Controllers;
 
+use App\Core\Security\SvgSanitizer;
 use App\Http\Controllers\Controller;
 use App\Modules\Brand\Models\Brand;
 use App\Modules\Brand\Models\BrandAsset;
@@ -9,6 +10,7 @@ use App\Modules\Organization\Services\AuditLogger;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class BrandAssetController extends Controller
 {
@@ -52,7 +54,20 @@ class BrandAssetController extends Controller
 
         $file = $request->file('file');
         $name = $request->input('name', $file->getClientOriginalName());
-        $path = $file->store("brands/{$brand->id}/assets", 'public');
+        $extension = strtolower($file->getClientOriginalExtension());
+        $mime = $file->getMimeType();
+        $isSvg = $extension === 'svg' || $mime === 'image/svg+xml';
+
+        if ($isSvg) {
+            $rawContent = file_get_contents($file->getRealPath());
+            $sanitized = SvgSanitizer::sanitize($rawContent);
+            $fileName = Str::random(40) . '.svg';
+            $path = "brands/{$brand->id}/assets/{$fileName}";
+            Storage::disk('public')->put($path, $sanitized);
+        } else {
+            $path = $file->store("brands/{$brand->id}/assets", 'public');
+        }
+
         $url = Storage::disk('public')->url($path);
 
         $dimensions = null;
