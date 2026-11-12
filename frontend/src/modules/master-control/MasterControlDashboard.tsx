@@ -22,6 +22,9 @@ import {
   SplitSquareVertical,
   Plus,
   Settings,
+  Code,
+  Trash2,
+  ChevronDown,
 } from 'lucide-react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { BreadcrumbBar } from '../../components/navigation/BreadcrumbBar'
@@ -32,6 +35,10 @@ import { BrandAssetUploader } from './components/BrandAssetUploader'
 import { RegisterTenantModal, type PlanItem } from './components/RegisterTenantModal'
 import { TenantDetailDrawer } from './components/TenantDetailDrawer'
 import { SuspendTenantModal } from './components/SuspendTenantModal'
+import { CmsFeaturesLivePreview } from './components/preview/CmsFeaturesLivePreview'
+import { CmsComparisonLivePreview } from './components/preview/CmsComparisonLivePreview'
+import { CmsPricingLivePreview } from './components/preview/CmsPricingLivePreview'
+import { CmsFaqLivePreview } from './components/preview/CmsFaqLivePreview'
 import {
   apiClient,
   type CmsBlockItem,
@@ -131,6 +138,7 @@ export const MasterControlDashboard: React.FC<MasterControlDashboardProps> = ({ 
   const [activeCmsBlockKey, setActiveCmsBlockKey] = useState<string>('hero')
   const [cmsBlockForm, setCmsBlockForm] = useState<any>({})
   const [showLivePreview, setShowLivePreview] = useState(true)
+  const [showRawJson, setShowRawJson] = useState(false)
 
   // 3. AI Prompt Foundry State
   const [promptGroups, setPromptGroups] = useState<AiPromptGroup[]>([])
@@ -901,6 +909,241 @@ export const MasterControlDashboard: React.FC<MasterControlDashboardProps> = ({ 
                   </div>
                 )}
 
+                {activeCmsBlockKey === 'features' && (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs font-medium text-foreground-secondary mb-1">
+                          Eyebrow Kicker
+                        </label>
+                        <input
+                          type="text"
+                          value={cmsBlockForm.section_kicker ?? ''}
+                          onChange={(e) => setCmsBlockForm({ ...cmsBlockForm, section_kicker: e.target.value })}
+                          placeholder="ORIGINALITY OVER GENERIC CONTENT"
+                          className="w-full px-3.5 py-2 rounded-xl border border-border bg-background text-foreground text-xs focus:ring-1 focus:ring-brand-accent outline-hidden"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-foreground-secondary mb-1">
+                          Section Title
+                        </label>
+                        <input
+                          type="text"
+                          value={cmsBlockForm.section_title ?? ''}
+                          onChange={(e) => setCmsBlockForm({ ...cmsBlockForm, section_title: e.target.value })}
+                          placeholder="Built for High-Growth Brands and Agencies"
+                          className="w-full px-3.5 py-2 rounded-xl border border-border bg-background text-foreground text-xs focus:ring-1 focus:ring-brand-accent outline-hidden"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="text-xs font-medium text-foreground-secondary">
+                          Feature Cards ({(cmsBlockForm.items || []).length})
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newItems = [...(cmsBlockForm.items || []), {
+                              title: 'New Feature Capability',
+                              description: 'Description of the architectural capability.',
+                              pill: 'Autonomous',
+                              icon: 'Sparkles',
+                            }]
+                            setCmsBlockForm({ ...cmsBlockForm, items: newItems })
+                          }}
+                          className="inline-flex items-center gap-1 text-[11px] font-mono text-brand-accent hover:underline"
+                        >
+                          <Plus className="w-3 h-3" /> Add Feature Card
+                        </button>
+                      </div>
+
+                      <div className="space-y-3 max-h-72 overflow-y-auto pr-1">
+                        {(cmsBlockForm.items || []).map((item: any, idx: number) => (
+                          <div key={idx} className="p-3 rounded-xl border border-border bg-background/60 space-y-2 relative">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] font-mono font-bold text-brand-accent">
+                                Card #{idx + 1}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const filtered = (cmsBlockForm.items || []).filter((_: any, i: number) => i !== idx)
+                                  setCmsBlockForm({ ...cmsBlockForm, items: filtered })
+                                }}
+                                className="text-foreground-muted hover:text-status-danger transition-colors p-1"
+                                title="Remove item"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                            <div className="grid grid-cols-3 gap-2">
+                              <div className="col-span-2">
+                                <input
+                                  type="text"
+                                  value={item.title ?? ''}
+                                  onChange={(e) => {
+                                    const updated = [...(cmsBlockForm.items || [])]
+                                    updated[idx] = { ...updated[idx], title: e.target.value }
+                                    setCmsBlockForm({ ...cmsBlockForm, items: updated })
+                                  }}
+                                  placeholder="Feature Title"
+                                  className="w-full px-2.5 py-1.5 rounded-lg border border-border bg-background text-foreground text-xs focus:ring-1 focus:ring-brand-accent outline-hidden"
+                                />
+                              </div>
+                              <div>
+                                <input
+                                  type="text"
+                                  value={item.pill ?? ''}
+                                  onChange={(e) => {
+                                    const updated = [...(cmsBlockForm.items || [])]
+                                    updated[idx] = { ...updated[idx], pill: e.target.value }
+                                    setCmsBlockForm({ ...cmsBlockForm, items: updated })
+                                  }}
+                                  placeholder="Pill Badge"
+                                  className="w-full px-2.5 py-1.5 rounded-lg border border-border bg-background text-foreground text-xs focus:ring-1 focus:ring-brand-accent outline-hidden"
+                                />
+                              </div>
+                            </div>
+                            <textarea
+                              rows={2}
+                              value={item.description ?? ''}
+                              onChange={(e) => {
+                                const updated = [...(cmsBlockForm.items || [])]
+                                updated[idx] = { ...updated[idx], description: e.target.value }
+                                setCmsBlockForm({ ...cmsBlockForm, items: updated })
+                              }}
+                              placeholder="Feature description text..."
+                              className="w-full px-2.5 py-1.5 rounded-lg border border-border bg-background text-foreground text-xs focus:ring-1 focus:ring-brand-accent outline-hidden"
+                            />
+                            <div className="flex items-center gap-2">
+                              <span className="text-[10px] font-mono text-foreground-muted">Icon:</span>
+                              <input
+                                type="text"
+                                value={item.icon ?? 'Sparkles'}
+                                onChange={(e) => {
+                                  const updated = [...(cmsBlockForm.items || [])]
+                                  updated[idx] = { ...updated[idx], icon: e.target.value }
+                                  setCmsBlockForm({ ...cmsBlockForm, items: updated })
+                                }}
+                                placeholder="Compass, Palette, ShieldCheck, Share2, Zap..."
+                                className="w-40 px-2 py-1 rounded border border-border bg-background text-foreground text-[11px] font-mono focus:ring-1 focus:ring-brand-accent outline-hidden"
+                              />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {activeCmsBlockKey === 'comparison' && (
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-xs font-medium text-foreground-secondary mb-1">
+                        Comparison Section Title
+                      </label>
+                      <input
+                        type="text"
+                        value={cmsBlockForm.section_title ?? ''}
+                        onChange={(e) => setCmsBlockForm({ ...cmsBlockForm, section_title: e.target.value })}
+                        placeholder="AutoCanvas vs. Generic AI Tools"
+                        className="w-full px-3.5 py-2 rounded-xl border border-border bg-background text-foreground text-xs focus:ring-1 focus:ring-brand-accent outline-hidden"
+                      />
+                    </div>
+
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="text-xs font-medium text-foreground-secondary">
+                          Comparison Rows ({(cmsBlockForm.rows || []).length})
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newRows = [...(cmsBlockForm.rows || []), {
+                              capability: 'New Capability',
+                              autocanvas: 'Deterministic, studio-grade execution',
+                              generic_tools: 'Unreliable generic output',
+                            }]
+                            setCmsBlockForm({ ...cmsBlockForm, rows: newRows })
+                          }}
+                          className="inline-flex items-center gap-1 text-[11px] font-mono text-brand-accent hover:underline"
+                        >
+                          <Plus className="w-3 h-3" /> Add Comparison Row
+                        </button>
+                      </div>
+
+                      <div className="space-y-3 max-h-72 overflow-y-auto pr-1">
+                        {(cmsBlockForm.rows || []).map((row: any, idx: number) => (
+                          <div key={idx} className="p-3 rounded-xl border border-border bg-background/60 space-y-2 relative">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] font-mono font-bold text-brand-accent">
+                                Row #{idx + 1}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const filtered = (cmsBlockForm.rows || []).filter((_: any, i: number) => i !== idx)
+                                  setCmsBlockForm({ ...cmsBlockForm, rows: filtered })
+                                }}
+                                className="text-foreground-muted hover:text-status-danger transition-colors p-1"
+                                title="Remove row"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                            <div>
+                              <input
+                                type="text"
+                                value={row.capability ?? ''}
+                                onChange={(e) => {
+                                  const updated = [...(cmsBlockForm.rows || [])]
+                                  updated[idx] = { ...updated[idx], capability: e.target.value }
+                                  setCmsBlockForm({ ...cmsBlockForm, rows: updated })
+                                }}
+                                placeholder="Capability / Criteria"
+                                className="w-full px-2.5 py-1.5 rounded-lg border border-border bg-background text-foreground text-xs font-semibold focus:ring-1 focus:ring-brand-accent outline-hidden"
+                              />
+                            </div>
+                            <div className="grid grid-cols-2 gap-2">
+                              <div>
+                                <label className="block text-[10px] font-mono text-status-success mb-0.5">AutoCanvas Advantage</label>
+                                <textarea
+                                  rows={2}
+                                  value={row.autocanvas ?? ''}
+                                  onChange={(e) => {
+                                    const updated = [...(cmsBlockForm.rows || [])]
+                                    updated[idx] = { ...updated[idx], autocanvas: e.target.value }
+                                    setCmsBlockForm({ ...cmsBlockForm, rows: updated })
+                                  }}
+                                  placeholder="AutoCanvas advantage..."
+                                  className="w-full px-2.5 py-1.5 rounded-lg border border-border bg-background text-foreground text-xs focus:ring-1 focus:ring-brand-accent outline-hidden"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-[10px] font-mono text-status-danger mb-0.5">Generic Tools Flaw</label>
+                                <textarea
+                                  rows={2}
+                                  value={row.generic_tools ?? ''}
+                                  onChange={(e) => {
+                                    const updated = [...(cmsBlockForm.rows || [])]
+                                    updated[idx] = { ...updated[idx], generic_tools: e.target.value }
+                                    setCmsBlockForm({ ...cmsBlockForm, rows: updated })
+                                  }}
+                                  placeholder="Generic tools failure..."
+                                  className="w-full px-2.5 py-1.5 rounded-lg border border-border bg-background text-foreground text-xs focus:ring-1 focus:ring-brand-accent outline-hidden"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {activeCmsBlockKey === 'pricing' && (
                   <div className="space-y-4">
                     <div>
@@ -926,7 +1169,90 @@ export const MasterControlDashboard: React.FC<MasterControlDashboardProps> = ({ 
                       />
                     </div>
                     <div className="text-xs text-foreground-secondary">
-                      Tiers are dynamically formatted. JSON edit available below for rapid modifications.
+                      Tiers are dynamically previewed in the right pane. Open the Direct JSON editor below for fine-grained tier modifications.
+                    </div>
+                  </div>
+                )}
+
+                {activeCmsBlockKey === 'faq' && (
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-xs font-medium text-foreground-secondary mb-1">
+                        FAQ Section Title
+                      </label>
+                      <input
+                        type="text"
+                        value={cmsBlockForm.section_title ?? ''}
+                        onChange={(e) => setCmsBlockForm({ ...cmsBlockForm, section_title: e.target.value })}
+                        placeholder="Frequently Answered Inquiries"
+                        className="w-full px-3.5 py-2 rounded-xl border border-border bg-background text-foreground text-xs focus:ring-1 focus:ring-brand-accent outline-hidden"
+                      />
+                    </div>
+
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="text-xs font-medium text-foreground-secondary">
+                          FAQ Questions ({(cmsBlockForm.items || []).length})
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newItems = [...(cmsBlockForm.items || []), {
+                              question: 'New Question?',
+                              answer: 'Clear, concise explanation for your customers.',
+                            }]
+                            setCmsBlockForm({ ...cmsBlockForm, items: newItems })
+                          }}
+                          className="inline-flex items-center gap-1 text-[11px] font-mono text-brand-accent hover:underline"
+                        >
+                          <Plus className="w-3 h-3" /> Add Question
+                        </button>
+                      </div>
+
+                      <div className="space-y-3 max-h-72 overflow-y-auto pr-1">
+                        {(cmsBlockForm.items || []).map((faq: any, idx: number) => (
+                          <div key={idx} className="p-3 rounded-xl border border-border bg-background/60 space-y-2 relative">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] font-mono font-bold text-brand-accent">
+                                Q#{idx + 1}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const filtered = (cmsBlockForm.items || []).filter((_: any, i: number) => i !== idx)
+                                  setCmsBlockForm({ ...cmsBlockForm, items: filtered })
+                                }}
+                                className="text-foreground-muted hover:text-status-danger transition-colors p-1"
+                                title="Remove question"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                            <input
+                              type="text"
+                              value={faq.question ?? ''}
+                              onChange={(e) => {
+                                const updated = [...(cmsBlockForm.items || [])]
+                                updated[idx] = { ...updated[idx], question: e.target.value }
+                                setCmsBlockForm({ ...cmsBlockForm, items: updated })
+                              }}
+                              placeholder="Question text..."
+                              className="w-full px-2.5 py-1.5 rounded-lg border border-border bg-background text-foreground text-xs font-semibold focus:ring-1 focus:ring-brand-accent outline-hidden"
+                            />
+                            <textarea
+                              rows={2}
+                              value={faq.answer ?? ''}
+                              onChange={(e) => {
+                                const updated = [...(cmsBlockForm.items || [])]
+                                updated[idx] = { ...updated[idx], answer: e.target.value }
+                                setCmsBlockForm({ ...cmsBlockForm, items: updated })
+                              }}
+                              placeholder="Answer explanation..."
+                              className="w-full px-2.5 py-1.5 rounded-lg border border-border bg-background text-foreground text-xs focus:ring-1 focus:ring-brand-accent outline-hidden"
+                            />
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 )}
@@ -1080,26 +1406,35 @@ export const MasterControlDashboard: React.FC<MasterControlDashboardProps> = ({ 
                   </div>
                 )}
 
-                {/* Raw JSON Code Box for Fine-Grained Precision */}
-                <div className="pt-2">
+                {/* Raw JSON Code Box for Fine-Grained Precision (Collapsible) */}
+                <div className="pt-3 border-t border-border-subtle">
                   <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-[11px] font-mono text-foreground-muted">
-                      Direct JSON Payload Editor
-                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setShowRawJson(!showRawJson)}
+                      className="inline-flex items-center gap-2 text-[11px] font-mono font-semibold text-foreground-secondary hover:text-foreground transition-colors cursor-pointer"
+                    >
+                      <Code className="w-3.5 h-3.5 text-brand-accent" />
+                      <span>{showRawJson ? 'Hide Direct JSON Payload Editor' : 'Show Direct JSON Payload Editor'}</span>
+                      <ChevronDown className={`w-3 h-3 transition-transform ${showRawJson ? 'rotate-180' : ''}`} />
+                    </button>
+                    <span className="text-[10px] font-mono text-foreground-muted">Advanced Schema</span>
                   </div>
-                  <textarea
-                    rows={8}
-                    value={JSON.stringify(cmsBlockForm, null, 2)}
-                    onChange={(e) => {
-                      try {
-                        const parsed = JSON.parse(e.target.value)
-                        setCmsBlockForm(parsed)
-                      } catch {
-                        // ignore syntax errors during typing
-                      }
-                    }}
-                    className="w-full p-3.5 rounded-xl border border-border bg-background font-mono text-[11px] text-foreground focus:ring-1 focus:ring-brand-accent outline-hidden"
-                  />
+                  {showRawJson && (
+                    <textarea
+                      rows={8}
+                      value={JSON.stringify(cmsBlockForm, null, 2)}
+                      onChange={(e) => {
+                        try {
+                          const parsed = JSON.parse(e.target.value)
+                          setCmsBlockForm(parsed)
+                        } catch {
+                          // ignore syntax errors during typing
+                        }
+                      }}
+                      className="w-full p-3.5 rounded-xl border border-border bg-background font-mono text-[11px] text-foreground focus:ring-1 focus:ring-brand-accent outline-hidden"
+                    />
+                  )}
                 </div>
               </div>
 
@@ -1138,6 +1473,22 @@ export const MasterControlDashboard: React.FC<MasterControlDashboardProps> = ({ 
                         </span>
                       </div>
                     </div>
+                  )}
+
+                  {activeCmsBlockKey === 'features' && (
+                    <CmsFeaturesLivePreview data={cmsBlockForm} />
+                  )}
+
+                  {activeCmsBlockKey === 'comparison' && (
+                    <CmsComparisonLivePreview data={cmsBlockForm} />
+                  )}
+
+                  {activeCmsBlockKey === 'pricing' && (
+                    <CmsPricingLivePreview data={cmsBlockForm} />
+                  )}
+
+                  {activeCmsBlockKey === 'faq' && (
+                    <CmsFaqLivePreview data={cmsBlockForm} />
                   )}
 
                   {activeCmsBlockKey === 'seo' && (
@@ -1183,16 +1534,21 @@ export const MasterControlDashboard: React.FC<MasterControlDashboardProps> = ({ 
                     </div>
                   )}
 
-                  {activeCmsBlockKey !== 'hero' && activeCmsBlockKey !== 'seo' && (
-                    <div className="p-6 rounded-xl border border-border bg-background space-y-3">
-                      <h3 className="text-sm font-bold text-foreground">
-                        {cmsBlockForm.section_title || `${activeCmsBlockKey} Section`}
-                      </h3>
-                      <pre className="p-3 rounded-lg bg-surface text-[11px] font-mono text-foreground-secondary overflow-x-auto max-h-60">
-                        {JSON.stringify(cmsBlockForm, null, 2)}
-                      </pre>
-                    </div>
-                  )}
+                  {activeCmsBlockKey !== 'hero' &&
+                    activeCmsBlockKey !== 'features' &&
+                    activeCmsBlockKey !== 'comparison' &&
+                    activeCmsBlockKey !== 'pricing' &&
+                    activeCmsBlockKey !== 'faq' &&
+                    activeCmsBlockKey !== 'seo' && (
+                      <div className="p-6 rounded-xl border border-border bg-background space-y-3">
+                        <h3 className="text-sm font-bold text-foreground">
+                          {cmsBlockForm.section_title || `${activeCmsBlockKey} Section`}
+                        </h3>
+                        <pre className="p-3 rounded-lg bg-surface text-[11px] font-mono text-foreground-secondary overflow-x-auto max-h-60">
+                          {JSON.stringify(cmsBlockForm, null, 2)}
+                        </pre>
+                      </div>
+                    )}
                 </div>
               )}
             </div>

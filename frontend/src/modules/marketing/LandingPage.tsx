@@ -119,9 +119,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           onExploreDemo={onEnterApp || (() => onOpenAuth('register'))}
           cmsHero={cmsData?.hero}
         />
-        <PlatformPillarsSection />
-        <DeterministicComparisonSection />
-        <PricingSection onSelectPlan={() => onOpenAuth('register')} />
+        <PlatformPillarsSection cmsFeatures={cmsData?.features} />
+        <DeterministicComparisonSection cmsComparison={cmsData?.comparison} />
+        <PricingSection
+          onSelectPlan={() => onOpenAuth('register')}
+          cmsPricing={cmsData?.pricing}
+        />
         <FaqSection cmsFaq={cmsData?.faq} />
       </main>
 

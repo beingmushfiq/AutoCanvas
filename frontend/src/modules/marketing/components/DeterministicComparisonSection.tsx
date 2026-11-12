@@ -1,8 +1,33 @@
 import React from 'react'
 import { Check, X, ShieldAlert, Layers } from 'lucide-react'
 import { useGsap, gsap } from '../../../lib/motion/useGsap'
+import type { PublicCmsData } from '../../../lib/api/client'
 
-export const DeterministicComparisonSection: React.FC = () => {
+interface DeterministicComparisonSectionProps {
+  cmsComparison?: PublicCmsData['comparison']
+}
+
+const DEFAULT_ROWS = [
+  {
+    capability: 'Headline & Body Copy',
+    autocanvas: 'Full layer scene graph: edit headlines, swap imagery, or tweak colors in 1 click.',
+    generic_tools: 'Text cannot be edited, translated, or checked for typos after generation.',
+  },
+  {
+    capability: 'Brand Identity & Vector Logos',
+    autocanvas: 'Unaltered vector SVG brand marks; guaranteed contrast and color fidelity.',
+    generic_tools: 'Logos are distorted, violating official corporate brand guidelines.',
+  },
+  {
+    capability: 'Accessibility & Screen Readers',
+    autocanvas: 'Fully accessible DOM layer tree with non-drag keyboard editing controls.',
+    generic_tools: 'Inaccessible to screen readers (pure flat raster pixels with zero DOM semantics).',
+  },
+]
+
+export const DeterministicComparisonSection: React.FC<DeterministicComparisonSectionProps> = ({
+  cmsComparison,
+}) => {
   const sectionRef = useGsap(() => {
     gsap.fromTo(
       '.comparison-card',
@@ -21,6 +46,12 @@ export const DeterministicComparisonSection: React.FC = () => {
     )
   })
 
+  const title = cmsComparison?.section_title || 'Why generic AI generators fail real brands.'
+  const rows =
+    Array.isArray(cmsComparison?.rows) && cmsComparison.rows.length > 0
+      ? cmsComparison.rows
+      : DEFAULT_ROWS
+
   return (
     <section ref={sectionRef} id="comparison" className="py-24 border-t border-border bg-background">
       <div className="max-w-7xl mx-auto px-6">
@@ -29,7 +60,7 @@ export const DeterministicComparisonSection: React.FC = () => {
             PRECISION BRAND ARCHITECTURE
           </span>
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground mt-2">
-            Why generic AI generators fail real brands.
+            {title}
           </h2>
           <p className="text-sm text-foreground-secondary mt-3 leading-relaxed">
             Generic AI tools garble text, warp official logos, and produce messy graphics.
@@ -65,18 +96,15 @@ export const DeterministicComparisonSection: React.FC = () => {
             </div>
 
             <ul className="mt-8 space-y-3 pt-6 border-t border-border-subtle text-xs text-foreground-secondary">
-              <li className="flex items-start gap-2">
-                <X className="w-4 h-4 text-status-danger shrink-0 mt-0.5" />
-                <span>Text cannot be edited, translated, or checked for typos after generation.</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <X className="w-4 h-4 text-status-danger shrink-0 mt-0.5" />
-                <span>Logos are distorted, violating official corporate brand guidelines.</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <X className="w-4 h-4 text-status-danger shrink-0 mt-0.5" />
-                <span>Inaccessible to screen readers (pure flat raster pixels with zero DOM semantics).</span>
-              </li>
+              {rows.map((row, idx) => (
+                <li key={row.capability || idx} className="flex items-start gap-2">
+                  <X className="w-4 h-4 text-status-danger shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-semibold text-foreground mr-1.5">{row.capability}:</span>
+                    <span>{row.generic_tools}</span>
+                  </div>
+                </li>
+              ))}
             </ul>
           </div>
 
@@ -109,18 +137,15 @@ export const DeterministicComparisonSection: React.FC = () => {
             </div>
 
             <ul className="mt-8 space-y-3 pt-6 border-t border-border-subtle text-xs text-foreground-secondary">
-              <li className="flex items-start gap-2">
-                <Check className="w-4 h-4 text-status-success shrink-0 mt-0.5" />
-                <span>Full layer scene graph: edit headlines, swap imagery, or tweak colors in 1 click.</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <Check className="w-4 h-4 text-status-success shrink-0 mt-0.5" />
-                <span>Unaltered vector SVG brand marks; guaranteed contrast and color fidelity.</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <Check className="w-4 h-4 text-status-success shrink-0 mt-0.5" />
-                <span>Fully accessible DOM layer tree with non-drag keyboard editing controls.</span>
-              </li>
+              {rows.map((row, idx) => (
+                <li key={row.capability || idx} className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-status-success shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-semibold text-foreground mr-1.5">{row.capability}:</span>
+                    <span>{row.autocanvas}</span>
+                  </div>
+                </li>
+              ))}
             </ul>
           </div>
         </div>
