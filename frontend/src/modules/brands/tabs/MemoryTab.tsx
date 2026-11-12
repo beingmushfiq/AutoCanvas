@@ -9,6 +9,41 @@ interface MemoryTabProps {
   brandId: string
 }
 
+const DEMO_MEMORY_ITEMS: BrandMemoryItem[] = [
+  {
+    id: 'mem-demo-1',
+    category: 'successful_style',
+    title: 'Carousel Structure vs Single Image',
+    content: 'Audiences engage 3x more with structured 4-slide carousels on LinkedIn compared to static single images.',
+    confidence_score: 0.94,
+    created_at: new Date(Date.now() - 86400000 * 12).toISOString(),
+  },
+  {
+    id: 'mem-demo-2',
+    category: 'approved_fact',
+    title: 'Editorial Tone Restrictions',
+    content: 'Strictly avoid hollow marketing buzzwords such as "game-changer", "synergy", or "revolutionary" in copy.',
+    confidence_score: 0.98,
+    created_at: new Date(Date.now() - 86400000 * 20).toISOString(),
+  },
+  {
+    id: 'mem-demo-3',
+    category: 'audience_insight',
+    title: 'Peak Audience Responsiveness',
+    content: 'Executive followers on LinkedIn have maximum interaction velocity between 09:00 - 11:00 UTC on Tuesdays and Thursdays.',
+    confidence_score: 0.89,
+    created_at: new Date(Date.now() - 86400000 * 5).toISOString(),
+  },
+  {
+    id: 'mem-demo-4',
+    category: 'campaign_milestone',
+    title: 'Deterministic SVG Rendering Launch',
+    content: 'Generated 42,000 impressions in the first 48 hours with a 6.2% engagement rate across LinkedIn and Twitter.',
+    confidence_score: 0.96,
+    created_at: new Date(Date.now() - 86400000 * 2).toISOString(),
+  },
+]
+
 export const MemoryTab: React.FC<MemoryTabProps> = ({ brandId }) => {
   const [memories, setMemories] = useState<BrandMemoryItem[]>([])
   const [loading, setLoading] = useState(true)
@@ -23,6 +58,12 @@ export const MemoryTab: React.FC<MemoryTabProps> = ({ brandId }) => {
   const [submitting, setSubmitting] = useState(false)
 
   const fetchMemories = async () => {
+    if (brandId === 'demo-brand-1') {
+      setMemories(DEMO_MEMORY_ITEMS)
+      setLoading(false)
+      return
+    }
+
     try {
       setLoading(true)
       const res = await apiClient.get<ApiResponse<BrandMemoryItem[]>>(`/brands/${brandId}/memory`)

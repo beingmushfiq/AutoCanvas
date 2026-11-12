@@ -644,7 +644,7 @@ export const AutopilotCommandDeck: React.FC<AutopilotCommandDeckProps> = ({ curr
                         </div>
                         <span className="font-semibold text-foreground">{c.momentum_score}</span>
                       </div>
-                      <span className="truncate max-w-[120px]">{(c.source_domains || []).slice(0, 2).join(', ')}</span>
+                      <span className="truncate max-w-30">{(c.source_domains || []).slice(0, 2).join(', ')}</span>
                     </div>
                   </div>
                 ))}

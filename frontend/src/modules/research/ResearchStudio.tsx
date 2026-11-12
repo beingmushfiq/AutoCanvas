@@ -18,12 +18,89 @@ import { OpportunitiesRadar } from './OpportunitiesRadar'
 import { FeedsManager } from './FeedsManager'
 import { CompetitorManager } from './CompetitorManager'
 import { EmptyState } from '../../components/ui/empty-state'
+import { useAuth } from '../auth/AuthContext'
+
+const DEMO_BRANDS_LIST: BrandSummary[] = [
+  {
+    id: 'demo-brand-1',
+    name: 'AutoCanvas Global',
+    slug: 'autocanvas-global',
+    industry: 'Enterprise SaaS & Marketing Tech',
+    status: 'active',
+    primary_color: '#0f172a',
+    secondary_color: '#f59e0b',
+    primary_logo_url: null,
+    created_at: new Date(Date.now() - 86400000 * 30).toISOString(),
+  },
+]
+
+const DEMO_OPPORTUNITIES: ContentOpportunity[] = [
+  {
+    id: 'opp-demo-1',
+    brand_id: 'demo-brand-1',
+    content_pillar_id: 'pillar-1',
+    feed_article_id: 'art-demo-1',
+    title: 'Meta & LinkedIn Algorithm Shift: Favoring Long-Form Educational Carousels',
+    angle: 'How B2B brand marketers can capture 3x more algorithmic distribution using multi-slide vector assets.',
+    why_it_matters: 'The latest platform ranking update heavily penalizes single-sentence generic link shares, giving massive preference to native in-feed documents.',
+    recommended_channels: ['linkedin', 'twitter'],
+    urgency_score: 92,
+    freshness_score: 95,
+    overall_opportunity_score: 94,
+    status: 'new',
+    converted_content_item_id: null,
+    pillar: {
+      id: 'pillar-1',
+      name: 'Thought Leadership',
+      color_tag: 'var(--brand-accent)',
+      weight_percentage: 40,
+    },
+    article: {
+      id: 'art-demo-1',
+      title: 'B2B Social Algorithm Shifts: The Document Post Era',
+      url: 'https://news.socialops.io/b2b-algorithm-shift-2026',
+      summary: 'Data from over 2.4 million professional posts reveals document carousels capture 4.2x more dwell time.',
+      published_at: new Date(Date.now() - 3600000 * 4).toISOString(),
+    },
+    created_at: new Date(Date.now() - 3600000 * 2).toISOString(),
+  },
+  {
+    id: 'opp-demo-2',
+    brand_id: 'demo-brand-1',
+    content_pillar_id: 'pillar-2',
+    feed_article_id: 'art-demo-2',
+    title: 'Why Creative AI Must Embrace Vector Determinism',
+    angle: 'Contrasting unpredictable diffusion models with pixel-perfect SVG template rendering for enterprise brand safety.',
+    why_it_matters: 'Design directors are rejecting generative AI tools that hallucinate typography or misrender corporate logos.',
+    recommended_channels: ['linkedin', 'instagram'],
+    urgency_score: 84,
+    freshness_score: 88,
+    overall_opportunity_score: 86,
+    status: 'new',
+    converted_content_item_id: null,
+    pillar: {
+      id: 'pillar-2',
+      name: 'Product Engineering',
+      color_tag: 'var(--brand-primary)',
+      weight_percentage: 30,
+    },
+    article: {
+      id: 'art-demo-2',
+      title: 'The Enterprise Gap in Generative Design',
+      url: 'https://designops.weekly/generative-typography-pitfalls',
+      summary: 'Why deterministic Chromium engines are replacing diffusion pipelines in automated marketing.',
+      published_at: new Date(Date.now() - 3600000 * 12).toISOString(),
+    },
+    created_at: new Date(Date.now() - 3600000 * 6).toISOString(),
+  },
+]
 
 interface ResearchStudioProps {
   onNavigateToContent?: () => void
 }
 
 export const ResearchStudio: React.FC<ResearchStudioProps> = ({ onNavigateToContent }) => {
+  const { isAuthenticated } = useAuth()
   const [brands, setBrands] = useState<BrandSummary[]>([])
   const [activeBrandId, setActiveBrandId] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<'opportunities' | 'feeds' | 'competitors'>('opportunities')
@@ -33,6 +110,14 @@ export const ResearchStudio: React.FC<ResearchStudioProps> = ({ onNavigateToCont
   const [error, setError] = useState<string | null>(null)
 
   const fetchBrands = async () => {
+    if (!isAuthenticated) {
+      setBrands(DEMO_BRANDS_LIST)
+      setActiveBrandId('demo-brand-1')
+      setOpportunities(DEMO_OPPORTUNITIES)
+      setLoading(false)
+      return
+    }
+
     try {
       setLoading(true)
       const res = await apiClient.get<ApiResponse<BrandSummary[]>>('/brands')
@@ -45,26 +130,33 @@ export const ResearchStudio: React.FC<ResearchStudioProps> = ({ onNavigateToCont
         await fetchOpportunities(id)
       } else {
         setActiveBrandId(null)
+        setOpportunities([])
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load brands')
+      setOpportunities([])
     } finally {
       setLoading(false)
     }
   }
 
   const fetchOpportunities = async (brandId: string) => {
+    if (!isAuthenticated) {
+      setOpportunities(DEMO_OPPORTUNITIES)
+      return
+    }
     try {
       const res = await apiClient.get<ApiResponse<ContentOpportunity[]>>(`/brands/${brandId}/opportunities?status=new`)
       setOpportunities(res.data || [])
     } catch (err) {
       console.error('Failed to load opportunities:', err)
+      setOpportunities([])
     }
   }
 
   useEffect(() => {
     fetchBrands()
-  }, [])
+  }, [isAuthenticated])
 
   const handleBrandChange = (brandId: string) => {
     setActiveBrandId(brandId)
@@ -104,6 +196,11 @@ export const ResearchStudio: React.FC<ResearchStudioProps> = ({ onNavigateToCont
               MOD-04 & MOD-05
             </span>
             <span className="text-xs text-foreground-secondary">Research & Trend Discovery</span>
+            {!isAuthenticated && (
+              <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-brand-accent/15 text-brand-accent border border-brand-accent/30">
+                DEMO PREVIEW
+              </span>
+            )}
           </div>
           <h2 className="text-xl font-bold text-foreground mt-1">Intelligence & Opportunity Radar</h2>
         </div>

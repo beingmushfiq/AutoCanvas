@@ -26,6 +26,76 @@ import { Badge } from '../../components/ui/badge'
 import { appToast } from '../../lib/toast'
 import { useAuth } from '../auth/AuthContext'
 
+const DEMO_BRANDS_LIST: BrandSummary[] = [
+  {
+    id: 'demo-brand-1',
+    name: 'AutoCanvas Global',
+    slug: 'autocanvas-global',
+    industry: 'Enterprise SaaS & Marketing Tech',
+    status: 'active',
+    primary_color: '#0f172a',
+    secondary_color: '#f59e0b',
+    primary_logo_url: null,
+    created_at: new Date(Date.now() - 86400000 * 30).toISOString(),
+  },
+]
+
+const DEMO_BRAND_DETAIL: BrandDetail = {
+  id: 'demo-brand-1',
+  name: 'AutoCanvas Global',
+  slug: 'autocanvas-global',
+  industry: 'Enterprise SaaS & Marketing Tech',
+  website_url: 'https://autocanvas.io',
+  status: 'active',
+  created_at: new Date(Date.now() - 86400000 * 30).toISOString(),
+  sources_count: 8,
+  memory_entries_count: 14,
+  profile: {
+    id: 'prof-demo',
+    brand_id: 'demo-brand-1',
+    business_description: 'AutoCanvas is the next-generation autonomous brand marketing operating system. It enables teams to maintain deterministic creative consistency across LinkedIn, Instagram, Facebook, and Twitter without hallucinated assets or broken typography.',
+    mission: 'Empower marketing teams to scale authentic brand presence autonomously while preserving strict brand safety.',
+    vision: 'A world where creative execution is completely deterministic and brand intelligence is persistent.',
+    positioning: 'The enterprise-grade brand OS for deterministic publishing and real-time social intelligence.',
+    products_services: ['Deterministic Creative Studio', 'Autonomous Publishing Scheduler', 'Social Listening & Radar', 'Unified Community Inbox'],
+    target_audience: 'VP Marketing, Heads of Growth, Creative Directors, and Multi-brand Agency Executives.',
+    personas: [
+      { name: 'Director Dave', role: 'VP Marketing', goal: 'Maintain brand consistency across 40+ posts/month' },
+      { name: 'Agency Anna', role: 'Agency Partner', goal: 'Manage multi-tenant workspaces with isolated tokens' },
+    ],
+    usps: ['Deterministic SVG/HTML Chromium rendering', 'Zero-jargon editorial copywriting', 'Strict multi-tenant token security'],
+    primary_cta: 'Start Free Enterprise Trial',
+    secondary_cta: 'Explore Interactive Demo',
+    prohibited_subjects: ['Political controversies', 'Speculative cryptocurrencies', 'Unverified performance claims'],
+  },
+  visual_identity: {
+    id: 'vis-demo',
+    brand_id: 'demo-brand-1',
+    primary_color: '#0f172a',
+    secondary_color: '#f59e0b',
+    accent_colors: ['#06b6d4', '#10b981', '#6366f1'],
+    primary_font: 'Inter',
+    secondary_font: 'JetBrains Mono',
+    primary_logo_url: null,
+    secondary_logo_url: null,
+    layout_preferences: { border_radius: '16px', aspect_ratios: ['1:1', '4:5', '16:9'] },
+    visual_exclusions: ['Low-resolution raster imagery', 'Cluttered background gradients', 'Unbranded stock photography'],
+  },
+  voice_profile: {
+    id: 'voice-demo',
+    brand_id: 'demo-brand-1',
+    personality_traits: ['Authoritative', 'Analytical', 'Pragmatic', 'Inspiring'],
+    tone: 'Confident, thoughtful, and executive-friendly',
+    communication_style: 'Structured, insight-driven, clear, and direct',
+    preferred_language: 'en',
+    formality_level: 'conversational',
+    channel_language_rules: {
+      linkedin: { tone: 'Thoughtful executive insights', vocabulary: ['Operational cadence', 'Deterministic', 'Brand equity'] },
+      twitter: { tone: 'Punchy, direct, and actionable', vocabulary: ['Quick tip', 'Breakdown', 'Framework'] },
+    },
+  },
+}
+
 interface BrandStudioProps {
   initialTab?: 'profile' | 'visual' | 'voice' | 'knowledge' | 'memory'
   onTabChange?: (tab: 'profile' | 'visual' | 'voice' | 'knowledge' | 'memory') => void
@@ -58,9 +128,9 @@ export const BrandStudio: React.FC<BrandStudioProps> = ({ initialTab = 'profile'
 
   const fetchBrands = async (selectId?: string) => {
     if (!isAuthenticated) {
-      setBrands([])
-      setActiveBrandId(null)
-      setActiveBrand(null)
+      setBrands(DEMO_BRANDS_LIST)
+      setActiveBrandId('demo-brand-1')
+      setActiveBrand(DEMO_BRAND_DETAIL)
       setLoading(false)
       return
     }
@@ -96,6 +166,10 @@ export const BrandStudio: React.FC<BrandStudioProps> = ({ initialTab = 'profile'
   }
 
   const fetchBrandDetail = async (brandId: string) => {
+    if (!isAuthenticated) {
+      setActiveBrand(DEMO_BRAND_DETAIL)
+      return
+    }
     try {
       const res = await apiClient.get<ApiResponse<BrandDetail>>(`/brands/${brandId}`)
       if (res.data) {
@@ -287,6 +361,11 @@ export const BrandStudio: React.FC<BrandStudioProps> = ({ initialTab = 'profile'
               <Badge variant={activeBrand?.status === 'active' ? 'success' : 'secondary'}>
                 {activeBrand?.status || 'Active'}
               </Badge>
+              {!isAuthenticated && (
+                <Badge variant="outline" className="border-brand-accent/40 bg-brand-accent/10 text-brand-accent text-[10px] font-mono font-bold">
+                  DEMO PREVIEW
+                </Badge>
+              )}
             </div>
           </div>
         </div>

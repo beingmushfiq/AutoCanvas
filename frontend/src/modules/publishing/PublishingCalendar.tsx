@@ -31,6 +31,7 @@ import {
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { apiClient } from '../../lib/api/client'
+import { useAuth } from '../auth/AuthContext'
 
 // Curated high-value initial posts (100% free of technical/futuristic jargon)
 const INITIAL_POSTS: CalendarPostItem[] = [
@@ -102,12 +103,13 @@ export const PublishingCalendar: React.FC<PublishingCalendarProps> = ({
   onViewChange,
   onNavigateToContent,
 }) => {
+  const { isAuthenticated } = useAuth()
   const [currentDate, setCurrentDate] = useState<Date>(new Date())
   const [viewMode, setViewMode] = useState<'month' | 'week' | 'agenda'>(initialView)
   const [platformFilter, setPlatformFilter] = useState<string>('all')
   const [showPeakTimes, setShowPeakTimes] = useState<boolean>(true)
   const [timezone, setTimezone] = useState<string>('UTC')
-  const [posts, setPosts] = useState<CalendarPostItem[]>(INITIAL_POSTS)
+  const [posts, setPosts] = useState<CalendarPostItem[]>(() => !isAuthenticated ? INITIAL_POSTS : [])
 
   useEffect(() => {
     if (initialView && ['month', 'week', 'agenda'].includes(initialView) && initialView !== viewMode) {
@@ -140,6 +142,11 @@ export const PublishingCalendar: React.FC<PublishingCalendarProps> = ({
 
   // Fetch live publishing queue and safety status from backend
   useEffect(() => {
+    if (!isAuthenticated) {
+      setPosts(INITIAL_POSTS)
+      return
+    }
+
     apiClient
       .getCircuitBreakerStatus()
       .then((res) => {
@@ -152,7 +159,7 @@ export const PublishingCalendar: React.FC<PublishingCalendarProps> = ({
     apiClient
       .getDispatches()
       .then((res) => {
-        if (res.success && Array.isArray(res.data) && res.data.length > 0) {
+        if (res.success && Array.isArray(res.data)) {
           const livePosts: CalendarPostItem[] = res.data.map((d) => ({
             id: d.id,
             title: d.content_variant?.caption
@@ -175,20 +182,15 @@ export const PublishingCalendar: React.FC<PublishingCalendarProps> = ({
             brandName: d.brand?.name || 'Active Brand',
             mediaType: 'image',
           }))
-
-          setPosts((prev) => {
-            const combined = [...livePosts]
-            for (const p of prev) {
-              if (!combined.some((c) => c.id === p.id)) {
-                combined.push(p)
-              }
-            }
-            return combined
-          })
+          setPosts(livePosts)
+        } else {
+          setPosts([])
         }
       })
-      .catch(() => {})
-  }, [])
+      .catch(() => {
+        setPosts([])
+      })
+  }, [isAuthenticated])
 
   // Navigation handlers
   const handlePrev = () => {
@@ -315,6 +317,25 @@ export const PublishingCalendar: React.FC<PublishingCalendarProps> = ({
     }
   }
 
+  // Dynamic Rhythm calculation
+  const scheduledThisWeek = React.useMemo(() => {
+    const now = new Date()
+    const startOfWeek = new Date(now)
+    startOfWeek.setDate(now.getDate() - now.getDay())
+    const endOfWeek = new Date(startOfWeek)
+    endOfWeek.setDate(startOfWeek.getDate() + 6)
+    const startYMD = formatYMD(startOfWeek)
+    const endYMD = formatYMD(endOfWeek)
+    return posts.filter((p) => p.scheduledAt >= startYMD && p.scheduledAt <= endYMD).length
+  }, [posts])
+
+  const nextScheduledPost = React.useMemo(() => {
+    const todayYMD = formatYMD(new Date())
+    return [...posts]
+      .filter((p) => p.scheduledAt >= todayYMD && (p.status === 'scheduled' || p.status === 'draft'))
+      .sort((a, b) => (a.scheduledAt + a.scheduledTime).localeCompare(b.scheduledAt + b.scheduledTime))[0]
+  }, [posts])
+
   // Filtered posts count
   const filteredPosts = posts.filter(
     (p) => platformFilter === 'all' || p.platform === platformFilter
@@ -365,9 +386,16 @@ export const PublishingCalendar: React.FC<PublishingCalendarProps> = ({
               <CalendarIcon className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-foreground tracking-tight">
-                Content & Publishing Calendar
-              </h2>
+              <div className="flex items-center gap-2">
+                <h2 className="text-lg font-bold text-foreground tracking-tight">
+                  Content & Publishing Calendar
+                </h2>
+                {!isAuthenticated && (
+                  <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-brand-accent/15 text-brand-accent border border-brand-accent/30">
+                    DEMO PREVIEW
+                  </span>
+                )}
+              </div>
               <p className="text-xs text-foreground-secondary">
                 Plan, organize, and manage your posts across every social channel
               </p>
@@ -410,12 +438,32 @@ export const PublishingCalendar: React.FC<PublishingCalendarProps> = ({
           <div className="text-xs">
             <div className="flex items-center gap-2">
               <span className="font-bold text-foreground">Weekly Publishing Rhythm</span>
-              <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-status-success/15 text-status-success">
-                85% ACTIVE
+              <span
+                className={`px-1.5 py-0.5 rounded text-[10px] font-mono font-bold ${
+                  !isAuthenticated
+                    ? 'bg-status-success/15 text-status-success'
+                    : scheduledThisWeek > 0
+                    ? 'bg-status-success/15 text-status-success'
+                    : 'bg-surface-muted text-foreground-muted'
+                }`}
+              >
+                {!isAuthenticated
+                  ? '85% ACTIVE'
+                  : scheduledThisWeek > 0
+                  ? `${Math.min(100, scheduledThisWeek * 20)}% ACTIVE`
+                  : '0% CADENCE'}
               </span>
             </div>
             <p className="text-[11px] text-foreground-muted mt-0.5">
-              5 posts scheduled this week · Next post: Today at 3:30 PM
+              {!isAuthenticated
+                ? '5 posts scheduled this week · Next post: Today at 3:30 PM'
+                : scheduledThisWeek > 0
+                ? `${scheduledThisWeek} post${scheduledThisWeek === 1 ? '' : 's'} scheduled this week · ${
+                    nextScheduledPost
+                      ? `Next post: ${nextScheduledPost.scheduledAt === formatYMD(new Date()) ? 'Today' : nextScheduledPost.scheduledAt} at ${nextScheduledPost.scheduledTime}`
+                      : 'Schedule complete'
+                  }`
+                : '0 posts scheduled this week · Ready to schedule'}
             </p>
           </div>
         </div>

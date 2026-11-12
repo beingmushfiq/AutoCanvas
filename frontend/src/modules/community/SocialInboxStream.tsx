@@ -18,8 +18,175 @@ import {
   type BrandSummary,
 } from '../../lib/api/client'
 import { EmptyState } from '../../components/ui/empty-state'
+import { useAuth } from '../auth/AuthContext'
+
+const DEMO_CONVERSATIONS: SocialConversationItem[] = [
+  {
+    id: 'demo-conv-1',
+    organization_id: 'org-demo',
+    workspace_id: 'ws-demo',
+    brand_id: 'demo-brand',
+    social_account_id: 'acc-li-1',
+    platform: 'linkedin',
+    conversation_type: 'post_comments',
+    platform_thread_id: 'urn:li:comment:101',
+    sender_id: 'user-lin-1',
+    sender_name: 'Sarah Lin (VP Marketing)',
+    status: 'open',
+    priority: 'high',
+    last_message_at: new Date(Date.now() - 1000 * 60 * 18).toISOString(),
+    created_at: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
+    latest_message: {
+      id: 'msg-demo-1',
+      organization_id: 'org-demo',
+      workspace_id: 'ws-demo',
+      brand_id: 'demo-brand',
+      social_conversation_id: 'demo-conv-1',
+      direction: 'inbound',
+      platform_message_id: 'pm-101',
+      sender_type: 'customer',
+      sender_name: 'Sarah Lin (VP Marketing)',
+      message_text: 'Does AutoCanvas support multi-brand workspace segregation for agency clients where each brand has strictly separated API keys?',
+      sentiment_score: 0.85,
+      intent: 'inquiry',
+      ai_draft_reply: 'Hi Sarah! Yes, AutoCanvas enforces strict multi-tenant isolation. Each brand in your workspace has dedicated social connector scopes and independent cadence settings.',
+      ai_draft_status: 'pending',
+      is_hidden_on_platform: false,
+      created_at: new Date(Date.now() - 1000 * 60 * 18).toISOString(),
+    },
+    messages: [
+      {
+        id: 'msg-demo-1',
+        organization_id: 'org-demo',
+        workspace_id: 'ws-demo',
+        brand_id: 'demo-brand',
+        social_conversation_id: 'demo-conv-1',
+        direction: 'inbound',
+        platform_message_id: 'pm-101',
+        sender_type: 'customer',
+        sender_name: 'Sarah Lin (VP Marketing)',
+        message_text: 'Does AutoCanvas support multi-brand workspace segregation for agency clients where each brand has strictly separated API keys?',
+        sentiment_score: 0.85,
+        intent: 'inquiry',
+        ai_draft_reply: 'Hi Sarah! Yes, AutoCanvas enforces strict multi-tenant isolation. Each brand in your workspace has dedicated social connector scopes and independent cadence settings.',
+        ai_draft_status: 'pending',
+        is_hidden_on_platform: false,
+        created_at: new Date(Date.now() - 1000 * 60 * 18).toISOString(),
+      },
+    ],
+  },
+  {
+    id: 'demo-conv-2',
+    organization_id: 'org-demo',
+    workspace_id: 'ws-demo',
+    brand_id: 'demo-brand',
+    social_account_id: 'acc-ig-1',
+    platform: 'instagram',
+    conversation_type: 'direct_message',
+    platform_thread_id: 'ig-thread-202',
+    sender_id: 'user-ig-2',
+    sender_name: 'Alexandre Rivera',
+    status: 'open',
+    priority: 'normal',
+    last_message_at: new Date(Date.now() - 1000 * 60 * 45).toISOString(),
+    created_at: new Date(Date.now() - 1000 * 60 * 60 * 4).toISOString(),
+    latest_message: {
+      id: 'msg-demo-2',
+      organization_id: 'org-demo',
+      workspace_id: 'ws-demo',
+      brand_id: 'demo-brand',
+      social_conversation_id: 'demo-conv-2',
+      direction: 'inbound',
+      platform_message_id: 'pm-202',
+      sender_type: 'customer',
+      sender_name: 'Alexandre Rivera',
+      message_text: 'Loved your carousel on deterministic SVG rendering. Any plans for direct Figma token sync?',
+      sentiment_score: 0.95,
+      intent: 'praise',
+      ai_draft_reply: 'Thanks Alexandre! Direct sync for Figma design tokens is on our roadmap. You can export tokens into our Visual Guidelines tab today!',
+      ai_draft_status: 'pending',
+      is_hidden_on_platform: false,
+      created_at: new Date(Date.now() - 1000 * 60 * 45).toISOString(),
+    },
+    messages: [
+      {
+        id: 'msg-demo-2',
+        organization_id: 'org-demo',
+        workspace_id: 'ws-demo',
+        brand_id: 'demo-brand',
+        social_conversation_id: 'demo-conv-2',
+        direction: 'inbound',
+        platform_message_id: 'pm-202',
+        sender_type: 'customer',
+        sender_name: 'Alexandre Rivera',
+        message_text: 'Loved your carousel on deterministic SVG rendering. Any plans for direct Figma token sync?',
+        sentiment_score: 0.95,
+        intent: 'praise',
+        ai_draft_reply: 'Thanks Alexandre! Direct sync for Figma design tokens is on our roadmap. You can export tokens into our Visual Guidelines tab today!',
+        ai_draft_status: 'pending',
+        is_hidden_on_platform: false,
+        created_at: new Date(Date.now() - 1000 * 60 * 45).toISOString(),
+      },
+    ],
+  },
+  {
+    id: 'demo-conv-3',
+    organization_id: 'org-demo',
+    workspace_id: 'ws-demo',
+    brand_id: 'demo-brand',
+    social_account_id: 'acc-tw-1',
+    platform: 'twitter',
+    conversation_type: 'mention',
+    platform_thread_id: 'tweet-303',
+    sender_id: 'user-tw-3',
+    sender_name: 'Marcus Chen',
+    status: 'escalated',
+    priority: 'urgent',
+    last_message_at: new Date(Date.now() - 1000 * 60 * 90).toISOString(),
+    created_at: new Date(Date.now() - 1000 * 60 * 60 * 6).toISOString(),
+    latest_message: {
+      id: 'msg-demo-3',
+      organization_id: 'org-demo',
+      workspace_id: 'ws-demo',
+      brand_id: 'demo-brand',
+      social_conversation_id: 'demo-conv-3',
+      direction: 'inbound',
+      platform_message_id: 'pm-303',
+      sender_type: 'customer',
+      sender_name: 'Marcus Chen',
+      message_text: 'Our scheduled morning campaign got delayed during the Meta API outage. How does the scheduler handle retry idempotency?',
+      sentiment_score: -0.4,
+      intent: 'complaint',
+      ai_draft_reply: 'Hi Marcus, our scheduler uses exponential backoff and Redis distributed locks. Once Meta restores API access, delayed posts are safely dispatched with idempotency checks to avoid duplicate publishing.',
+      ai_draft_status: 'pending',
+      is_hidden_on_platform: false,
+      created_at: new Date(Date.now() - 1000 * 60 * 90).toISOString(),
+    },
+    messages: [
+      {
+        id: 'msg-demo-3',
+        organization_id: 'org-demo',
+        workspace_id: 'ws-demo',
+        brand_id: 'demo-brand',
+        social_conversation_id: 'demo-conv-3',
+        direction: 'inbound',
+        platform_message_id: 'pm-303',
+        sender_type: 'customer',
+        sender_name: 'Marcus Chen',
+        message_text: 'Our scheduled morning campaign got delayed during the Meta API outage. How does the scheduler handle retry idempotency?',
+        sentiment_score: -0.4,
+        intent: 'complaint',
+        ai_draft_reply: 'Hi Marcus, our scheduler uses exponential backoff and Redis distributed locks. Once Meta restores API access, delayed posts are safely dispatched with idempotency checks to avoid duplicate publishing.',
+        ai_draft_status: 'pending',
+        is_hidden_on_platform: false,
+        created_at: new Date(Date.now() - 1000 * 60 * 90).toISOString(),
+      },
+    ],
+  },
+]
 
 export const SocialInboxStream: React.FC = () => {
+  const { isAuthenticated } = useAuth()
   const [brands, setBrands] = useState<BrandSummary[]>([])
   const [selectedBrandId, setSelectedBrandId] = useState<string>('')
   const [conversations, setConversations] = useState<SocialConversationItem[]>([])
@@ -34,9 +201,14 @@ export const SocialInboxStream: React.FC = () => {
   const [actionSuccess, setActionSuccess] = useState<string | null>(null)
   const [actionError, setActionError] = useState<string | null>(null)
 
-  // 1. Fetch available brands on mount
+  // 1. Fetch available brands on mount (or demo brand in guest mode)
   useEffect(() => {
     async function loadBrands() {
+      if (!isAuthenticated) {
+        setBrands([{ id: 'demo-brand', name: 'AutoCanvas Global' } as any])
+        setSelectedBrandId('demo-brand')
+        return
+      }
       try {
         const res = await apiClient.getBrands()
         if (res.data && res.data.length > 0) {
@@ -48,10 +220,25 @@ export const SocialInboxStream: React.FC = () => {
       }
     }
     loadBrands()
-  }, [])
+  }, [isAuthenticated])
 
   // 2. Load conversations for selected brand & filter
   const loadConversations = useCallback(async () => {
+    if (!isAuthenticated) {
+      const filtered = DEMO_CONVERSATIONS.filter((c) =>
+        statusFilter === 'all' ? true : c.status === statusFilter
+      )
+      setConversations(filtered)
+      if (filtered.length > 0 && !selectedConversation) {
+        setSelectedConversation(filtered[0])
+        const latestInbound = filtered[0].messages?.filter((m) => m.direction === 'inbound').pop()
+        setReplyText(latestInbound?.ai_draft_reply || '')
+      } else if (filtered.length === 0) {
+        setSelectedConversation(null)
+      }
+      return
+    }
+
     if (!selectedBrandId) return
     setIsLoading(true)
     setActionError(null)
@@ -72,7 +259,7 @@ export const SocialInboxStream: React.FC = () => {
     } finally {
       setIsLoading(false)
     }
-  }, [selectedBrandId, statusFilter])
+  }, [isAuthenticated, selectedBrandId, statusFilter])
 
   useEffect(() => {
     loadConversations()
@@ -80,6 +267,16 @@ export const SocialInboxStream: React.FC = () => {
 
   // 3. Load full conversation details & messages
   const loadConversationDetail = async (conversationId: string) => {
+    if (!isAuthenticated) {
+      const found = DEMO_CONVERSATIONS.find((c) => c.id === conversationId)
+      if (found) {
+        setSelectedConversation(found)
+        const latestInbound = found.messages?.filter((m) => m.direction === 'inbound').pop()
+        setReplyText(latestInbound?.ai_draft_reply || '')
+      }
+      return
+    }
+
     setIsDetailLoading(true)
     try {
       const res = await apiClient.getInboxConversation(conversationId)
@@ -103,6 +300,40 @@ export const SocialInboxStream: React.FC = () => {
   // 4. Dispatch Approved Reply
   const handleSendReply = async () => {
     if (!selectedConversation || !replyText.trim()) return
+
+    if (!isAuthenticated) {
+      setIsSubmitting(true)
+      await new Promise((r) => setTimeout(r, 450))
+      setActionSuccess('Demo Mode: Reply simulated successfully with brand voice compliance.')
+      const updatedMessages = [
+        ...(selectedConversation.messages || []),
+        {
+          id: `msg-demo-reply-${Date.now()}`,
+          organization_id: 'org-demo',
+          workspace_id: 'ws-demo',
+          brand_id: 'demo-brand',
+          social_conversation_id: selectedConversation.id,
+          direction: 'outbound' as const,
+          platform_message_id: `reply-${Date.now()}`,
+          sender_type: 'agent' as const,
+          sender_name: 'Brand Lead',
+          message_text: replyText.trim(),
+          sentiment_score: 1.0,
+          intent: 'general' as const,
+          ai_draft_status: 'accepted' as const,
+          is_hidden_on_platform: false,
+          created_at: new Date().toISOString(),
+        },
+      ]
+      setSelectedConversation({
+        ...selectedConversation,
+        messages: updatedMessages,
+      })
+      setReplyText('')
+      setIsSubmitting(false)
+      return
+    }
+
     const latestInbound = selectedConversation.messages?.filter((m) => m.direction === 'inbound').pop()
     if (!latestInbound) return
 
@@ -198,9 +429,15 @@ export const SocialInboxStream: React.FC = () => {
             <h1 className="text-2xl font-bold tracking-tight text-foreground">
               Unified Community Inbox
             </h1>
-            <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-brand-primary text-foreground-inverse">
-              Phase 9
-            </span>
+            {!isAuthenticated ? (
+              <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-brand-accent/15 text-brand-accent border border-brand-accent/30 font-mono">
+                DEMO PREVIEW
+              </span>
+            ) : (
+              <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-brand-primary text-foreground-inverse">
+                Phase 9
+              </span>
+            )}
           </div>
           <p className="text-sm text-foreground-secondary mt-1">
             Omnichannel customer sentiment detection, automated spam shielding, and AI brand voice assistant.

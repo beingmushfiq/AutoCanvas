@@ -39,6 +39,12 @@ export const OpportunitiesRadar: React.FC<OpportunitiesRadarProps> = ({
     try {
       setScanning(true)
       setError(null)
+      if (brandId === 'demo-brand-1') {
+        await new Promise((r) => setTimeout(r, 600))
+        setScanning(false)
+        onRefresh()
+        return
+      }
       await apiClient.post<ApiResponse<ContentOpportunity[]>>(`/brands/${brandId}/opportunities/detect`, {
         limit: 4,
       })
@@ -54,6 +60,13 @@ export const OpportunitiesRadar: React.FC<OpportunitiesRadarProps> = ({
     try {
       setConvertingId(opp.id)
       setError(null)
+      if (brandId === 'demo-brand-1') {
+        await new Promise((r) => setTimeout(r, 500))
+        setSuccessMessage(`Demo Mode: Opportunity converted! Multi-channel post drafted in Content Studio.`)
+        setConvertingId(null)
+        if (onNavigateToContent) onNavigateToContent()
+        return
+      }
       await apiClient.post<ApiResponse<{ opportunity: ContentOpportunity; content_item: unknown }>>(
         `/research/opportunities/${opp.id}/convert`,
         { generate_creative: true }
@@ -69,6 +82,10 @@ export const OpportunitiesRadar: React.FC<OpportunitiesRadarProps> = ({
 
   const handleDismiss = async (id: string) => {
     try {
+      if (brandId === 'demo-brand-1') {
+        onRefresh()
+        return
+      }
       await apiClient.post(`/research/opportunities/${id}/dismiss`)
       onRefresh()
     } catch (err) {

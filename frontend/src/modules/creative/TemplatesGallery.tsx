@@ -9,6 +9,7 @@ import { Button } from '../../components/ui/button'
 import { Badge } from '../../components/ui/badge'
 import { Card } from '../../components/ui/card'
 import { EmptyState } from '../../components/ui/empty-state'
+import { useAuth } from '../auth/AuthContext'
 import { apiClient, type BrandSummary, type ApiResponse } from '../../lib/api/client'
 import { appToast } from '../../lib/toast'
 
@@ -95,6 +96,7 @@ export const TemplatesGallery: React.FC<TemplatesGalleryProps> = ({
   onSelectTemplate,
   onGenerateContent,
 }) => {
+  const { isAuthenticated } = useAuth()
   const [brands, setBrands] = useState<BrandSummary[]>([])
   const [selectedBrandId, setSelectedBrandId] = useState<string>('')
   const [templates, setTemplates] = useState<CreativeTemplateItem[]>(DEFAULT_TEMPLATES)
@@ -106,6 +108,11 @@ export const TemplatesGallery: React.FC<TemplatesGalleryProps> = ({
   // Load brands on mount
   useEffect(() => {
     async function loadBrands() {
+      if (!isAuthenticated) {
+        setBrands([{ id: 'demo-brand-1', name: 'AutoCanvas Global' } as any])
+        setSelectedBrandId('demo-brand-1')
+        return
+      }
       try {
         const res = await apiClient.getBrands()
         if (res.data && res.data.length > 0) {
@@ -117,7 +124,7 @@ export const TemplatesGallery: React.FC<TemplatesGalleryProps> = ({
       }
     }
     loadBrands()
-  }, [])
+  }, [isAuthenticated])
 
   // Load server-side Chromium creative templates
   useEffect(() => {
@@ -198,10 +205,16 @@ export const TemplatesGallery: React.FC<TemplatesGalleryProps> = ({
         <div>
           <div className="flex items-center gap-3">
             <h2 className="text-xl font-bold text-foreground">Creative Templates Gallery</h2>
-            <Badge variant="outline" className="border-border text-foreground-secondary text-xs">
-              <Palette className="w-3.5 h-3.5 mr-1 text-brand-accent" />
-              100% Deterministic SVG/HTML
-            </Badge>
+            {!isAuthenticated ? (
+              <Badge variant="outline" className="border-brand-accent/50 text-brand-accent text-xs">
+                DEMO PREVIEW
+              </Badge>
+            ) : (
+              <Badge variant="outline" className="border-border text-foreground-secondary text-xs">
+                <Palette className="w-3.5 h-3.5 mr-1 text-brand-accent" />
+                100% Deterministic SVG/HTML
+              </Badge>
+            )}
           </div>
           <p className="text-sm text-foreground-secondary mt-1">
             Production-ready multi-format layouts. Styled automatically with your active brand colors, fonts, and assets.

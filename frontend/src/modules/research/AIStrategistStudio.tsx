@@ -118,6 +118,11 @@ export const AIStrategistStudio: React.FC<AIStrategistStudioProps> = ({ onNaviga
   // Load brands on mount
   useEffect(() => {
     async function loadBrands() {
+      if (!isAuthenticated) {
+        setBrands([{ id: 'demo-brand-1', name: 'AutoCanvas Global' } as any])
+        setSelectedBrandId('demo-brand-1')
+        return
+      }
       try {
         const res = await apiClient.getBrands()
         if (res.data && res.data.length > 0) {
@@ -129,7 +134,7 @@ export const AIStrategistStudio: React.FC<AIStrategistStudioProps> = ({ onNaviga
       }
     }
     loadBrands()
-  }, [])
+  }, [isAuthenticated])
 
   // In authenticated mode, fetch live brand pillars, campaigns, and dispatches
   useEffect(() => {
@@ -294,10 +299,18 @@ export const AIStrategistStudio: React.FC<AIStrategistStudioProps> = ({ onNaviga
             <Target className="w-4 h-4 text-brand-accent" />
           </div>
           <div className="text-2xl font-bold text-foreground">
-            {pillars.length > 0 ? '94 / 100' : (!isAuthenticated ? '94 / 100' : 'Ready')}
+            {!isAuthenticated
+              ? '94 / 100'
+              : publishedCount > 0
+              ? `${Math.round(Math.min(98, 70 + (pillars.filter(p => p.status === 'balanced').length / Math.max(1, pillars.length)) * 28))} / 100`
+              : '-- / 100'}
           </div>
           <p className="text-xs text-status-success font-medium">
-            {pillars.length > 0 || !isAuthenticated ? 'Optimal brand voice & tone consistency' : 'Awaiting published posts'}
+            {!isAuthenticated
+              ? 'Optimal brand voice & tone consistency'
+              : publishedCount > 0
+              ? 'Calculated from published dispatch alignment'
+              : 'Awaiting published post history'}
           </p>
         </Card>
 
@@ -320,7 +333,7 @@ export const AIStrategistStudio: React.FC<AIStrategistStudioProps> = ({ onNaviga
             <Compass className="w-4 h-4 text-status-success" />
           </div>
           <div className="text-2xl font-bold text-foreground">
-            {campaigns.length} {campaigns.length === 1 ? 'Running' : 'Running'}
+            {campaigns.length} Running
           </div>
           <p className="text-xs text-foreground-secondary">
             {campaigns.length > 0
@@ -334,9 +347,11 @@ export const AIStrategistStudio: React.FC<AIStrategistStudioProps> = ({ onNaviga
             <span>Optimal Publishing Slot</span>
             <Clock className="w-4 h-4 text-brand-accent" />
           </div>
-          <div className="text-2xl font-bold text-foreground">Tue 09:30 AM</div>
+          <div className="text-2xl font-bold text-foreground">
+            {!isAuthenticated ? 'Tue 09:30 AM' : (publishedCount > 0 ? 'Tue 09:30 AM' : 'Awaiting history')}
+          </div>
           <p className="text-xs text-foreground-secondary">
-            Next high-velocity window on LinkedIn
+            {!isAuthenticated ? 'Next high-velocity window on LinkedIn' : (publishedCount > 0 ? 'Estimated high-velocity window' : 'Telemetry calibrating')}
           </p>
         </Card>
       </div>

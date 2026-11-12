@@ -25,12 +25,150 @@ import { Button } from '../../components/ui/button'
 import { Badge } from '../../components/ui/badge'
 import { appToast } from '../../lib/toast'
 import { EmptyState } from '../../components/ui/empty-state'
+import { useAuth } from '../auth/AuthContext'
+
+const DEMO_BRANDS_LIST: BrandSummary[] = [
+  {
+    id: 'demo-brand-1',
+    name: 'AutoCanvas Global',
+    slug: 'autocanvas-global',
+    industry: 'Enterprise SaaS & Marketing Tech',
+    status: 'active',
+    primary_color: '#0f172a',
+    secondary_color: '#f59e0b',
+    primary_logo_url: null,
+    created_at: new Date(Date.now() - 86400000 * 30).toISOString(),
+  },
+]
+
+const DEMO_POSTS: ContentItem[] = [
+  {
+    id: 'demo-post-1',
+    brand_id: 'demo-brand-1',
+    content_pillar_id: 'pillar-1',
+    campaign_id: null,
+    title: '5 Ways Modern Brands Stay Ahead on Social',
+    concept: 'Educational breakdown on why modern marketing leaders prefer structured weekly publishing rhythms over chaotic last-minute posting.',
+    status: 'approved',
+    risk_level: 'low',
+    overall_quality_score: 96,
+    qa_report: {
+      brand_alignment_score: 98,
+      platform_fit_score: 95,
+      readability_score: 94,
+      overall_quality_score: 96,
+      risk_level: 'low',
+      safety_checks: {
+        contains_prohibited_terms: false,
+        unsubstantiated_claims: false,
+        competitor_mentions: false,
+      },
+      suggestions: ['Add a custom hashtag for enhanced discoverability'],
+    },
+    review_feedback: 'Approved for automated multi-channel dispatch.',
+    reviewed_at: new Date(Date.now() - 86400000).toISOString(),
+    created_at: new Date(Date.now() - 86400000 * 2).toISOString(),
+    pillar: {
+      id: 'pillar-1',
+      brand_id: 'demo-brand-1',
+      name: 'Thought Leadership',
+      description: 'High-value executive insights and industry benchmarks',
+      target_percentage: 40,
+      color: 'var(--brand-accent)',
+    } as any,
+    variants: [
+      {
+        id: 'var-li-1',
+        content_item_id: 'demo-post-1',
+        platform: 'linkedin',
+        caption: 'Why executive marketing teams are moving away from manual last-minute posting toward unified weekly publishing rhythms. Maintaining brand consistency across 40+ posts per month requires deterministic workflows, not frantic Slack pings.',
+        hashtags: ['#MarketingLeadership', '#BrandOps', '#ProductGrowth'],
+        cta_text: 'Read the full framework',
+        cta_url: 'https://autocanvas.io/blog/publishing-rhythms',
+        character_count: 242,
+        media_urls: [],
+        creative_document: null,
+        quality_score: 98,
+        platform_options: null,
+        created_at: new Date(Date.now() - 86400000 * 2).toISOString(),
+      },
+      {
+        id: 'var-tw-1',
+        content_item_id: 'demo-post-1',
+        platform: 'twitter',
+        caption: '5 ways high-growth brands maintain social consistency:\n\n1. Lock design tokens before copy\n2. Establish weekly rhythms\n3. Protect brand safety\n4. Automate queue retry\n5. Measure pillar ROI',
+        hashtags: ['#MarketingOps', '#Growth'],
+        cta_text: null,
+        cta_url: null,
+        character_count: 178,
+        media_urls: [],
+        creative_document: null,
+        quality_score: 94,
+        platform_options: null,
+        created_at: new Date(Date.now() - 86400000 * 2).toISOString(),
+      },
+    ],
+  },
+  {
+    id: 'demo-post-2',
+    brand_id: 'demo-brand-1',
+    content_pillar_id: 'pillar-2',
+    campaign_id: null,
+    title: 'Deterministic Creative Rendering: The Death of Hallucinated Typography',
+    concept: 'Explaining why raster AI models blur fonts and how AutoCanvas uses Chromium SVG engines for crisp, vector-grade typography.',
+    status: 'draft',
+    risk_level: 'low',
+    overall_quality_score: 92,
+    qa_report: {
+      brand_alignment_score: 94,
+      platform_fit_score: 90,
+      readability_score: 92,
+      overall_quality_score: 92,
+      risk_level: 'low',
+      safety_checks: {
+        contains_prohibited_terms: false,
+        unsubstantiated_claims: false,
+        competitor_mentions: false,
+      },
+      suggestions: ['Consider adding a call-to-action button'],
+    },
+    review_feedback: null,
+    reviewed_at: null,
+    created_at: new Date(Date.now() - 86400000 * 3).toISOString(),
+    pillar: {
+      id: 'pillar-2',
+      brand_id: 'demo-brand-1',
+      name: 'Product Engineering',
+      description: 'Deep dives into deterministic design and technology',
+      target_percentage: 30,
+      color: 'var(--brand-primary)',
+    } as any,
+    variants: [
+      {
+        id: 'var-li-2',
+        content_item_id: 'demo-post-2',
+        platform: 'linkedin',
+        caption: 'Raster AI generation is great for moodboards, but unacceptable for brand guidelines. When enterprise brands publish, letterforms must render at exact kerning and corporate hex values. Here is how deterministic layout engines solve this.',
+        hashtags: ['#DesignOps', '#BrandTech', '#Engineering'],
+        cta_text: 'Explore the architecture',
+        cta_url: 'https://autocanvas.io/docs/deterministic-rendering',
+        character_count: 265,
+        media_urls: [],
+        creative_document: null,
+        quality_score: 95,
+        platform_options: null,
+        created_at: new Date(Date.now() - 86400000 * 3).toISOString(),
+      },
+    ],
+  },
+]
 
 interface ContentStudioProps {
   initialView?: 'posts' | 'creative'
 }
 
 export const ContentStudio: React.FC<ContentStudioProps> = ({ initialView = 'posts' }) => {
+  const { isAuthenticated } = useAuth()
   const [brands, setBrands] = useState<BrandSummary[]>([])
   const [activeBrandId, setActiveBrandId] = useState<string | null>(null)
   const [posts, setPosts] = useState<ContentItem[]>([])
@@ -51,6 +189,14 @@ export const ContentStudio: React.FC<ContentStudioProps> = ({ initialView = 'pos
   const [showBrandMenu, setShowBrandMenu] = useState(false)
 
   const fetchBrands = async () => {
+    if (!isAuthenticated) {
+      setBrands(DEMO_BRANDS_LIST)
+      setActiveBrandId('demo-brand-1')
+      setPosts(DEMO_POSTS)
+      setLoading(false)
+      return
+    }
+
     try {
       setLoading(true)
       const res = await apiClient.get<ApiResponse<BrandSummary[]>>('/brands')
@@ -63,26 +209,33 @@ export const ContentStudio: React.FC<ContentStudioProps> = ({ initialView = 'pos
         await fetchPosts(id)
       } else {
         setActiveBrandId(null)
+        setPosts([])
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load brands')
+      setPosts([])
     } finally {
       setLoading(false)
     }
   }
 
   const fetchPosts = async (brandId: string) => {
+    if (!isAuthenticated) {
+      setPosts(DEMO_POSTS)
+      return
+    }
     try {
       const res = await apiClient.get<ApiResponse<ContentItem[]>>(`/brands/${brandId}/content`)
       setPosts(res.data || [])
     } catch (err) {
       console.error('Failed to load posts:', err)
+      setPosts([])
     }
   }
 
   useEffect(() => {
     fetchBrands()
-  }, [])
+  }, [isAuthenticated])
 
   const handleBrandChange = (id: string) => {
     setActiveBrandId(id)
@@ -229,9 +382,16 @@ export const ContentStudio: React.FC<ContentStudioProps> = ({ initialView = 'pos
                 </div>
               )}
             </div>
-            <p className="text-xs text-foreground-secondary mt-0.5">
-              Omnichannel Content Generation & Production Pipeline
-            </p>
+            <div className="flex items-center gap-2 mt-0.5">
+              <p className="text-xs text-foreground-secondary">
+                Omnichannel Content Generation & Production Pipeline
+              </p>
+              {!isAuthenticated && (
+                <Badge variant="outline" className="border-brand-accent/40 bg-brand-accent/10 text-brand-accent text-[10px] font-mono font-bold">
+                  DEMO PREVIEW
+                </Badge>
+              )}
+            </div>
           </div>
         </div>
 

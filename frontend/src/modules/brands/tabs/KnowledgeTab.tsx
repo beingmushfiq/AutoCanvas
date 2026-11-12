@@ -23,6 +23,39 @@ interface KnowledgeTabProps {
   brandId: string
 }
 
+const DEMO_KNOWLEDGE_SOURCES: KnowledgeSourceItem[] = [
+  {
+    id: 'src-demo-1',
+    source_type: 'document',
+    display_name: 'AutoCanvas Enterprise Architecture & Brand Safety Whitepaper.pdf',
+    original_uri: 'https://docs.autocanvas.io/whitepaper.pdf',
+    credibility: 'A',
+    status: 'indexed',
+    chunks_count: 42,
+    created_at: new Date(Date.now() - 86400000 * 14).toISOString(),
+  },
+  {
+    id: 'src-demo-2',
+    source_type: 'url',
+    display_name: 'AutoCanvas Official Style & Tone Guidelines',
+    original_uri: 'https://brand.autocanvas.io/guidelines',
+    credibility: 'A',
+    status: 'indexed',
+    chunks_count: 28,
+    created_at: new Date(Date.now() - 86400000 * 7).toISOString(),
+  },
+  {
+    id: 'src-demo-3',
+    source_type: 'text',
+    display_name: 'Q4 2026 Messaging Matrix & Competitive Differentiation',
+    original_uri: null,
+    credibility: 'B',
+    status: 'indexed',
+    chunks_count: 15,
+    created_at: new Date(Date.now() - 86400000 * 3).toISOString(),
+  },
+]
+
 export const KnowledgeTab: React.FC<KnowledgeTabProps> = ({ brandId }) => {
   const [sources, setSources] = useState<KnowledgeSourceItem[]>([])
   const [loading, setLoading] = useState(true)
@@ -43,6 +76,12 @@ export const KnowledgeTab: React.FC<KnowledgeTabProps> = ({ brandId }) => {
   const [searchResults, setSearchResults] = useState<KnowledgeSearchMatch[] | null>(null)
 
   const fetchSources = async () => {
+    if (brandId === 'demo-brand-1') {
+      setSources(DEMO_KNOWLEDGE_SOURCES)
+      setLoading(false)
+      return
+    }
+
     try {
       setLoading(true)
       const res = await apiClient.get<ApiResponse<KnowledgeSourceItem[]>>(`/brands/${brandId}/knowledge`)

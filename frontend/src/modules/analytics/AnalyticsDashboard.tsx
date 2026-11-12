@@ -23,8 +23,194 @@ import {
   type TopPostAnalyticsItem,
 } from '../../lib/api/client'
 import { EmptyState } from '../../components/ui/empty-state'
+import { useAuth } from '../auth/AuthContext'
+
+const DEMO_OVERVIEW: AnalyticsOverviewReport = {
+  period: {
+    start_date: new Date(Date.now() - 86400000 * 30).toISOString().split('T')[0],
+    end_date: new Date().toISOString().split('T')[0],
+    duration_days: 30,
+  },
+  kpis: {
+    impressions: { value: 1284500, delta_percent: 18.4 },
+    reach: { value: 894200, delta_percent: 14.2 },
+    engagements: { value: 64200, delta_percent: 22.8 },
+    clicks: { value: 12400, delta_percent: 9.5 },
+    follower_growth: { value: 3420, delta_percent: 12.1 },
+    engagement_rate: { value: 4.8, delta_percent: 1.2 },
+  },
+}
+
+const DEMO_TIMESERIES: AnalyticsTimeSeriesPoint[] = Array.from({ length: 30 }, (_, i) => {
+  const d = new Date()
+  d.setDate(d.getDate() - (29 - i))
+  const dayStr = d.toISOString().split('T')[0]
+  const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+  const dayName = dayNames[d.getDay()]
+  const baseImpressions = 25000 + Math.sin(i / 3) * 8000 + i * 800
+  const baseEngagements = Math.round(baseImpressions * 0.052)
+  return {
+    date: dayStr,
+    day_name: dayName,
+    impressions: Math.round(baseImpressions),
+    reach: Math.round(baseImpressions * 0.72),
+    engagements: baseEngagements,
+    clicks: Math.round(baseEngagements * 0.18),
+    engagement_rate: 5.2,
+  }
+})
+
+const DEMO_PILLARS: PillarRoiItem[] = [
+  {
+    pillar_id: 'pillar-1',
+    pillar_name: 'Thought Leadership',
+    color_tag: 'var(--brand-accent)',
+    target_percentage: 40,
+    post_count: 14,
+    total_impressions: 512000,
+    total_engagements: 28400,
+    avg_engagement_rate: 5.5,
+    roi_score: 94,
+  },
+  {
+    pillar_id: 'pillar-2',
+    pillar_name: 'Product Engineering',
+    color_tag: 'var(--brand-primary)',
+    target_percentage: 30,
+    post_count: 10,
+    total_impressions: 348000,
+    total_engagements: 18200,
+    avg_engagement_rate: 5.2,
+    roi_score: 88,
+  },
+  {
+    pillar_id: 'pillar-3',
+    pillar_name: 'Brand Culture',
+    color_tag: 'var(--status-info)',
+    target_percentage: 20,
+    post_count: 8,
+    total_impressions: 242000,
+    total_engagements: 11400,
+    avg_engagement_rate: 4.7,
+    roi_score: 82,
+  },
+  {
+    pillar_id: 'pillar-4',
+    pillar_name: 'Educational Carousels',
+    color_tag: 'var(--status-success)',
+    target_percentage: 10,
+    post_count: 6,
+    total_impressions: 182500,
+    total_engagements: 6200,
+    avg_engagement_rate: 3.4,
+    roi_score: 74,
+  },
+]
+
+const DEMO_BEST_TIMES: BestPostingTimesReport = {
+  matrix: [],
+  recommended_slots: [
+    { day_name: 'Tuesday', day_index: 2, hour: 9, hour_formatted: '09:00 AM', engagements: 342, post_count: 8, score: 96 },
+    { day_name: 'Thursday', day_index: 4, hour: 14, hour_formatted: '02:00 PM', engagements: 298, post_count: 6, score: 92 },
+    { day_name: 'Wednesday', day_index: 3, hour: 11, hour_formatted: '11:00 AM', engagements: 264, post_count: 5, score: 88 },
+  ],
+}
+
+const DEMO_TOP_POSTS: TopPostAnalyticsItem[] = [
+  {
+    id: 'top-1',
+    platform: 'linkedin',
+    platform_post_id: 'li-post-1',
+    likes_count: 2450,
+    comments_count: 380,
+    shares_count: 590,
+    clicks_count: 1240,
+    impressions_count: 48500,
+    reach_count: 36200,
+    engagement_rate: 7.05,
+    published_at: new Date(Date.now() - 86400000 * 2).toISOString(),
+    content_item: {
+      id: 'ci-1',
+      title: '5 Ways Modern Brands Stay Ahead on Social',
+      concept: 'Why executive marketing teams are moving away from manual last-minute posting toward unified weekly publishing rhythms.',
+    },
+  },
+  {
+    id: 'top-2',
+    platform: 'instagram',
+    platform_post_id: 'ig-post-2',
+    likes_count: 1980,
+    comments_count: 240,
+    shares_count: 490,
+    clicks_count: 890,
+    impressions_count: 39200,
+    reach_count: 29800,
+    engagement_rate: 6.91,
+    published_at: new Date(Date.now() - 86400000 * 4).toISOString(),
+    content_item: {
+      id: 'ci-2',
+      title: 'Behind the Scenes: Our New Creative Studio Process',
+      concept: 'Clean visuals, crisp brand typography, and consistent brand colors across every platform reel.',
+    },
+  },
+  {
+    id: 'top-3',
+    platform: 'linkedin',
+    platform_post_id: 'li-post-3',
+    likes_count: 1420,
+    comments_count: 190,
+    shares_count: 370,
+    clicks_count: 720,
+    impressions_count: 31800,
+    reach_count: 24100,
+    engagement_rate: 6.22,
+    published_at: new Date(Date.now() - 86400000 * 7).toISOString(),
+    content_item: {
+      id: 'ci-3',
+      title: 'Industry Insights: What Audiences Value This Quarter',
+      concept: 'Analyzing why authentic educational breakdowns generate 3x more meaningful comments than promotional posts.',
+    },
+  },
+  {
+    id: 'top-4',
+    platform: 'facebook',
+    platform_post_id: 'fb-post-4',
+    likes_count: 980,
+    comments_count: 110,
+    shares_count: 260,
+    clicks_count: 510,
+    impressions_count: 22400,
+    reach_count: 18200,
+    engagement_rate: 6.03,
+    published_at: new Date(Date.now() - 86400000 * 9).toISOString(),
+    content_item: {
+      id: 'ci-4',
+      title: 'Scaling Brand Consistency Across Channels',
+      concept: 'How automated scheduling cuts marketing team overhead by 50%.',
+    },
+  },
+  {
+    id: 'top-5',
+    platform: 'twitter',
+    platform_post_id: 'tw-post-5',
+    likes_count: 840,
+    comments_count: 95,
+    shares_count: 185,
+    clicks_count: 420,
+    impressions_count: 18900,
+    reach_count: 15400,
+    engagement_rate: 5.92,
+    published_at: new Date(Date.now() - 86400000 * 12).toISOString(),
+    content_item: {
+      id: 'ci-5',
+      title: 'The 3-Second Hook Rule in Editorial Copywriting',
+      concept: 'If your opening sentence does not create curiosity, 80% will keep scrolling.',
+    },
+  },
+]
 
 export const AnalyticsDashboard: React.FC = () => {
+  const { isAuthenticated } = useAuth()
   const [brands, setBrands] = useState<BrandSummary[]>([])
   const [selectedBrandId, setSelectedBrandId] = useState<string>('')
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d'>('30d')
@@ -38,9 +224,14 @@ export const AnalyticsDashboard: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // 1. Fetch available brands on mount
+  // 1. Fetch available brands on mount (or supply demo brand in guest mode)
   useEffect(() => {
     async function loadBrands() {
+      if (!isAuthenticated) {
+        setBrands([{ id: 'demo-brand', name: 'AutoCanvas Global' } as any])
+        setSelectedBrandId('demo-brand')
+        return
+      }
       try {
         const res = await apiClient.getBrands()
         if (res.data && res.data.length > 0) {
@@ -52,7 +243,7 @@ export const AnalyticsDashboard: React.FC = () => {
       }
     }
     loadBrands()
-  }, [])
+  }, [isAuthenticated])
 
   // 2. Calculate date parameters from timeRange
   const getDateRange = useCallback(() => {
@@ -67,8 +258,17 @@ export const AnalyticsDashboard: React.FC = () => {
     }
   }, [timeRange])
 
-  // 3. Load all analytics metrics
+  // 3. Load all analytics metrics (live telemetry or interactive demo)
   const loadAnalytics = useCallback(async () => {
+    if (!isAuthenticated) {
+      setOverview(DEMO_OVERVIEW)
+      setTimeseries(DEMO_TIMESERIES)
+      setPillars(DEMO_PILLARS)
+      setBestTimes(DEMO_BEST_TIMES)
+      setTopPosts(DEMO_TOP_POSTS)
+      return
+    }
+
     if (!selectedBrandId) return
     setIsLoading(true)
     setError(null)
@@ -76,11 +276,11 @@ export const AnalyticsDashboard: React.FC = () => {
 
     try {
       const [overviewRes, timeseriesRes, pillarsRes, bestTimesRes, topPostsRes] = await Promise.all([
-        apiClient.getAnalyticsOverview(selectedBrandId, { start_date, end_date }),
-        apiClient.getAnalyticsTimeSeries(selectedBrandId, { start_date, end_date }),
-        apiClient.getAnalyticsPillars(selectedBrandId, { start_date, end_date }),
-        apiClient.getAnalyticsBestTimes(selectedBrandId),
-        apiClient.getAnalyticsTopPosts(selectedBrandId, 5),
+        apiClient.getAnalyticsOverview(selectedBrandId, { start_date, end_date }).catch(() => ({ data: null })),
+        apiClient.getAnalyticsTimeSeries(selectedBrandId, { start_date, end_date }).catch(() => ({ data: [] })),
+        apiClient.getAnalyticsPillars(selectedBrandId, { start_date, end_date }).catch(() => ({ data: [] })),
+        apiClient.getAnalyticsBestTimes(selectedBrandId).catch(() => ({ data: null })),
+        apiClient.getAnalyticsTopPosts(selectedBrandId, 5).catch(() => ({ data: [] })),
       ])
 
       if (overviewRes.data) setOverview(overviewRes.data)
@@ -93,7 +293,7 @@ export const AnalyticsDashboard: React.FC = () => {
     } finally {
       setIsLoading(false)
     }
-  }, [selectedBrandId, getDateRange])
+  }, [isAuthenticated, selectedBrandId, getDateRange])
 
   useEffect(() => {
     loadAnalytics()
@@ -137,9 +337,15 @@ export const AnalyticsDashboard: React.FC = () => {
             <h1 className="text-2xl font-bold tracking-tight text-foreground">
               Cross-Platform Performance & Analytics
             </h1>
-            <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-brand-primary text-foreground-inverse">
-              Phase 10
-            </span>
+            {!isAuthenticated ? (
+              <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-brand-accent/15 text-brand-accent border border-brand-accent/30 font-mono">
+                DEMO PREVIEW
+              </span>
+            ) : (
+              <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-brand-primary text-foreground-inverse">
+                Phase 10
+              </span>
+            )}
           </div>
           <p className="text-sm text-foreground-secondary mt-1">
             Deterministic attribution, content pillar ROI efficiency, and historical audience activity heatmaps.
