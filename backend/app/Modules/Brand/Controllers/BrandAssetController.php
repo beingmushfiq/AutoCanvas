@@ -9,6 +9,7 @@ use App\Modules\Brand\Models\BrandAsset;
 use App\Modules\Organization\Services\AuditLogger;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -52,15 +53,24 @@ class BrandAssetController extends Controller
             'tags' => ['nullable', 'array'],
         ]);
 
+        /** @var UploadedFile|null $file */
         $file = $request->file('file');
+        if (! $file instanceof UploadedFile) {
+            return response()->json([
+                'success' => false,
+                'error' => ['message' => 'No valid file uploaded.'],
+            ], 422);
+        }
+
         $name = $request->input('name', $file->getClientOriginalName());
         $extension = strtolower($file->getClientOriginalExtension());
-        $mime = $file->getMimeType();
+        $mime = $file->getMimeType() ?: 'application/octet-stream';
         $isSvg = $extension === 'svg' || $mime === 'image/svg+xml';
 
         if ($isSvg) {
-            $rawContent = file_get_contents($file->getRealPath());
-            $sanitized = SvgSanitizer::sanitize($rawContent);
+            $realPath = $file->getRealPath();
+            $rawContent = $realPath ? file_get_contents($realPath) : '';
+            $sanitized = SvgSanitizer::sanitize($rawContent ?: '');
             $fileName = Str::random(40) . '.svg';
             $path = "brands/{$brand->id}/assets/{$fileName}";
             Storage::disk('public')->put($path, $sanitized);
@@ -71,8 +81,9 @@ class BrandAssetController extends Controller
         $url = Storage::disk('public')->url($path);
 
         $dimensions = null;
-        if (str_starts_with($file->getMimeType(), 'image/') && $file->getMimeType() !== 'image/svg+xml') {
-            $imageInfo = @getimagesize($file->getRealPath());
+        if (str_starts_with($mime, 'image/') && $mime !== 'image/svg+xml') {
+            $realPath = $file->getRealPath();
+            $imageInfo = $realPath ? @getimagesize($realPath) : false;
             if ($imageInfo) {
                 $dimensions = ['width' => $imageInfo[0], 'height' => $imageInfo[1]];
             }
@@ -86,7 +97,7 @@ class BrandAssetController extends Controller
             'type' => $request->input('type'),
             'file_path' => $path,
             'file_url' => $url,
-            'mime_type' => $file->getMimeType(),
+            'mime_type' => $mime,
             'size_bytes' => $file->getSize(),
             'dimensions' => $dimensions,
             'tags' => $request->input('tags', []),
@@ -108,6 +119,7 @@ class BrandAssetController extends Controller
     {
         $orgId = app('current_organization_id');
         $brand = Brand::where('organization_id', $orgId)->findOrFail($brandId);
+        /** @var BrandAsset $asset */
         $asset = $brand->assets()->where('organization_id', $orgId)->findOrFail($assetId);
 
         AuditLogger::log('brand.asset_deleted', $asset, ['name' => $asset->name], null, $orgId);

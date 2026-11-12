@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Core\Scopes\TenantScope;
 use App\Core\Security\SvgSanitizer;
 use App\Models\User;
 use App\Modules\Billing\Models\Invoice;
@@ -11,8 +12,6 @@ use App\Modules\Brand\Models\Brand;
 use App\Modules\Brand\Models\BrandAsset;
 use App\Modules\Organization\Models\Organization;
 use App\Modules\Organization\Models\OrganizationMember;
-use App\Modules\Publishing\Models\MagicReviewLink;
-use App\Modules\Publishing\Models\PublishingDispatch;
 use App\Modules\Research\Models\RssFeed;
 use App\Modules\Research\Services\RssIngestionService;
 use App\Modules\Workspace\Models\Workspace;
@@ -265,6 +264,7 @@ SVG;
 
         $response->assertStatus(201);
 
+        /** @var BrandAsset|null $asset */
         $asset = BrandAsset::first();
         $this->assertNotNull($asset);
 
@@ -284,7 +284,7 @@ SVG;
         app()->forgetInstance('current_organization_id');
         auth()->logout();
 
-        $scope = new \App\Core\Scopes\TenantScope;
+        $scope = new TenantScope;
         $scope->enforceInConsole = true;
         $builder = Brand::query();
         

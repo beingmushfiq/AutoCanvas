@@ -27,8 +27,12 @@ class TenantScope implements Scope
 
         if (app()->has('current_organization_id')) {
             $organizationId = app('current_organization_id');
-        } elseif (auth()->check() && isset(auth()->user()->current_organization_id)) {
-            $organizationId = auth()->user()->current_organization_id;
+        } elseif (auth()->check()) {
+            /** @var \App\Models\User|null $user */
+            $user = auth()->user();
+            if ($user && isset($user->current_organization_id)) {
+                $organizationId = $user->current_organization_id;
+            }
         }
 
         if ($organizationId) {

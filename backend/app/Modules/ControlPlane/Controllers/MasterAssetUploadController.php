@@ -4,9 +4,11 @@ namespace App\Modules\ControlPlane\Controllers;
 
 use App\Core\Security\SvgSanitizer;
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use App\Modules\ControlPlane\Models\SystemChangeLog;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -22,17 +24,26 @@ class MasterAssetUploadController extends Controller
             'asset_type' => ['nullable', 'string', 'in:primary_logo,dark_logo,favicon,general'],
         ]);
 
+        /** @var UploadedFile|null $file */
         $file = $request->file('file');
+        if (! $file instanceof UploadedFile) {
+            return response()->json([
+                'success' => false,
+                'error' => ['message' => 'No valid file uploaded.'],
+            ], 422);
+        }
+
         $extension = strtolower($file->getClientOriginalExtension());
-        $mime = $file->getMimeType();
+        $mime = $file->getMimeType() ?: 'application/octet-stream';
         $safeName = Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
         $fileName = "{$safeName}-" . Str::random(8) . ".{$extension}";
         $storageDir = 'platform-assets';
 
         // Perform SVG sanitization to neutralize stored XSS vulnerabilities
         if ($extension === 'svg' || $mime === 'image/svg+xml') {
-            $content = file_get_contents($file->getRealPath());
-            $sanitized = SvgSanitizer::sanitize($content);
+            $realPath = $file->getRealPath();
+            $content = $realPath ? file_get_contents($realPath) : '';
+            $sanitized = SvgSanitizer::sanitize($content ?: '');
 
             $path = "{$storageDir}/{$fileName}";
             Storage::disk('public')->put($path, $sanitized);
@@ -43,6 +54,7 @@ class MasterAssetUploadController extends Controller
         $url = Storage::disk('public')->url($path);
 
         // Record in system change log
+        /** @var User|null $admin */
         $admin = $request->user();
         if ($admin) {
             SystemChangeLog::create([
