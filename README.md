@@ -19,7 +19,7 @@
 [![Vite 8](https://img.shields.io/badge/Vite-8.3-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev)
 [![Tailwind CSS v4](https://img.shields.io/badge/Tailwind_CSS-v4.3-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
 [![WCAG 2.2 AA](https://img.shields.io/badge/WCAG_2.2-Level_AA-059669?style=for-the-badge&logo=w3c&logoColor=white)](https://www.w3.org/WAI/standards-guidelines/wcag/)
-[![Tests Passing](https://img.shields.io/badge/Tests-173%2F173_Passing-10B981?style=for-the-badge&logo=checkmarx&logoColor=white)](https://phpunit.de)
+[![Tests Passing](https://img.shields.io/badge/Tests-177%2F177_Passing-10B981?style=for-the-badge&logo=checkmarx&logoColor=white)](https://phpunit.de)
 [![Engineered By](https://img.shields.io/badge/Engineered_By-DevCenterPoint-D97706?style=for-the-badge&logo=googlecloud&logoColor=white)](https://devcenterpoint.com)
 
 ---

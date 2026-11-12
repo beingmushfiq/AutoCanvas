@@ -11,12 +11,16 @@ import { useGsap, gsap } from '../../../lib/motion/useGsap'
 interface HeroSectionProps {
   onGetStarted: () => void
   onExploreDemo: () => void
+  onEnterApp?: () => void
+  isAuthenticated?: boolean
   cmsHero?: PublicCmsData['hero']
 }
 
 export const HeroSection: React.FC<HeroSectionProps> = ({
   onGetStarted,
   onExploreDemo,
+  onEnterApp,
+  isAuthenticated = false,
   cmsHero,
 }) => {
   const badgeText = cmsHero?.badge || 'ENGINEERED BY DEVCENTERPOINT · SMART ORIGINAL CONTENT'
@@ -55,7 +59,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           href="https://devcenterpoint.com"
           target="_blank"
           rel="noreferrer"
-          className="hero-badge inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-border bg-surface hover:border-brand-accent/50 shadow-2xs mb-8 transition-all group opacity-0"
+          className="hero-badge inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-border bg-surface hover:border-brand-accent/50 shadow-2xs mb-8 transition-all group opacity-0 cursor-pointer hover:-translate-y-0.5 duration-150"
         >
           <span className="relative flex h-2 w-2">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-accent opacity-75" />
@@ -82,21 +86,33 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
 
         {/* Action Buttons */}
         <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-          <button
-            onClick={onGetStarted}
-            className="hero-cta-btn w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-interactive-primary text-interactive-primary-fg text-sm font-semibold hover:opacity-90 active:scale-98 transition-all shadow-md opacity-0"
-          >
-            <span>{primaryCta}</span>
-            <ArrowRight className="w-4 h-4" aria-hidden="true" />
-          </button>
+          {isAuthenticated ? (
+            <button
+              onClick={onEnterApp}
+              className="hero-cta-btn w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl bg-interactive-primary text-interactive-primary-fg text-sm font-semibold hover:opacity-90 hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 active:scale-98 transition-all duration-200 ease-out shadow-md opacity-0 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent focus-visible:ring-offset-2 motion-reduce:transform-none motion-reduce:transition-none"
+            >
+              <span>Enter Workspace</span>
+              <ArrowRight className="w-4 h-4" aria-hidden="true" />
+            </button>
+          ) : (
+            <>
+              <button
+                onClick={onGetStarted}
+                className="hero-cta-btn w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-interactive-primary text-interactive-primary-fg text-sm font-semibold hover:opacity-90 hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 active:scale-98 transition-all duration-200 ease-out shadow-md opacity-0 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent focus-visible:ring-offset-2 motion-reduce:transform-none motion-reduce:transition-none"
+              >
+                <span>{primaryCta}</span>
+                <ArrowRight className="w-4 h-4" aria-hidden="true" />
+              </button>
 
-          <button
-            onClick={onExploreDemo}
-            className="hero-cta-btn w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl border border-border bg-surface text-foreground text-sm font-semibold hover:bg-surface-raised transition-all active:scale-98 opacity-0"
-          >
-            <Zap className="w-4 h-4 text-brand-accent" aria-hidden="true" />
-            <span>{secondaryCta}</span>
-          </button>
+              <button
+                onClick={onExploreDemo}
+                className="hero-cta-btn w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl border border-border bg-surface text-foreground text-sm font-semibold hover:bg-surface-raised hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 ease-out active:translate-y-0 active:scale-98 opacity-0 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent focus-visible:ring-offset-2 motion-reduce:transform-none motion-reduce:transition-none"
+              >
+                <Zap className="w-4 h-4 text-brand-accent" aria-hidden="true" />
+                <span>{secondaryCta}</span>
+              </button>
+            </>
+          )}
         </div>
 
         {/* Trust Badges */}

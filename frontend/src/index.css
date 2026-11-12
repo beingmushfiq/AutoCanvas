@@ -347,6 +347,18 @@
 }
 
 /* ========================================================================= */
+/* GLOBAL INTERACTIVE AFFORDANCE & CURSOR RESETS                             */
+/* ========================================================================= */
+button:not(:disabled),
+[role="button"]:not([aria-disabled="true"]) {
+  cursor: pointer;
+}
+button:disabled,
+[role="button"][aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
+/* ========================================================================= */
 /* CIRCULAR RADIAL VIEW TRANSITION FOR THEME TOGGLE                          */
 /* ========================================================================= */
 ::view-transition-old(root),

@@ -26,7 +26,7 @@ const PREF_STORAGE_KEY = 'autocanvas_user_preferences'
 export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [theme, setThemeState] = useState<ThemeMode>(() => {
     const saved = localStorage.getItem(`${PREF_STORAGE_KEY}_theme`)
-    return (saved === 'light' || saved === 'dark') ? saved : 'dark'
+    return (saved === 'light' || saved === 'dark') ? saved : 'light'
   })
 
   const [density, setDensityState] = useState<DensityMode>(() => {

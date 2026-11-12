@@ -7,6 +7,7 @@ import { PricingSection } from './components/PricingSection'
 import { FaqSection } from './components/FaqSection'
 import { MarketingFooter } from './components/MarketingFooter'
 import { apiClient, type PublicCmsData } from '../../lib/api/client'
+import { useAuth } from '../auth/AuthContext'
 import { useDocumentHead } from '../../lib/seo/useDocumentHead'
 import {
   generateOrganizationSchema,
@@ -27,6 +28,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   onEnterApp,
   isAuthenticated = false,
 }) => {
+  const { logout } = useAuth()
   const [cmsData, setCmsData] = useState<PublicCmsData | null>(null)
 
   useEffect(() => {
@@ -108,6 +110,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       <MarketingNavbar
         onOpenAuth={onOpenAuth}
         onEnterApp={onEnterApp}
+        onLogout={logout}
         isAuthenticated={isAuthenticated}
         announcement={cmsData?.branding?.announcement_banner}
       />
@@ -117,6 +120,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         <HeroSection
           onGetStarted={() => onOpenAuth('register')}
           onExploreDemo={onEnterApp || (() => onOpenAuth('register'))}
+          onEnterApp={onEnterApp}
+          isAuthenticated={isAuthenticated}
           cmsHero={cmsData?.hero}
         />
         <PlatformPillarsSection cmsFeatures={cmsData?.features} />
