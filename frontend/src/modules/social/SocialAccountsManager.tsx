@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import {
   Share2,
   PlusCircle,
@@ -104,12 +105,31 @@ const DEMO_ACCOUNTS: SocialAccountItem[] = [
 
 export const SocialAccountsManager: React.FC = () => {
   const { isAuthenticated } = useAuth()
+  const [searchParams, setSearchParams] = useSearchParams()
   const [accounts, setAccounts] = useState<SocialAccountItem[]>(DEMO_ACCOUNTS)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [actionSuccess, setActionSuccess] = useState<string | null>(null)
   const [connectModalOpen, setConnectModalOpen] = useState(false)
   const [processingId, setProcessingId] = useState<string | null>(null)
+
+  useEffect(() => {
+    const connected = searchParams.get('connected')
+    const errorParam = searchParams.get('error')
+
+    if (connected) {
+      const accountName = searchParams.get('account') || 'social'
+      appToast.success(`Successfully connected ${connected} account!`, {
+        description: `Connected to ${decodeURIComponent(accountName)}`,
+      })
+      setSearchParams({})
+    } else if (errorParam) {
+      appToast.error('Connection failed', {
+        description: decodeURIComponent(errorParam),
+      })
+      setSearchParams({})
+    }
+  }, [searchParams, setSearchParams])
 
   // Fetch accounts on load
   const fetchAccounts = async () => {

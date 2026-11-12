@@ -57,6 +57,40 @@ class SocialConnectorController extends Controller
     }
 
     /**
+     * Handle browser-based OAuth callback with HMAC verification and 302 redirect.
+     */
+    public function handleBrowserCallback(Request $request, string $platform): \Illuminate\Http\RedirectResponse
+    {
+        $code = $request->query('code');
+        $state = $request->query('state');
+        $error = $request->query('error_description') ?? $request->query('error');
+
+        $frontendUrl = '/workspace/social';
+
+        if ($error) {
+            return redirect("{$frontendUrl}?error=" . urlencode($error));
+        }
+
+        if (!$code || !$state) {
+            return redirect("{$frontendUrl}?error=" . urlencode('Missing required authorization parameters.'));
+        }
+
+        $stateData = $this->oauthManager->verifyState($state);
+        if (!$stateData) {
+            return redirect("{$frontendUrl}?error=" . urlencode('Invalid, expired, or tampered OAuth session. Please retry.'));
+        }
+
+        try {
+            $redirectUri = url("/oauth/social/{$platform}/callback");
+            $account = $this->oauthManager->handleCallback($platform, $code, $redirectUri, $stateData);
+
+            return redirect("{$frontendUrl}?connected={$platform}&account=" . urlencode($account->account_name));
+        } catch (\Throwable $e) {
+            return redirect("{$frontendUrl}?error=" . urlencode('Token exchange failed: ' . $e->getMessage()));
+        }
+    }
+
+    /**
      * Generate OAuth authorization URL with signed CSRF state.
      */
     public function oauthUrl(Request $request, string $platform): JsonResponse

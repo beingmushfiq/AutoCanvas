@@ -21,7 +21,10 @@ Route::get('/docs', [SeoController::class, 'landingPage']);
 Route::get('/terms', [SeoController::class, 'landingPage']);
 Route::get('/privacy', [SeoController::class, 'landingPage']);
 
-// 3. SPA Client-Side Fallback for Non-API Routes
+// 3. Social Platform Callback Route (Publicly Accessible)
+Route::get('/oauth/social/{platform}/callback', [App\Modules\SocialConnectors\Controllers\SocialConnectorController::class, 'handleBrowserCallback']);
+
+// 4. SPA Client-Side Fallback for Non-API Routes
 Route::fallback(function () {
     $spaIndex = public_path('index.html');
     if (file_exists($spaIndex)) {

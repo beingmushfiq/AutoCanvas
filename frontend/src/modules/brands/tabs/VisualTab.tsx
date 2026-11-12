@@ -154,48 +154,65 @@ export const VisualTab: React.FC<VisualTabProps> = ({ brandId, initialVisual, on
 
         {/* Accent Colors */}
         <div className="pt-3 border-t border-border">
-          <label className="block text-xs font-semibold text-foreground mb-2">Accent Palette</label>
-          <div className="flex flex-wrap items-center gap-2 mb-3">
+          <label className="block text-xs font-semibold text-foreground mb-3">Accent Palette</label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
             {accentColors.map((color, idx) => (
               <div
                 key={idx}
-                className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-border bg-background-subtle text-xs font-mono text-foreground"
+                className="flex items-center gap-2 p-2 rounded-lg border border-border bg-surface-muted"
               >
-                <div className="w-3.5 h-3.5 rounded-full border border-border" style={{ backgroundColor: color }} />
-                <span>{color}</span>
+                <input
+                  type="color"
+                  value={color}
+                  onChange={(e) => {
+                    const newAccents = [...accentColors]
+                    newAccents[idx] = e.target.value
+                    setAccentColors(newAccents)
+                  }}
+                  className="w-8 h-8 rounded border border-border cursor-pointer p-0.5 bg-surface"
+                />
+                <Input
+                  type="text"
+                  value={color}
+                  onChange={(e) => {
+                    const newAccents = [...accentColors]
+                    newAccents[idx] = e.target.value
+                    setAccentColors(newAccents)
+                  }}
+                  className="flex-1 font-mono"
+                />
                 <button
                   type="button"
                   onClick={() => handleRemoveAccent(color)}
-                  aria-label={`Remove accent color ${color}`}
-                  className="text-foreground-muted hover:text-status-danger ml-1"
+                  className="text-foreground-muted hover:text-status-danger p-1"
                 >
-                  <Trash2 className="w-3 h-3" />
+                  <Trash2 className="w-4 h-4" />
                 </button>
               </div>
             ))}
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3 pt-2 border-t border-border">
             <input
               type="color"
               value={newAccent}
               onChange={(e) => setNewAccent(e.target.value)}
-              className="w-8 h-8 rounded border border-border cursor-pointer p-0.5 bg-surface"
+              className="w-10 h-10 rounded-lg border border-border cursor-pointer p-0.5 bg-surface"
             />
             <Input
               type="text"
               value={newAccent}
               onChange={(e) => setNewAccent(e.target.value)}
-              className="w-28 font-mono"
+              className="w-32 font-mono"
             />
             <Button
               type="button"
               variant="outline"
               size="sm"
               onClick={handleAddAccent}
-              className="gap-1"
+              className="gap-2"
             >
-              <Plus className="w-3.5 h-3.5" />
+              <Plus className="w-4 h-4" />
               <span>Add Accent</span>
             </Button>
           </div>
