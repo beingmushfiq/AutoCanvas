@@ -9,6 +9,7 @@ interface PricingTier {
   description: string
   features: string[]
   highlighted?: boolean
+  contact_sales?: boolean
 }
 
 interface CmsPricingLivePreviewProps {
@@ -26,8 +27,10 @@ export const CmsPricingLivePreview: React.FC<CmsPricingLivePreviewProps> = ({ da
   const title = data.section_title || 'Transparent, Simple Subscriptions'
   const exchangeRate = Math.max(1, Number(data.currency_bdt_rate) || 120)
   const tiers = Array.isArray(data.tiers) && data.tiers.length > 0 ? data.tiers : []
+  const isFourTiers = tiers.length === 4
 
   const formatPrice = (usdPrice: number) => {
+    if (usdPrice === 0) return 'Custom'
     if (currency === 'BDT') {
       const bdtAmount = Math.round(usdPrice * exchangeRate)
       return `৳${bdtAmount.toLocaleString('en-US')}`
@@ -57,7 +60,7 @@ export const CmsPricingLivePreview: React.FC<CmsPricingLivePreviewProps> = ({ da
           <button
             type="button"
             onClick={() => setBillingCycle('monthly')}
-            className={`px-3 py-1 rounded-lg transition-all ${
+            className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${
               billingCycle === 'monthly'
                 ? 'bg-interactive-primary text-interactive-primary-fg font-semibold shadow-2xs'
                 : 'text-foreground-secondary hover:text-foreground'
@@ -68,7 +71,7 @@ export const CmsPricingLivePreview: React.FC<CmsPricingLivePreviewProps> = ({ da
           <button
             type="button"
             onClick={() => setBillingCycle('annual')}
-            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg transition-all ${
+            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg transition-all cursor-pointer ${
               billingCycle === 'annual'
                 ? 'bg-interactive-primary text-interactive-primary-fg font-semibold shadow-2xs'
                 : 'text-foreground-secondary hover:text-foreground'
@@ -86,9 +89,9 @@ export const CmsPricingLivePreview: React.FC<CmsPricingLivePreviewProps> = ({ da
           <button
             type="button"
             onClick={() => setCurrency('USD')}
-            className={`px-2.5 py-1 rounded-lg transition-all ${
+            className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
               currency === 'USD'
-                ? 'bg-brand-accent text-black font-bold shadow-2xs'
+                ? 'bg-interactive-primary text-interactive-primary-fg font-bold shadow-2xs'
                 : 'text-foreground-secondary hover:text-foreground'
             }`}
           >
@@ -97,9 +100,9 @@ export const CmsPricingLivePreview: React.FC<CmsPricingLivePreviewProps> = ({ da
           <button
             type="button"
             onClick={() => setCurrency('BDT')}
-            className={`px-2.5 py-1 rounded-lg transition-all ${
+            className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
               currency === 'BDT'
-                ? 'bg-brand-accent text-black font-bold shadow-2xs'
+                ? 'bg-interactive-primary text-interactive-primary-fg font-bold shadow-2xs'
                 : 'text-foreground-secondary hover:text-foreground'
             }`}
           >
@@ -109,10 +112,17 @@ export const CmsPricingLivePreview: React.FC<CmsPricingLivePreviewProps> = ({ da
       </div>
 
       {/* Tiers Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 pt-2">
+      <div
+        className={`grid ${
+          isFourTiers
+            ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3'
+            : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5'
+        } pt-2`}
+      >
         {tiers.map((tier) => {
           const basePrice = billingCycle === 'annual' ? tier.annual_price_usd : tier.monthly_price_usd
           const isHighlighted = !!tier.highlighted
+          const hasContactSales = !!tier.contact_sales
 
           return (
             <div
@@ -124,7 +134,7 @@ export const CmsPricingLivePreview: React.FC<CmsPricingLivePreviewProps> = ({ da
               }`}
             >
               {isHighlighted && (
-                <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full bg-brand-accent text-black text-[10px] font-mono font-bold tracking-wider uppercase flex items-center gap-1 shadow-xs">
+                <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full bg-brand-accent text-interactive-primary-fg text-[10px] font-mono font-bold tracking-wider uppercase flex items-center gap-1 shadow-xs">
                   <Sparkles className="w-2.5 h-2.5" /> Most Popular
                 </div>
               )}
@@ -145,8 +155,8 @@ export const CmsPricingLivePreview: React.FC<CmsPricingLivePreviewProps> = ({ da
                   {tier.description}
                 </p>
 
-                <ul className="mt-4 space-y-2 border-t border-border-subtle pt-3.5 text-xs text-foreground-secondary">
-                  {tier.features.map((feat, fIdx) => (
+                <ul className="mt-4 space-y-1.5 border-t border-border-subtle pt-3.5 text-xs text-foreground-secondary">
+                  {(tier.features || []).map((feat, fIdx) => (
                     <li key={fIdx} className="flex items-start gap-1.5 text-[11px]">
                       <Check className="w-3.5 h-3.5 text-status-success shrink-0 mt-0.5" />
                       <span>{feat}</span>
@@ -155,10 +165,10 @@ export const CmsPricingLivePreview: React.FC<CmsPricingLivePreviewProps> = ({ da
                 </ul>
               </div>
 
-              <div className="mt-5 pt-3">
+              <div className="mt-5 pt-3 space-y-1.5">
                 <button
                   type="button"
-                  className={`w-full py-2 rounded-xl text-xs font-semibold transition-all ${
+                  className={`w-full py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                     isHighlighted
                       ? 'bg-interactive-primary text-interactive-primary-fg hover:opacity-90'
                       : 'border border-border bg-background hover:bg-surface-raised text-foreground'
@@ -166,6 +176,12 @@ export const CmsPricingLivePreview: React.FC<CmsPricingLivePreviewProps> = ({ da
                 >
                   Choose {tier.name}
                 </button>
+
+                {hasContactSales && (
+                  <div className="text-center text-[10px] font-mono text-brand-accent">
+                    + Contact Sales & Invoicing
+                  </div>
+                )}
               </div>
             </div>
           )
@@ -174,4 +190,3 @@ export const CmsPricingLivePreview: React.FC<CmsPricingLivePreviewProps> = ({ da
     </div>
   )
 }
-

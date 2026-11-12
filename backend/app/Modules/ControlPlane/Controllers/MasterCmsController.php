@@ -64,6 +64,19 @@ class MasterCmsController extends Controller
     }
 
     /**
+     * Flush public landing page CMS cache.
+     */
+    public function purgeCache(): JsonResponse
+    {
+        $this->cmsService->flushPublicCache();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Public landing page CMS cache purged successfully.',
+        ]);
+    }
+
+    /**
      * Get theme overrides & white-label settings.
      */
     public function getTheme(): JsonResponse

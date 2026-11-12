@@ -299,6 +299,20 @@ export const MasterControlDashboard: React.FC<MasterControlDashboardProps> = ({ 
     }
   }
 
+  const [isPurgingCache, setIsPurgingCache] = useState(false)
+
+  const handlePurgeCmsCache = async () => {
+    setIsPurgingCache(true)
+    try {
+      await apiClient.purgeCmsCache()
+      flashSuccess('Public marketing CMS cache purged successfully. Changes are live immediately.')
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Failed to purge CMS cache.')
+    } finally {
+      setIsPurgingCache(false)
+    }
+  }
+
   const handleTaskTypeChange = (taskType: string) => {
     setSelectedTaskType(taskType)
     const grp = promptGroups.find((g) => g.task_type === taskType)
@@ -782,8 +796,17 @@ export const MasterControlDashboard: React.FC<MasterControlDashboardProps> = ({ 
               </div>
               <div className="flex items-center gap-3">
                 <button
+                  onClick={handlePurgeCmsCache}
+                  disabled={isPurgingCache}
+                  title="Purge public marketing landing page cache"
+                  className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold border border-border bg-surface text-foreground-secondary hover:text-foreground hover:bg-surface-raised transition-all cursor-pointer disabled:opacity-50"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${isPurgingCache ? 'animate-spin' : ''}`} />
+                  <span>{isPurgingCache ? 'Purging...' : 'Purge Cache'}</span>
+                </button>
+                <button
                   onClick={() => setShowLivePreview(!showLivePreview)}
-                  className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold border transition-all ${
+                  className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold border transition-all cursor-pointer ${
                     showLivePreview
                       ? 'bg-brand-accent/15 border-brand-accent/40 text-brand-accent'
                       : 'bg-surface border-border text-foreground-secondary'
@@ -795,7 +818,7 @@ export const MasterControlDashboard: React.FC<MasterControlDashboardProps> = ({ 
                 <button
                   onClick={handleSaveCmsBlock}
                   disabled={isSaving}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-interactive-primary text-interactive-primary-fg text-xs font-semibold hover:opacity-90 active:scale-98 transition-all shadow-md disabled:opacity-50"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-interactive-primary text-interactive-primary-fg text-xs font-semibold hover:opacity-90 active:scale-98 transition-all shadow-md disabled:opacity-50 cursor-pointer"
                 >
                   <Save className="w-4 h-4" />
                   <span>{isSaving ? 'Deploying...' : `Save '${activeCmsBlockKey}'`}</span>
@@ -811,9 +834,9 @@ export const MasterControlDashboard: React.FC<MasterControlDashboardProps> = ({ 
                   <button
                     key={key}
                     onClick={() => handleSelectCmsBlock(key)}
-                    className={`px-4 py-2 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all ${
+                    className={`px-4 py-2 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer ${
                       isActive
-                        ? 'bg-brand-accent text-black font-bold shadow-2xs'
+                        ? 'bg-brand-accent text-interactive-primary-fg font-bold shadow-2xs'
                         : 'bg-surface text-foreground-secondary hover:text-foreground border border-border'
                     }`}
                   >
@@ -1146,30 +1169,251 @@ export const MasterControlDashboard: React.FC<MasterControlDashboardProps> = ({ 
 
                 {activeCmsBlockKey === 'pricing' && (
                   <div className="space-y-4">
-                    <div>
-                      <label className="block text-xs font-medium text-foreground-secondary mb-1">
-                        Pricing Section Title
-                      </label>
-                      <input
-                        type="text"
-                        value={cmsBlockForm.section_title ?? ''}
-                        onChange={(e) => setCmsBlockForm({ ...cmsBlockForm, section_title: e.target.value })}
-                        className="w-full px-3.5 py-2 rounded-xl border border-border bg-background text-foreground text-xs focus:ring-1 focus:ring-brand-accent outline-hidden"
-                      />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs font-medium text-foreground-secondary mb-1">
+                          Pricing Section Title
+                        </label>
+                        <input
+                          type="text"
+                          value={cmsBlockForm.section_title ?? ''}
+                          onChange={(e) => setCmsBlockForm({ ...cmsBlockForm, section_title: e.target.value })}
+                          className="w-full px-3.5 py-2 rounded-xl border border-border bg-background text-foreground text-xs focus:ring-1 focus:ring-brand-accent outline-hidden"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-foreground-secondary mb-1">
+                          BDT / USD Exchange Rate (for Local Billing)
+                        </label>
+                        <input
+                          type="number"
+                          value={cmsBlockForm.currency_bdt_rate ?? 120}
+                          onChange={(e) => setCmsBlockForm({ ...cmsBlockForm, currency_bdt_rate: Number(e.target.value) })}
+                          className="w-full px-3.5 py-2 rounded-xl border border-border bg-background text-foreground text-xs focus:ring-1 focus:ring-brand-accent outline-hidden"
+                        />
+                      </div>
                     </div>
+
                     <div>
-                      <label className="block text-xs font-medium text-foreground-secondary mb-1">
-                        BDT / USD Exchange Rate (for Local Billing)
-                      </label>
-                      <input
-                        type="number"
-                        value={cmsBlockForm.currency_bdt_rate ?? 120}
-                        onChange={(e) => setCmsBlockForm({ ...cmsBlockForm, currency_bdt_rate: Number(e.target.value) })}
-                        className="w-full px-3.5 py-2 rounded-xl border border-border bg-background text-foreground text-xs focus:ring-1 focus:ring-brand-accent outline-hidden"
-                      />
-                    </div>
-                    <div className="text-xs text-foreground-secondary">
-                      Tiers are dynamically previewed in the right pane. Open the Direct JSON editor below for fine-grained tier modifications.
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="text-xs font-medium text-foreground-secondary">
+                          Subscription Tiers ({(cmsBlockForm.tiers || []).length})
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newTiers = [
+                              ...(cmsBlockForm.tiers || []),
+                              {
+                                id: `plan-${Date.now()}`,
+                                name: 'New Tier',
+                                monthly_price_usd: 99,
+                                annual_price_usd: 79,
+                                description: 'Tailored for specialized team needs.',
+                                features: ['Custom Capability 1', 'Dedicated Publishing Engine'],
+                                highlighted: false,
+                                contact_sales: false,
+                              },
+                            ]
+                            setCmsBlockForm({ ...cmsBlockForm, tiers: newTiers })
+                          }}
+                          className="inline-flex items-center gap-1 text-[11px] font-mono text-brand-accent hover:underline cursor-pointer"
+                        >
+                          <Plus className="w-3 h-3" /> Add Tier
+                        </button>
+                      </div>
+
+                      <div className="space-y-4 max-h-[460px] overflow-y-auto pr-1">
+                        {(cmsBlockForm.tiers || []).map((tier: any, idx: number) => (
+                          <div
+                            key={idx}
+                            className={`p-4 rounded-xl border ${
+                              tier.highlighted
+                                ? 'border-brand-accent bg-surface/90'
+                                : 'border-border bg-background/60'
+                            } space-y-3 relative`}
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs font-mono font-bold text-brand-accent">
+                                  #{idx + 1} {tier.name || 'Tier'}
+                                </span>
+                                {tier.highlighted && (
+                                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-brand-accent text-interactive-primary-fg">
+                                    MOST POPULAR
+                                  </span>
+                                )}
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const filtered = (cmsBlockForm.tiers || []).filter((_: any, i: number) => i !== idx)
+                                  setCmsBlockForm({ ...cmsBlockForm, tiers: filtered })
+                                }}
+                                className="text-foreground-muted hover:text-status-danger transition-colors p-1 cursor-pointer"
+                                title="Remove tier"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-2">
+                              <div>
+                                <label className="block text-[10px] font-mono text-foreground-muted mb-0.5">Tier Name</label>
+                                <input
+                                  type="text"
+                                  value={tier.name ?? ''}
+                                  onChange={(e) => {
+                                    const updated = [...(cmsBlockForm.tiers || [])]
+                                    updated[idx] = { ...updated[idx], name: e.target.value }
+                                    setCmsBlockForm({ ...cmsBlockForm, tiers: updated })
+                                  }}
+                                  placeholder="e.g. Starter"
+                                  className="w-full px-2.5 py-1.5 rounded-lg border border-border bg-background text-foreground text-xs focus:ring-1 focus:ring-brand-accent outline-hidden"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-[10px] font-mono text-foreground-muted mb-0.5">Slug ID</label>
+                                <input
+                                  type="text"
+                                  value={tier.id ?? ''}
+                                  onChange={(e) => {
+                                    const updated = [...(cmsBlockForm.tiers || [])]
+                                    updated[idx] = { ...updated[idx], id: e.target.value }
+                                    setCmsBlockForm({ ...cmsBlockForm, tiers: updated })
+                                  }}
+                                  placeholder="e.g. starter"
+                                  className="w-full px-2.5 py-1.5 rounded-lg border border-border bg-background text-foreground text-xs focus:ring-1 focus:ring-brand-accent outline-hidden"
+                                />
+                              </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-2">
+                              <div>
+                                <label className="block text-[10px] font-mono text-foreground-muted mb-0.5">Monthly Price ($)</label>
+                                <input
+                                  type="number"
+                                  value={tier.monthly_price_usd ?? 0}
+                                  onChange={(e) => {
+                                    const updated = [...(cmsBlockForm.tiers || [])]
+                                    updated[idx] = { ...updated[idx], monthly_price_usd: Number(e.target.value) }
+                                    setCmsBlockForm({ ...cmsBlockForm, tiers: updated })
+                                  }}
+                                  className="w-full px-2.5 py-1.5 rounded-lg border border-border bg-background text-foreground text-xs focus:ring-1 focus:ring-brand-accent outline-hidden"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-[10px] font-mono text-foreground-muted mb-0.5">Annual Price / Mo ($)</label>
+                                <input
+                                  type="number"
+                                  value={tier.annual_price_usd ?? 0}
+                                  onChange={(e) => {
+                                    const updated = [...(cmsBlockForm.tiers || [])]
+                                    updated[idx] = { ...updated[idx], annual_price_usd: Number(e.target.value) }
+                                    setCmsBlockForm({ ...cmsBlockForm, tiers: updated })
+                                  }}
+                                  className="w-full px-2.5 py-1.5 rounded-lg border border-border bg-background text-foreground text-xs focus:ring-1 focus:ring-brand-accent outline-hidden"
+                                />
+                              </div>
+                            </div>
+
+                            <div>
+                              <label className="block text-[10px] font-mono text-foreground-muted mb-0.5">Description</label>
+                              <input
+                                type="text"
+                                value={tier.description ?? ''}
+                                onChange={(e) => {
+                                  const updated = [...(cmsBlockForm.tiers || [])]
+                                  updated[idx] = { ...updated[idx], description: e.target.value }
+                                  setCmsBlockForm({ ...cmsBlockForm, tiers: updated })
+                                }}
+                                placeholder="Short value statement..."
+                                className="w-full px-2.5 py-1.5 rounded-lg border border-border bg-background text-foreground text-xs focus:ring-1 focus:ring-brand-accent outline-hidden"
+                              />
+                            </div>
+
+                            <div className="flex flex-wrap items-center gap-4 text-xs text-foreground-secondary pt-1">
+                              <label className="inline-flex items-center gap-2 cursor-pointer">
+                                <input
+                                  type="checkbox"
+                                  checked={!!tier.highlighted}
+                                  onChange={(e) => {
+                                    const updated = [...(cmsBlockForm.tiers || [])]
+                                    updated[idx] = { ...updated[idx], highlighted: e.target.checked }
+                                    setCmsBlockForm({ ...cmsBlockForm, tiers: updated })
+                                  }}
+                                  className="rounded border-border text-brand-accent focus:ring-brand-accent"
+                                />
+                                <span>Highlighted ("Most Popular")</span>
+                              </label>
+
+                              <label className="inline-flex items-center gap-2 cursor-pointer">
+                                <input
+                                  type="checkbox"
+                                  checked={!!tier.contact_sales}
+                                  onChange={(e) => {
+                                    const updated = [...(cmsBlockForm.tiers || [])]
+                                    updated[idx] = { ...updated[idx], contact_sales: e.target.checked }
+                                    setCmsBlockForm({ ...cmsBlockForm, tiers: updated })
+                                  }}
+                                  className="rounded border-border text-brand-accent focus:ring-brand-accent"
+                                />
+                                <span>Contact Sales / Invoicing CTA</span>
+                              </label>
+                            </div>
+
+                            <div className="pt-2 border-t border-border-subtle">
+                              <div className="flex items-center justify-between mb-1.5">
+                                <label className="text-[10px] font-mono text-foreground-muted">
+                                  Features ({((tier.features || []).length)})
+                                </label>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const updated = [...(cmsBlockForm.tiers || [])]
+                                    const features = [...(updated[idx].features || []), 'New capability']
+                                    updated[idx] = { ...updated[idx], features }
+                                    setCmsBlockForm({ ...cmsBlockForm, tiers: updated })
+                                  }}
+                                  className="text-[10px] font-mono text-brand-accent hover:underline cursor-pointer"
+                                >
+                                  + Add Feature
+                                </button>
+                              </div>
+                              <div className="space-y-1.5 max-h-36 overflow-y-auto pr-1">
+                                {(tier.features || []).map((feat: string, fIdx: number) => (
+                                  <div key={fIdx} className="flex items-center gap-1.5">
+                                    <input
+                                      type="text"
+                                      value={feat}
+                                      onChange={(e) => {
+                                        const updated = [...(cmsBlockForm.tiers || [])]
+                                        const features = [...(updated[idx].features || [])]
+                                        features[fIdx] = e.target.value
+                                        updated[idx] = { ...updated[idx], features }
+                                        setCmsBlockForm({ ...cmsBlockForm, tiers: updated })
+                                      }}
+                                      className="flex-1 px-2 py-1 rounded border border-border bg-background text-foreground text-[11px] focus:ring-1 focus:ring-brand-accent outline-hidden"
+                                    />
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        const updated = [...(cmsBlockForm.tiers || [])]
+                                        const features = (updated[idx].features || []).filter((_: any, i: number) => i !== fIdx)
+                                        updated[idx] = { ...updated[idx], features }
+                                        setCmsBlockForm({ ...cmsBlockForm, tiers: updated })
+                                      }}
+                                      className="text-foreground-muted hover:text-status-danger transition-colors p-0.5 cursor-pointer"
+                                    >
+                                      <Trash2 className="w-3 h-3" />
+                                    </button>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 )}

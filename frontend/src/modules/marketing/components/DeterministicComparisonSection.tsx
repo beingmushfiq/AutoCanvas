@@ -9,19 +9,19 @@ interface DeterministicComparisonSectionProps {
 
 const DEFAULT_ROWS = [
   {
-    capability: 'Headline & Body Copy',
-    autocanvas: 'Full layer scene graph: edit headlines, swap imagery, or tweak colors in 1 click.',
-    generic_tools: 'Text cannot be edited, translated, or checked for typos after generation.',
+    capability: 'Content Repetition',
+    autocanvas: 'Guaranteed Duplicate Prevention (Phrase, Concept & Design Rotation)',
+    generic_tools: 'Repeats the same generic tropes and questions every few days',
   },
   {
-    capability: 'Brand Identity & Vector Logos',
-    autocanvas: 'Unaltered vector SVG brand marks; guaranteed contrast and color fidelity.',
-    generic_tools: 'Logos are distorted, violating official corporate brand guidelines.',
+    capability: 'Creative Graphic Quality',
+    autocanvas: 'Crisp brand typography, exact colors, and pixel-perfect graphic layouts',
+    generic_tools: 'Garbled AI raster text and generic distorted visuals',
   },
   {
-    capability: 'Accessibility & Screen Readers',
-    autocanvas: 'Fully accessible DOM layer tree with non-drag keyboard editing controls.',
-    generic_tools: 'Inaccessible to screen readers (pure flat raster pixels with zero DOM semantics).',
+    capability: 'Source Intelligence',
+    autocanvas: 'Hourly industry news monitoring, trending topic discovery, and verified facts',
+    generic_tools: 'Zero live industry grounding; hallucinations',
   },
 ]
 
@@ -31,12 +31,12 @@ export const DeterministicComparisonSection: React.FC<DeterministicComparisonSec
   const sectionRef = useGsap(() => {
     gsap.fromTo(
       '.comparison-card',
-      { opacity: 0, y: 35 },
+      { opacity: 0, y: 30 },
       {
         opacity: 1,
         y: 0,
-        duration: 0.75,
-        stagger: 0.2,
+        duration: 0.65,
+        stagger: 0.15,
         ease: 'power3.out',
         scrollTrigger: {
           trigger: '.comparison-grid',
@@ -44,9 +44,9 @@ export const DeterministicComparisonSection: React.FC<DeterministicComparisonSec
         },
       }
     )
-  })
+  }, [cmsComparison])
 
-  const title = cmsComparison?.section_title || 'Why generic AI generators fail real brands.'
+  const title = cmsComparison?.section_title || 'AutoCanvas vs. Generic AI Tools'
   const rows =
     Array.isArray(cmsComparison?.rows) && cmsComparison.rows.length > 0
       ? cmsComparison.rows
@@ -70,7 +70,7 @@ export const DeterministicComparisonSection: React.FC<DeterministicComparisonSec
 
         <div className="comparison-grid grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
           {/* Flawed Generative Tool Card */}
-          <div className="comparison-card opacity-0 p-8 rounded-2xl border border-status-danger/30 bg-surface/50 flex flex-col justify-between relative overflow-hidden transition-all duration-300 hover:border-status-danger/50 shadow-2xs">
+          <div className="comparison-card p-8 rounded-2xl border border-status-danger/30 bg-surface/50 flex flex-col justify-between relative overflow-hidden transition-all duration-300 hover:border-status-danger/50 shadow-2xs">
             <div className="absolute top-0 right-0 px-4 py-1.5 bg-status-danger/10 text-status-danger text-[11px] font-mono font-semibold rounded-bl-xl border-l border-b border-status-danger/20">
               TRADITIONAL AI GENERATORS
             </div>
@@ -109,7 +109,7 @@ export const DeterministicComparisonSection: React.FC<DeterministicComparisonSec
           </div>
 
           {/* AutoCanvas Deterministic Renderer Card */}
-          <div className="comparison-card opacity-0 p-8 rounded-2xl border-2 border-brand-accent bg-surface flex flex-col justify-between relative shadow-xl hover:-translate-y-1.5 transition-all duration-300">
+          <div className="comparison-card p-8 rounded-2xl border-2 border-brand-accent bg-surface flex flex-col justify-between relative shadow-xl hover:-translate-y-1.5 transition-all duration-300">
             <div className="absolute top-0 right-0 px-4 py-1.5 bg-brand-accent text-interactive-primary-fg text-[11px] font-mono font-bold rounded-bl-xl shadow-xs">
               THE AUTOCANVAS ENGINE
             </div>

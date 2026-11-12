@@ -144,6 +144,7 @@ Route::prefix('v1')->group(function () {
             Route::prefix('cms')->group(function () {
                 Route::get('/blocks', [MasterCmsController::class, 'getBlocks']);
                 Route::post('/blocks/{key}', [MasterCmsController::class, 'updateBlock']);
+                Route::post('/purge-cache', [MasterCmsController::class, 'purgeCache']);
                 Route::get('/theme', [MasterCmsController::class, 'getTheme']);
                 Route::post('/theme', [MasterCmsController::class, 'updateTheme']);
                 Route::post('/assets/upload', [MasterAssetUploadController::class, 'upload']);

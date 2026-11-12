@@ -10,38 +10,50 @@ interface PlatformPillarsSectionProps {
 const DEFAULT_PILLARS = [
   {
     icon: 'Compass',
-    pill: 'Trend Radar',
-    title: 'Continuous Trend Intelligence',
+    pill: 'Automated',
+    title: 'Real-Time News Discovery',
     description:
-      'Live industry news, competitor insights, and market trends gathered automatically to give you fresh content ideas around the clock.',
+      'Discovers related Google News feeds, Reddit discussions, and industry publication sitemaps every 60 minutes.',
     bullets: [
-      'Industry News & Search Trend Monitoring',
-      'Competitor Strategy & Activity Insights',
+      'Hourly Source Ingestion',
+      'Topic & Sentiment Analysis',
       'Smart Content Opportunity Scoring',
     ],
   },
   {
-    icon: 'Palette',
-    pill: 'Studio Canvas',
-    title: 'Studio-Quality Brand Graphics',
+    icon: 'ShieldCheck',
+    pill: 'Guaranteed',
+    title: 'Guaranteed Duplicate Prevention',
     description:
-      'Zero distorted text or warped logos. Clean, editable brand designs with high-contrast typography and precise corporate color consistency.',
+      'Multi-tier checks catch repeated phrases and identical ideas, keeping every post fresh across 180 days of history.',
     bullets: [
-      'Interactive Visual Design Studio',
-      'Bilingual Font Support (English & Bengali)',
+      'Phrase & Concept Novelty Gate',
+      'Historical Cadence Safeguard',
+      '100% Repetition Rejection',
+    ],
+  },
+  {
+    icon: 'Palette',
+    pill: 'Studio Quality',
+    title: 'Studio Visual Brand Designer',
+    description:
+      'No garbled text or distorted images. AutoCanvas generates crisp, high-resolution graphics with your exact brand fonts and colors.',
+    bullets: [
+      'Deterministic SVG/HTML Layouts',
+      'Pixel-Perfect Typography & Logos',
       'Preview for Every Social Channel',
     ],
   },
   {
-    icon: 'Calendar',
-    pill: 'Autonomous Queue',
-    title: 'Smart Multi-Channel Publishing',
+    icon: 'Share2',
+    pill: 'Channel Native',
+    title: 'Multi-Channel Native Adaptation',
     description:
-      'Consistent publishing cadence that prevents accidental double posts, ensures dependable delivery, and gives you a 1-click safety pause.',
+      'Tailored hooks, hashtags, and formatting for LinkedIn, Instagram, Facebook, and Twitter without lazy cross-posting.',
     bullets: [
-      'Safe Publishing Queue & Double-Post Protection',
-      '1-Click Safety Pause Button',
-      'Complete Workspace Privacy & Isolation',
+      'Safe Publishing Queue & Locks',
+      '1-Click Instant Safety Pause',
+      'Isolated Multi-Tenant Security',
     ],
   },
 ]
@@ -50,12 +62,12 @@ export const PlatformPillarsSection: React.FC<PlatformPillarsSectionProps> = ({ 
   const sectionRef = useGsap(() => {
     gsap.fromTo(
       '.pillar-card',
-      { opacity: 0, y: 40 },
+      { opacity: 0, y: 30 },
       {
         opacity: 1,
         y: 0,
-        duration: 0.7,
-        stagger: 0.15,
+        duration: 0.65,
+        stagger: 0.12,
         ease: 'power3.out',
         scrollTrigger: {
           trigger: '.pillar-grid',
@@ -63,11 +75,13 @@ export const PlatformPillarsSection: React.FC<PlatformPillarsSectionProps> = ({ 
         },
       }
     )
-  })
+  }, [cmsFeatures])
 
-  const kicker = cmsFeatures?.section_kicker || 'ARCHITECTURE OF EXCELLENCE'
-  const title = cmsFeatures?.section_title || 'Engineered for precision. Built for scale.'
+  const kicker = cmsFeatures?.section_kicker || 'ORIGINALITY OVER GENERIC CONTENT'
+  const title = cmsFeatures?.section_title || 'Built for High-Growth Brands and Agencies'
   const hasCustomItems = Array.isArray(cmsFeatures?.items) && cmsFeatures.items.length > 0
+  const items = hasCustomItems ? cmsFeatures.items : DEFAULT_PILLARS
+  const isFourColumns = items.length === 4
 
   return (
     <section ref={sectionRef} id="features" className="py-24 border-t border-border bg-surface/50">
@@ -85,72 +99,59 @@ export const PlatformPillarsSection: React.FC<PlatformPillarsSectionProps> = ({ 
           </p>
         </div>
 
-        <div className="pillar-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {hasCustomItems
-            ? cmsFeatures.items.map((item, idx) => (
-                <div
-                  key={item.title || idx}
-                  className="pillar-card opacity-0 p-8 rounded-2xl border border-border bg-surface flex flex-col justify-between shadow-2xs hover:border-brand-accent/50 hover:-translate-y-1.5 hover:shadow-xl transition-all duration-300 ease-out group relative overflow-hidden"
-                >
-                  <div className="absolute inset-0 bg-linear-to-b from-brand-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-                  <div className="relative z-10">
-                    <div className="flex items-center justify-between mb-6">
-                      <div className="w-12 h-12 rounded-xl bg-background-subtle border border-border flex items-center justify-center text-brand-accent group-hover:scale-110 group-hover:border-brand-accent/40 group-hover:bg-brand-accent/10 transition-all duration-300">
-                        <DynamicCmsIcon name={item.icon} className="w-6 h-6" aria-hidden="true" />
-                      </div>
-                      {item.pill && (
-                        <span className="text-[11px] font-mono font-semibold px-2.5 py-0.5 rounded-full bg-brand-accent/10 text-brand-accent border border-brand-accent/20">
-                          {item.pill}
-                        </span>
-                      )}
+        <div
+          className={`pillar-grid grid ${
+            isFourColumns
+              ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6'
+              : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'
+          }`}
+        >
+          {items.map((item, idx) => {
+            const bullets = 'bullets' in item ? (item as any).bullets : null
+
+            return (
+              <div
+                key={item.title || idx}
+                className="pillar-card p-6 sm:p-7 rounded-2xl border border-border bg-surface flex flex-col justify-between shadow-2xs hover:border-brand-accent/50 hover:-translate-y-1.5 hover:shadow-xl transition-all duration-300 ease-out group relative overflow-hidden"
+              >
+                <div className="absolute inset-0 bg-linear-to-b from-brand-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+                <div className="relative z-10">
+                  <div className="flex items-center justify-between mb-5">
+                    <div className="w-11 h-11 rounded-xl bg-background-subtle border border-border flex items-center justify-center text-brand-accent group-hover:scale-110 group-hover:border-brand-accent/40 group-hover:bg-brand-accent/10 transition-all duration-300">
+                      <DynamicCmsIcon name={item.icon} className="w-5 h-5" aria-hidden="true" />
                     </div>
-                    <h3 className="text-lg font-bold text-foreground tracking-tight group-hover:text-brand-accent transition-colors">
-                      {item.title}
-                    </h3>
-                    <p className="text-xs text-foreground-secondary mt-2.5 leading-relaxed">
-                      {item.description}
-                    </p>
+                    {item.pill && (
+                      <span className="text-[11px] font-mono font-semibold px-2.5 py-0.5 rounded-full bg-brand-accent/10 text-brand-accent border border-brand-accent/20">
+                        {item.pill}
+                      </span>
+                    )}
                   </div>
-                  <div className="relative z-10 mt-8 pt-6 border-t border-border-subtle flex items-center gap-2 text-xs text-foreground-secondary font-mono">
-                    <span className="w-1.5 h-1.5 rounded-full bg-brand-accent animate-pulse" />
-                    <span>Verified Autonomous Capability</span>
-                  </div>
+                  <h3 className="text-base sm:text-lg font-bold text-foreground tracking-tight group-hover:text-brand-accent transition-colors">
+                    {item.title}
+                  </h3>
+                  <p className="text-xs text-foreground-secondary mt-2.5 leading-relaxed">
+                    {item.description}
+                  </p>
                 </div>
-              ))
-            : DEFAULT_PILLARS.map((pillar, idx) => (
-                <div
-                  key={pillar.title || idx}
-                  className="pillar-card opacity-0 p-8 rounded-2xl border border-border bg-surface flex flex-col justify-between shadow-2xs hover:border-brand-accent/50 hover:-translate-y-1.5 hover:shadow-xl transition-all duration-300 ease-out group relative overflow-hidden"
-                >
-                  <div className="absolute inset-0 bg-linear-to-b from-brand-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-                  <div className="relative z-10">
-                    <div className="flex items-center justify-between mb-6">
-                      <div className="w-12 h-12 rounded-xl bg-background-subtle border border-border flex items-center justify-center text-brand-accent group-hover:scale-110 group-hover:border-brand-accent/40 group-hover:bg-brand-accent/10 transition-all duration-300">
-                        <DynamicCmsIcon name={pillar.icon} className="w-6 h-6" aria-hidden="true" />
-                      </div>
-                      {pillar.pill && (
-                        <span className="text-[11px] font-mono font-semibold px-2.5 py-0.5 rounded-full bg-brand-accent/10 text-brand-accent border border-brand-accent/20">
-                          {pillar.pill}
-                        </span>
-                      )}
-                    </div>
-                    <h3 className="text-lg font-bold text-foreground tracking-tight group-hover:text-brand-accent transition-colors">
-                      {pillar.title}
-                    </h3>
-                    <p className="text-xs text-foreground-secondary mt-2.5 leading-relaxed">
-                      {pillar.description}
-                    </p>
-                  </div>
-                  <ul className="relative z-10 mt-8 space-y-2.5 pt-6 border-t border-border-subtle text-xs text-foreground-secondary">
-                    {pillar.bullets.map((bullet, bIdx) => (
+
+                {bullets ? (
+                  <ul className="relative z-10 mt-6 space-y-2 pt-5 border-t border-border-subtle text-xs text-foreground-secondary">
+                    {bullets.map((bullet: string, bIdx: number) => (
                       <li key={bIdx} className="flex items-center gap-2 group-hover:translate-x-0.5 transition-transform duration-200">
-                        <span className="w-1.5 h-1.5 rounded-full bg-brand-accent" />
-                        {bullet}
+                        <span className="w-1.5 h-1.5 rounded-full bg-brand-accent shrink-0" />
+                        <span className="truncate">{bullet}</span>
                       </li>
                     ))}
                   </ul>
-                </div>
-              ))}
+                ) : (
+                  <div className="relative z-10 mt-6 pt-5 border-t border-border-subtle flex items-center gap-2 text-xs text-foreground-secondary font-mono">
+                    <span className="w-1.5 h-1.5 rounded-full bg-brand-accent animate-pulse shrink-0" />
+                    <span>Verified Autonomous Capability</span>
+                  </div>
+                )}
+              </div>
+            )
+          })}
         </div>
       </div>
     </section>

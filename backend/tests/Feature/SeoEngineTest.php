@@ -198,8 +198,8 @@ class SeoEngineTest extends TestCase
         $this->assertStringContainsString('Meta Graph API', $content);
         $this->assertStringContainsString('LinkedIn Community Management API', $content);
         $this->assertStringContainsString('DevCenterPoint', $content);
-        $this->assertStringContainsString('Creator & Boutique', $content);
-        $this->assertStringContainsString('Enterprise Platform', $content);
+        $this->assertStringContainsString('Starter', $content);
+        $this->assertStringContainsString('Agency Pro', $content);
     }
 
     /**

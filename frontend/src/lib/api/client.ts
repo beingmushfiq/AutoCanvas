@@ -352,6 +352,10 @@ class ApiClient {
     return this.post<ApiResponse<CmsBlockItem>>(`/control-plane/cms/blocks/${key}`, data)
   }
 
+  public async purgeCmsCache(): Promise<ApiResponse<{ message: string }>> {
+    return this.post<ApiResponse<{ message: string }>>('/control-plane/cms/purge-cache')
+  }
+
   public async getMasterTheme(): Promise<ApiResponse<CustomThemeData>> {
     return this.get<ApiResponse<CustomThemeData>>('/control-plane/cms/theme')
   }
@@ -1101,6 +1105,7 @@ export interface PublicCmsData {
       description: string
       features: string[]
       highlighted: boolean
+      contact_sales?: boolean
     }>
   }
   faq: {
