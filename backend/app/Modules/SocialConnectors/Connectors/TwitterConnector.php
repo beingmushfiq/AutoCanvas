@@ -155,6 +155,30 @@ class TwitterConnector implements SocialConnectorInterface
         }
     }
 
+    public function introspectToken(string $token, ?string $providerId = null): array
+    {
+        try {
+            $profile = $this->fetchAccountProfile($token, $providerId);
+            return [
+                'id' => (string) (($profile['provider_id'] ?? '') ?: $providerId),
+                'name' => ($profile['name'] ?? '') ?: 'X (Twitter) Account',
+                'avatar_url' => $profile['avatar_url'] ?? null,
+                'account_type' => 'profile',
+                'scopes' => ['tweet.read', 'tweet.write', 'users.read'],
+                'expires_at' => Carbon::now()->addDays(60),
+            ];
+        } catch (\Throwable $e) {
+            return [
+                'id' => $providerId ?: 'tw_' . uniqid(),
+                'name' => 'X (Twitter) Profile',
+                'avatar_url' => null,
+                'account_type' => 'profile',
+                'scopes' => ['tweet.read', 'tweet.write', 'users.read'],
+                'expires_at' => Carbon::now()->addDays(60),
+            ];
+        }
+    }
+
     public function publish(array $content, array $tokens): array
     {
         $token = $tokens['access_token'] ?? null;

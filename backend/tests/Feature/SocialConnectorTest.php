@@ -488,4 +488,45 @@ class SocialConnectorTest extends TestCase
                 ],
             ]);
     }
+
+    public function test_direct_token_binding_persists_actual_account(): void
+    {
+        Http::fake([
+            'https://graph.facebook.com/v21.0/1122334455*' => Http::response([
+                'id' => '1122334455',
+                'name' => 'Real Verified Brand Page',
+                'category' => 'Marketing Agency',
+                'picture' => [
+                    'data' => [
+                        'url' => 'https://cdn.example.com/page-avatar.png',
+                    ],
+                ],
+            ], 200),
+        ]);
+
+        $res = $this->withHeaders([
+            'Authorization' => "Bearer {$this->tokenA}",
+        ])->postJson('/api/v1/social/connectors/bind-direct', [
+            'platform' => 'facebook',
+            'provider_id' => '1122334455',
+            'account_name' => 'Real Verified Brand Page',
+            'access_token' => 'EAA_real_page_access_token_xyz_987',
+            'account_type' => 'page',
+        ]);
+
+        $res->assertStatus(200)
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('data.account_name', 'Real Verified Brand Page')
+            ->assertJsonPath('data.provider_id', '1122334455');
+
+        $account = SocialAccount::where('organization_id', $this->orgA->id)
+            ->where('provider_id', '1122334455')
+            ->first();
+
+        $this->assertNotNull($account);
+        $this->assertEquals('facebook', $account->platform);
+        $this->assertEquals('connected', $account->connection_status);
+        $this->assertEquals('EAA_real_page_access_token_xyz_987', $account->access_token);
+        $this->assertEquals('direct_token', $account->metadata['binding_method']);
+    }
 }

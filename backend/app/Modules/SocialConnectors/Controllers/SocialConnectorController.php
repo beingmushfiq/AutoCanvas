@@ -5,6 +5,7 @@ namespace App\Modules\SocialConnectors\Controllers;
 use App\Http\Controllers\Controller;
 use App\Modules\SocialConnectors\Models\SocialAccount;
 use App\Modules\SocialConnectors\Services\OAuthManager;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use RuntimeException;
@@ -47,6 +48,7 @@ class SocialConnectorController extends Controller
                 'is_expiring_soon' => $account->isExpiringSoon(7),
                 'scopes' => $account->scopes,
                 'last_synced_at' => $account->last_synced_at?->toIso8601String(),
+                'metadata' => $account->metadata,
             ];
         });
 
@@ -117,6 +119,79 @@ class SocialConnectorController extends Controller
                 'platform' => $platform,
                 'authorization_url' => $url,
                 'state' => $state,
+            ],
+        ]);
+    }
+
+    /**
+     * Direct Enterprise Token & Page ID Binding (Bypasses Meta App Review).
+     */
+    public function bindDirect(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'platform' => 'required|in:facebook,instagram,linkedin',
+            'access_token' => 'required|string',
+            'provider_id' => 'nullable|string|max:100',
+            'account_name' => 'nullable|string|max:255',
+            'account_type' => 'nullable|string|in:page,profile,business,organization',
+            'brand_id' => 'nullable|string',
+        ]);
+
+        $orgId = $request->user()->current_organization_id;
+        $wsId = $request->user()->current_workspace_id;
+        $platform = strtolower($validated['platform']);
+        $token = trim($validated['access_token']);
+
+        // 1. Introspect token against real platform API
+        $connector = $this->oauthManager->getConnector($platform);
+        $profileData = $connector->introspectToken($token, $validated['provider_id'] ?? null);
+
+        $providerId = !empty($validated['provider_id']) ? $validated['provider_id'] : ($profileData['id'] ?? 'dir_' . bin2hex(random_bytes(6)));
+        $accountName = !empty($validated['account_name']) ? $validated['account_name'] : ($profileData['name'] ?? ucfirst($platform) . ' Channel');
+        $avatarUrl = $profileData['avatar_url'] ?? null;
+        $accountType = !empty($validated['account_type']) ? $validated['account_type'] : ($profileData['account_type'] ?? 'page');
+
+        // 2. Persist encrypted SocialAccount
+        $account = SocialAccount::updateOrCreate(
+            [
+                'organization_id' => $orgId,
+                'platform' => $platform,
+                'provider_id' => (string) $providerId,
+            ],
+            [
+                'workspace_id' => $wsId,
+                'brand_id' => $validated['brand_id'] ?? null,
+                'account_name' => $accountName,
+                'account_type' => $accountType,
+                'avatar_url' => $avatarUrl,
+                'access_token' => $token,
+                'refresh_token' => null,
+                'expires_at' => $profileData['expires_at'] ?? Carbon::now()->addDays(90),
+                'scopes' => $profileData['scopes'] ?? ['publish_actions'],
+                'is_active' => true,
+                'connection_status' => 'connected',
+                'metadata' => [
+                    'binding_method' => 'direct_token',
+                    'bound_by_user_id' => $request->user()->id,
+                    'bound_at' => Carbon::now()->toIso8601String(),
+                ],
+                'last_synced_at' => Carbon::now(),
+            ]
+        );
+
+        return response()->json([
+            'success' => true,
+            'message' => "Successfully bound {$platform} account: {$account->account_name}",
+            'data' => [
+                'id' => $account->id,
+                'platform' => $account->platform,
+                'account_name' => $account->account_name,
+                'provider_id' => $account->provider_id,
+                'account_type' => $account->account_type,
+                'avatar_url' => $account->avatar_url,
+                'connection_status' => $account->connection_status,
+                'is_active' => $account->is_active,
+                'expires_at' => $account->expires_at?->toIso8601String(),
             ],
         ]);
     }

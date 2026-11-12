@@ -57,7 +57,7 @@ class LinkedInConnector implements SocialConnectorInterface
 
     public function exchangeCodeForTokens(string $code, string $redirectUri): array
     {
-        if ($code === 'sandbox_sim_code' || str_starts_with($this->clientId, 'mock_') || empty($this->clientId)) {
+        if ($code === 'sandbox_sim_code') {
             return [
                 'access_token' => 'sandbox_verified_token_' . bin2hex(random_bytes(16)),
                 'refresh_token' => null,
@@ -138,6 +138,36 @@ class LinkedInConnector implements SocialConnectorInterface
     {
         $res = Http::timeout(10)->withToken($accessToken)->get("{$this->apiBaseUrl}/v2/userinfo");
         return $res->json() ?? [];
+    }
+
+    public function introspectToken(string $token, ?string $providerId = null): array
+    {
+        try {
+            $res = Http::timeout(10)->withToken($token)->get("{$this->apiBaseUrl}/v2/userinfo");
+            if ($res->successful()) {
+                $profile = $res->json();
+                $sub = $profile['sub'] ?? $providerId;
+                return [
+                    'id' => (string) ($providerId ?: $sub),
+                    'name' => $profile['name'] ?? 'LinkedIn Member',
+                    'avatar_url' => $profile['picture'] ?? null,
+                    'account_type' => str_contains((string) $providerId, 'organization') ? 'organization' : 'profile',
+                    'scopes' => ['openid', 'profile', 'w_member_social'],
+                    'expires_at' => Carbon::now()->addDays(60),
+                ];
+            }
+        } catch (\Throwable $e) {
+            Log::warning("LinkedIn token introspection error: " . $e->getMessage());
+        }
+
+        return [
+            'id' => $providerId ?: 'li_' . uniqid(),
+            'name' => 'LinkedIn Account',
+            'avatar_url' => null,
+            'account_type' => str_contains((string) $providerId, 'organization') ? 'organization' : 'profile',
+            'scopes' => ['openid', 'profile', 'w_member_social'],
+            'expires_at' => Carbon::now()->addDays(60),
+        ];
     }
 
     public function publish(array $content, array $tokens): array

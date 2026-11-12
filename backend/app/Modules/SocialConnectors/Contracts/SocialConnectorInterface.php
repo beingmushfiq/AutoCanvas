@@ -35,6 +35,11 @@ interface SocialConnectorInterface
     public function fetchAccountProfile(string $accessToken, ?string $accountId = null): array;
 
     /**
+     * Introspect an access token against the upstream platform API.
+     */
+    public function introspectToken(string $token, ?string $providerId = null): array;
+
+    /**
      * Publish content (text commentary, image/video URLs, carousel) to destination account.
      */
     public function publish(array $content, array $tokens): array;

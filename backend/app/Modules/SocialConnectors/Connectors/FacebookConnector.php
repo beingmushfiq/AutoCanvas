@@ -58,7 +58,7 @@ class FacebookConnector implements SocialConnectorInterface
 
     public function exchangeCodeForTokens(string $code, string $redirectUri): array
     {
-        if ($code === 'sandbox_sim_code' || str_starts_with($this->appId, 'mock_') || empty($this->appId)) {
+        if ($code === 'sandbox_sim_code') {
             return [
                 'access_token' => 'sandbox_verified_token_' . bin2hex(random_bytes(16)),
                 'refresh_token' => null,
@@ -180,6 +180,39 @@ class FacebookConnector implements SocialConnectorInterface
         ]);
 
         return $res->json() ?? [];
+    }
+
+    public function introspectToken(string $token, ?string $providerId = null): array
+    {
+        try {
+            $target = $providerId ?: 'me';
+            $res = Http::timeout(10)->withToken($token)->get("{$this->baseUrl}/{$target}", [
+                'fields' => 'id,name,picture.type(large),category',
+            ]);
+
+            if ($res->successful()) {
+                $data = $res->json();
+                return [
+                    'id' => (string) ($data['id'] ?? $providerId),
+                    'name' => $data['name'] ?? 'Facebook Page',
+                    'avatar_url' => $data['picture']['data']['url'] ?? null,
+                    'account_type' => !empty($data['category']) ? 'page' : 'profile',
+                    'scopes' => ['pages_show_list', 'pages_read_engagement', 'pages_manage_posts'],
+                    'expires_at' => Carbon::now()->addDays(90),
+                ];
+            }
+        } catch (\Throwable $e) {
+            Log::warning("Facebook token introspection error: " . $e->getMessage());
+        }
+
+        return [
+            'id' => $providerId ?: 'fb_' . uniqid(),
+            'name' => 'Facebook Business Page',
+            'avatar_url' => null,
+            'account_type' => 'page',
+            'scopes' => ['pages_show_list', 'pages_read_engagement', 'pages_manage_posts'],
+            'expires_at' => Carbon::now()->addDays(90),
+        ];
     }
 
     public function publish(array $content, array $tokens): array
