@@ -1,0 +1,19 @@
+/* TEAM */
+Chief Architect & Lead Engineer: DevCenterPoint Team
+Contact: hello@devcenterpoint.com
+Website: https://devcenterpoint.com
+Twitter: @devcenterpoint
+Location: Dhaka, Bangladesh / Global Remote
+
+/* THANKS */
+Laravel Framework (Taylor Otwell & Contributors)
+React & Vite (Meta & Evan You)
+Tailwind CSS (Adam Wathan & Tailwind Labs)
+Schema.org & W3C Standards Committees
+
+/* SITE */
+Standards: HTML5, CSS3, Schema.org JSON-LD, RFC 9309, RFC 9116, llms.txt
+Architecture: Laravel 12 (PHP 8.3), React 19, TypeScript, MySQL 8, Redis, Headless Chromium
+Hosting: cPanel Enterprise / Cloudflare R2
+Software: AutoCanvas SaaS
+

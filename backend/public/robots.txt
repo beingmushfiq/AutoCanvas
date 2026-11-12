@@ -6,6 +6,10 @@ Allow: /
 Allow: /build/
 Allow: /brand/
 Allow: /favicon*
+Allow: /llms.txt
+Allow: /llms-full.txt
+Allow: /humans.txt
+Allow: /.well-known/security.txt
 Disallow: /api/
 Disallow: /workspace/
 Disallow: /master-control/
@@ -13,16 +17,25 @@ Disallow: /storage/
 Disallow: /oauth/
 Disallow: /reset-password
 
-# Conversational AI Search Bots (Perplexity, ChatGPT, Claude, Gemini)
+# Conversational & Search AI Bots (OpenAI, Anthropic, Perplexity, Google, Apple, Meta)
 User-agent: GPTBot
+User-agent: OAI-SearchBot
+User-agent: ChatGPT-User
 User-agent: PerplexityBot
 User-agent: ClaudeBot
+User-agent: Claude-Web
+User-agent: anthropic-ai
 User-agent: Google-Extended
+User-agent: Applebot-Extended
+User-agent: Meta-ExternalAgent
+User-agent: cohere-ai
 Allow: /
+Allow: /llms.txt
+Allow: /llms-full.txt
 Disallow: /api/
 Disallow: /workspace/
 Disallow: /master-control/
 Disallow: /storage/
 
-# XML Sitemap Reference
+# Discovery & Sitemap Indexes
 Sitemap: https://autocanvas.devcenterpoint.com/sitemap.xml

@@ -53,20 +53,42 @@ LLMs favor sources with high information gain and specific technical veracity ov
 
 ---
 
-## 3. Conversational AI Bot Crawl Policies
+## 3. The `llms.txt` & `llms-full.txt` Machine-Readable Discovery Standard
+
+To bypass the token-wasting overhead of scraping dynamic JavaScript applications, AutoCanvas natively implements the open `/llms.txt` standard (developed by Answer.AI):
+
+1. **`/llms.txt` (Fast Inference & Routing Index):**
+   - Served with `Content-Type: text/markdown; charset=UTF-8`.
+   - Offers an uncluttered, token-dense overview of the platform, linking to verified documentation paths with single-sentence capability descriptions.
+2. **`/llms-full.txt` (Long-Context Deep Research Compendium):**
+   - Synthesizes complete system specifications, deterministic rendering workflows, pricing matrices, and enterprise FAQs into a single, cohesive Markdown document.
+   - Designed for long-context reasoning models (Claude 3.5 Sonnet, Gemini 1.5/2.0 Pro, GPT-4o) during automated SaaS comparisons or RAG evaluations.
+
+---
+
+## 4. Conversational AI Bot Crawl Policies
 
 Rather than blocking AI crawlers, AutoCanvas implements an **Intelligent Discovery Crawler Policy**:
-- **Public Marketing Content:** Full crawl permission granted to conversational search engines (`GPTBot`, `PerplexityBot`, `ClaudeBot`, `Google-Extended`) to ensure AutoCanvas is indexed in their real-time knowledge graphs.
+- **Public Marketing Content:** Full crawl permission granted to conversational search engines (`GPTBot`, `OAI-SearchBot`, `ChatGPT-User`, `PerplexityBot`, `ClaudeBot`, `Claude-Web`, `anthropic-ai`, `Google-Extended`, `Applebot-Extended`, `Meta-ExternalAgent`, `cohere-ai`) to ensure AutoCanvas is indexed in their real-time knowledge graphs.
 - **Tenant & Application Data:** Strict `Disallow` rules and HTTP `X-Robots-Tag: noindex` prevent AI bots from scraping private client workspaces, analytics, or administrative endpoints.
 
 ### Robots.txt Directives for AI Agents
 ```text
 # Explicit Allow for AI Search Crawlers on Public Pages
 User-agent: GPTBot
+User-agent: OAI-SearchBot
+User-agent: ChatGPT-User
 User-agent: PerplexityBot
 User-agent: ClaudeBot
+User-agent: Claude-Web
+User-agent: anthropic-ai
 User-agent: Google-Extended
+User-agent: Applebot-Extended
+User-agent: Meta-ExternalAgent
+User-agent: cohere-ai
 Allow: /
+Allow: /llms.txt
+Allow: /llms-full.txt
 Disallow: /api/
 Disallow: /workspace/
 Disallow: /master-control/
@@ -75,7 +97,7 @@ Disallow: /storage/
 
 ---
 
-## 4. Entity Knowledge Graph Alignment
+## 5. Entity Knowledge Graph Alignment
 AutoCanvas is registered across semantic knowledge graphs with consistent attributes:
 - **Canonical Name:** AutoCanvas
 - **Entity Type:** Social Media Management Software (`schema.org/SoftwareApplication`)

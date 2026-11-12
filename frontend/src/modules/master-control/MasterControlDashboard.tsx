@@ -938,14 +938,14 @@ export const MasterControlDashboard: React.FC<MasterControlDashboardProps> = ({ 
                         <div className="text-xs font-semibold text-foreground">Discovery Diagnostics</div>
                         <div className="text-[11px] text-foreground-secondary">Verify public crawler discovery endpoints</div>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-wrap">
                         <a
                           href="/robots.txt"
                           target="_blank"
                           rel="noreferrer"
                           className="px-2.5 py-1 rounded-lg border border-border bg-surface text-foreground hover:bg-surface-raised text-[11px] font-mono transition-colors"
                         >
-                          View /robots.txt
+                          /robots.txt
                         </a>
                         <a
                           href="/sitemap.xml"
@@ -953,7 +953,23 @@ export const MasterControlDashboard: React.FC<MasterControlDashboardProps> = ({ 
                           rel="noreferrer"
                           className="px-2.5 py-1 rounded-lg border border-border bg-surface text-foreground hover:bg-surface-raised text-[11px] font-mono transition-colors"
                         >
-                          View /sitemap.xml
+                          /sitemap.xml
+                        </a>
+                        <a
+                          href="/llms.txt"
+                          target="_blank"
+                          rel="noreferrer"
+                          className="px-2.5 py-1 rounded-lg border border-border bg-surface text-foreground hover:bg-surface-raised text-[11px] font-mono transition-colors"
+                        >
+                          /llms.txt
+                        </a>
+                        <a
+                          href="/llms-full.txt"
+                          target="_blank"
+                          rel="noreferrer"
+                          className="px-2.5 py-1 rounded-lg border border-border bg-surface text-foreground hover:bg-surface-raised text-[11px] font-mono transition-colors"
+                        >
+                          /llms-full.txt
                         </a>
                       </div>
                     </div>

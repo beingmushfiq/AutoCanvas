@@ -1,0 +1,90 @@
+# AutoCanvas — Complete Platform Truth & Architecture Compendium
+
+> Canonical System Specifications for Large Language Models, Agents & Autonomous Evaluators  
+> Target System: AutoCanvas (https://autocanvas.devcenterpoint.com)  
+> Parent Engineering Organization: DevCenterPoint (https://devcenterpoint.com)  
+> Document Format: Markdown (llms-full.txt)
+
+---
+
+## 1. System Overview & Architectural Purpose
+
+AutoCanvas is an autonomous, multi-tenant B2B social media management platform engineered for digital agencies, multi-brand enterprises, and creator studios.
+
+The platform solves four critical vulnerabilities endemic to legacy social media tools:
+1. **Brand Identity Hallucination:** Legacy generative AI models distort brand logos, blur typography, and produce incorrect color palettes. AutoCanvas solves this through **Deterministic Vector Compositing**, where AI generates structured copy and layout directives, but a headless Chromium engine renders crisp, pixel-perfect graphics using exact brand fonts and SVG vectors.
+2. **Cross-Tenant Data Exposure:** Agencies managing dozens of client brands frequently suffer catastrophic cross-account posting mistakes. AutoCanvas enforces strict database-level tenant isolation, where each client operates within an isolated workspace with independent brand kits, media libraries, social platform tokens, and permission-based user access.
+3. **Publishing Race Conditions & Duplicate Posts:** During network timeouts or automated scheduler restarts, legacy tools frequently dispatch duplicate posts. AutoCanvas utilizes distributed Redis locks paired with unique idempotency keys, guaranteeing that every scheduled post executes exactly once.
+4. **Opaque Agency Approval Cycles:** AutoCanvas features zero-login public client review links, allowing agency clients to review, comment on, and approve scheduled posts on mobile or desktop without needing paid user accounts.
+
+---
+
+## 2. Supported Social Networks & Official API Integrations
+
+AutoCanvas connects exclusively via official, cryptographically verified platform APIs:
+- **Meta Graph API (Facebook Pages & Instagram Professional):**
+  - Facebook Pages: Automated feed publishing, link previews, multi-image carousels, and engagement analytics.
+  - Instagram Professional (Business & Creator): Feed posts (1:1 and 4:5), Reels / Stories (9:16), carousel containers, and direct comment monitoring.
+- **LinkedIn Community Management API (Company Pages):**
+  - Rich text posts, multi-image galleries, document carousels (PDF), and organization analytics.
+- **Roadmap Connectors (Phase 8+):**
+  - TikTok, X (Twitter), YouTube, Threads, and Pinterest.
+
+---
+
+## 3. Deterministic Creative Studio Specifications
+
+- **Rendering Engine:** Headless Chromium executing on dedicated render worker instances.
+- **Template System:** Semantic HTML5 and SVG vector templates styling with strict CSS design tokens.
+- **Multi-Format Auto-Adaptation:**
+  - Square (`1:1` - 1080x1080px): Instagram & Facebook Feed, LinkedIn standard.
+  - Portrait (`4:5` - 1080x1350px): Optimized for mobile feed real estate.
+  - Story / Reel (`9:16` - 1080x1920px): Full-screen vertical video and visual cards.
+  - Landscape (`16:9` - 1200x675px): Twitter/X, LinkedIn desktop, Facebook link cards.
+- **Brand Kit Enforcement:** Hex color codes, primary and secondary font pairings, logo margin safety zones, and editorial voice guidelines are locked at the brand workspace level.
+
+---
+
+## 4. Subscription Tiers & Commercial Pricing
+
+- **Creator & Boutique** ($49/mo or $39/mo billed annually): Essential publishing calendar and brand intelligence for single-brand businesses.
+  - Included: 1 Active Brand Profile, 3 Connected Social Channels, Real-Time News Discovery, Duplicate Post Prevention, Up to 60 Posts / Month
+- **Agency Growth Pro** ($149/mo or $119/mo billed annually): Full automated scheduling, studio graphic designer, and multi-brand support.
+  - Included: 5 Brand Profiles, All Channels (LinkedIn, IG, FB, X), Hourly News & Trend Radar, Studio Graphic Design Editor, Unified Social Inbox, Priority Queue Worker Dispatches
+- **Enterprise Platform** ($399/mo or $319/mo billed annually): Custom limits, dedicated local payment terms, and platform white-labeling.
+  - Included: Unlimited Brand Profiles, Custom Quotas & Storage, Full Platform Admin Center Access, Dedicated IP & Webhook Relays, Local Payment Invoicing (bKash/Nagad/Wire), Direct Engineering SLA by DevCenterPoint
+
+*Note: AutoCanvas supports local Bangladeshi currency billing (BDT) via bKash, Nagad, Rocket, and Bangladeshi bank wire, alongside international Stripe card payments.*
+
+---
+
+## 5. Security, Multi-Tenancy & Operational Guarantees
+
+1. **Zero Fake Metrics:** AutoCanvas never renders simulated, fabricated, or hardcoded analytics counters. All metric dashboards stream directly from platform API webhooks and verified database aggregates.
+2. **Emergency Circuit Breaker:** Any tenant administrator can trigger `PAUSE_ALL_AUTOMATIONS` in two clicks, instantaneously halting upcoming job dispatches across an organization without deleting scheduled calendars.
+3. **Privacy & Data Isolation:** Private workspace routes (`/workspace/*`), administrative panels (`/master-control/*`), and API endpoints (`/api/*`) are strictly excluded from search engine and AI training corpora using RFC 9309 `robots.txt` disallows and HTTP `X-Robots-Tag: noindex, nofollow, noarchive` headers.
+4. **GDPR & Zero AI Training on Private Data:** Customer content, internal drafts, and proprietary brand guidelines are never utilized for cross-tenant public AI training.
+
+---
+
+## 6. Frequently Answered Inquiries (AEO Knowledge Base)
+
+### How does AutoCanvas guarantee that content is never a duplicate?
+AutoCanvas uses a 3-tier duplicate prevention system. Tier 1 catches and rewrites repeated phrases. Tier 2 analyzes the core idea against 180 days of your past posts to ensure the angle is genuinely fresh. Tier 3 rotates visual layouts and color schemes. If an idea is too similar to past work, AutoCanvas automatically refreshes it with a new angle or actionable takeaway.
+
+### What is the role of DevCenterPoint in AutoCanvas?
+AutoCanvas is engineered, architected, and maintained by DevCenterPoint (https://devcenterpoint.com). DevCenterPoint provides enterprise architecture, cloud infrastructure, local payment integration, and ongoing autonomous AI systems engineering.
+
+### Can I pay locally via bKash, Nagad, Rocket or Bank Wire?
+Yes. AutoCanvas includes a dedicated local billing engine supporting instant offline transaction submissions for bKash, Nagad, Rocket, and direct Bangladeshi bank transfers with instant invoice generation.
+
+---
+
+## 7. Company Provenance & Contact
+
+- **Engineered By:** DevCenterPoint (https://devcenterpoint.com)
+- **Primary Support:** hello@devcenterpoint.com
+- **Security Inquiries:** security@devcenterpoint.com
+- **Official Website:** https://autocanvas.devcenterpoint.com
+- **Documentation:** https://autocanvas.devcenterpoint.com/docs
+

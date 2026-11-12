@@ -161,4 +161,106 @@ class SeoEngineTest extends TestCase
         $homeResponse = $this->get('/');
         $this->assertStringContainsString('Customized AutoCanvas Title for Growth Teams', $homeResponse->getContent());
     }
+
+    /**
+     * Test /llms.txt Answer.AI standard markdown output.
+     */
+    public function test_llms_txt_returns_markdown_and_curated_routes(): void
+    {
+        $response = $this->get('/llms.txt');
+
+        $response->assertStatus(200);
+        $this->assertStringContainsString('text/markdown', $response->headers->get('Content-Type'));
+
+        $content = $response->getContent();
+        $this->assertStringContainsString('# AutoCanvas', $content);
+        $this->assertStringContainsString('> Autonomous multi-tenant social media management', $content);
+        $this->assertStringContainsString('/features/creative-studio', $content);
+        $this->assertStringContainsString('/features/publishing-calendar', $content);
+        $this->assertStringContainsString('/solutions/agencies', $content);
+        $this->assertStringContainsString('/pricing', $content);
+        $this->assertStringContainsString('/llms-full.txt', $content);
+    }
+
+    /**
+     * Test /llms-full.txt complete platform truth compendium.
+     */
+    public function test_llms_full_txt_returns_consolidated_platform_truth(): void
+    {
+        $response = $this->get('/llms-full.txt');
+
+        $response->assertStatus(200);
+        $this->assertStringContainsString('text/markdown', $response->headers->get('Content-Type'));
+
+        $content = $response->getContent();
+        $this->assertStringContainsString('# AutoCanvas — Complete Platform Truth & Architecture Compendium', $content);
+        $this->assertStringContainsString('Deterministic Vector Compositing', $content);
+        $this->assertStringContainsString('Meta Graph API', $content);
+        $this->assertStringContainsString('LinkedIn Community Management API', $content);
+        $this->assertStringContainsString('DevCenterPoint', $content);
+        $this->assertStringContainsString('Creator & Boutique', $content);
+        $this->assertStringContainsString('Enterprise Platform', $content);
+    }
+
+    /**
+     * Test RFC 9116 security.txt and humans.txt availability.
+     */
+    public function test_security_txt_and_humans_txt_available(): void
+    {
+        $secResponse = $this->get('/.well-known/security.txt');
+        $secResponse->assertStatus(200);
+        $this->assertStringContainsString('text/plain', $secResponse->headers->get('Content-Type'));
+        $this->assertStringContainsString('mailto:security@devcenterpoint.com', $secResponse->getContent());
+        $this->assertStringContainsString('Canonical: ', $secResponse->getContent());
+
+        $humResponse = $this->get('/humans.txt');
+        $humResponse->assertStatus(200);
+        $this->assertStringContainsString('text/plain', $humResponse->headers->get('Content-Type'));
+        $this->assertStringContainsString('DevCenterPoint Team', $humResponse->getContent());
+        $this->assertStringContainsString('Laravel 12', $humResponse->getContent());
+    }
+
+    /**
+     * Test expanded AI search bots in robots.txt.
+     */
+    public function test_robots_txt_contains_llms_and_expanded_ai_bots(): void
+    {
+        $response = $this->get('/robots.txt');
+        $content = $response->getContent();
+
+        $this->assertStringContainsString('Allow: /llms.txt', $content);
+        $this->assertStringContainsString('Allow: /llms-full.txt', $content);
+        $this->assertStringContainsString('User-agent: OAI-SearchBot', $content);
+        $this->assertStringContainsString('User-agent: ChatGPT-User', $content);
+        $this->assertStringContainsString('User-agent: Claude-Web', $content);
+        $this->assertStringContainsString('User-agent: Applebot-Extended', $content);
+        $this->assertStringContainsString('User-agent: Meta-ExternalAgent', $content);
+    }
+
+    /**
+     * Test canonical subpages inject route-specific pre-rendered metadata and breadcrumbs.
+     */
+    public function test_canonical_subpages_inject_pre_rendered_metadata(): void
+    {
+        // 1. Pricing subpage
+        $pricingResponse = $this->get('/pricing');
+        $pricingResponse->assertStatus(200);
+        $pricingContent = $pricingResponse->getContent();
+        $this->assertStringContainsString('Pricing & Subscriptions — AutoCanvas', $pricingContent);
+        $this->assertStringContainsString('/pricing', $pricingContent);
+        $this->assertStringContainsString('BreadcrumbList', $pricingContent);
+
+        // 2. Creative studio subpage
+        $studioResponse = $this->get('/features/creative-studio');
+        $studioResponse->assertStatus(200);
+        $studioContent = $studioResponse->getContent();
+        $this->assertStringContainsString('Deterministic Creative Studio — AutoCanvas', $studioContent);
+        $this->assertStringContainsString('BreadcrumbList', $studioContent);
+
+        // 3. Documentation subpage
+        $docsResponse = $this->get('/docs');
+        $docsResponse->assertStatus(200);
+        $docsContent = $docsResponse->getContent();
+        $this->assertStringContainsString('Platform Documentation & Architecture — AutoCanvas', $docsContent);
+    }
 }

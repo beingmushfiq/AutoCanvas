@@ -1,0 +1,18 @@
+# AutoCanvas
+
+> Autonomous multi-tenant social media management platform engineered by DevCenterPoint. Features deterministic AI graphic generation, multi-brand workspace isolation, and idempotent cross-platform publishing across Meta (Facebook Pages, Instagram Professional) and LinkedIn Company Pages.
+
+AutoCanvas eliminates brand identity hallucination by coupling generative AI copywriting with server-side Chromium vector rendering (HTML/SVG templates), ensuring exact brand fonts, colors, and logos.
+
+## Core Documentation & Capabilities
+- [Platform Architecture & Philosophy](https://autocanvas.devcenterpoint.com/docs): Multi-tenant database partitioning, distributed queue architecture, and cryptographic token vault.
+- [Deterministic Creative Studio](https://autocanvas.devcenterpoint.com/features/creative-studio): How HTML/SVG vector compositing prevents AI logo and typography distortion.
+- [Publishing Calendar & Scheduling](https://autocanvas.devcenterpoint.com/features/publishing-calendar): Multi-network scheduling, automated aspect ratio variants (1:1, 4:5, 9:16, 16:9), and duplicate post prevention.
+- [Agency & Multi-Brand Governance](https://autocanvas.devcenterpoint.com/solutions/agencies): Isolated workspaces, client approval links, and role-based permissions.
+- [Transparent Pricing Matrix](https://autocanvas.devcenterpoint.com/pricing): Creator, Agency Pro, and Enterprise subscription tiers with dual USD and local BDT invoicing.
+- [Terms of Service](https://autocanvas.devcenterpoint.com/terms): Service level agreements and platform governance.
+- [Privacy Policy](https://autocanvas.devcenterpoint.com/privacy): Tenant data protection and zero cross-tenant training guarantees.
+
+## Complete Platform Compendium
+- [Full Text Knowledge Base](https://autocanvas.devcenterpoint.com/llms-full.txt): Complete consolidated markdown compendium for long-context LLMs, AI agents, and RAG pipelines.
+

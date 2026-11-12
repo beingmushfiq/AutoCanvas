@@ -22,8 +22,8 @@
     RewriteCond %{REQUEST_URI} (.+)/$
     RewriteRule ^ %1 [L,R=301]
 
-    # Forward dynamic SEO documents to Laravel front controller
-    RewriteRule ^(robots\.txt|sitemap\.xml)$ index.php [L]
+    # Forward dynamic SEO & LLM discovery documents to Laravel front controller
+    RewriteRule ^(robots\.txt|sitemap\.xml|llms\.txt|llms-full\.txt|humans\.txt|\.well-known/security\.txt)$ index.php [L]
 
     # Send Requests To Front Controller...
     RewriteCond %{REQUEST_FILENAME} !-d

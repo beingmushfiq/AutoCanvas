@@ -54,3 +54,13 @@
   - `backend/tests/Feature/SeoEngineTest.php`: Comprehensive test suite verifying robots syntax, sitemap XML validity, security headers, server-side HTML pre-injection, and CMS block persistence.
   - Built production bundle with `node scripts/build-for-cpanel.mjs`.
 
+### [2026-11-12] Phase 7: Advanced AI Discovery, LLMs.txt & Crawler Engine Architecture
+- **Files Modified / Created:**
+  - `backend/app/Http/Controllers/Api/V1/SeoController.php`: Added `llms()`, `llmsFull()`, `securityTxt()`, `humans()`, expanded AI bot rules in `robots()`, and canonical subpage pre-injection.
+  - `backend/routes/web.php`: Registered `/llms.txt`, `/llms-full.txt`, `/.well-known/security.txt`, `/humans.txt`, and subpage routes (`/pricing`, `/docs`, `/features/*`).
+  - `backend/public/.htaccess`: Added rewrite rule to forward discovery files to front controller.
+  - `backend/public/llms.txt` & `backend/public/llms-full.txt`: Static zero-downtime physical fallbacks.
+  - `backend/public/.well-known/security.txt` & `backend/public/humans.txt`: Standards-compliant platform provenance.
+  - `frontend/src/modules/master-control/MasterControlDashboard.tsx`: Integrated `/llms.txt` and `/llms-full.txt` diagnostics toolbar.
+  - `backend/tests/Feature/SeoEngineTest.php`: Expanded tests to cover LLMs.txt, security.txt, humans.txt, and subpage pre-injection.
+
