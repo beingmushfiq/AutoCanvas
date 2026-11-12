@@ -194,10 +194,10 @@ export const PricingSection: React.FC<PricingSectionProps> = ({ onSelectPlan, cm
             return (
               <div
                 key={tier.id || tier.name}
-                className={`pricing-card opacity-0 p-6 rounded-2xl flex flex-col justify-between transition-all ${
+                className={`pricing-card opacity-0 p-6 rounded-2xl flex flex-col justify-between transition-all duration-300 ease-out ${
                   isHighlighted
-                    ? 'border-2 border-brand-accent bg-surface shadow-lg relative'
-                    : 'border border-border bg-surface shadow-2xs'
+                    ? 'border-2 border-brand-accent bg-surface shadow-xl relative hover:-translate-y-2.5 hover:shadow-2xl ring-1 ring-brand-accent/20'
+                    : 'border border-border bg-surface shadow-2xs hover:-translate-y-1.5 hover:shadow-xl'
                 }`}
               >
                 {isHighlighted && (

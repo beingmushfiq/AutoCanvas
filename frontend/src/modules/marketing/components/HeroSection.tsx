@@ -7,6 +7,7 @@ import {
 } from 'lucide-react'
 import type { PublicCmsData } from '../../../lib/api/client'
 import { useGsap, gsap } from '../../../lib/motion/useGsap'
+import { HeroInteractiveShowcase } from './HeroInteractiveShowcase'
 
 interface HeroSectionProps {
   onGetStarted: () => void
@@ -130,6 +131,9 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             Real Social Engagement Data
           </span>
         </div>
+
+        {/* Live Interactive Architecture & Preview Showcase */}
+        <HeroInteractiveShowcase />
       </div>
     </section>
   )

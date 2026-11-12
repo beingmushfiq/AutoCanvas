@@ -221,7 +221,7 @@ export const CommandCenterOverview: React.FC<CommandCenterOverviewProps> = ({
 
       {/* KPI Top Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="p-5">
+        <Card className="p-5 hover:-translate-y-1 hover:shadow-lg transition-all duration-300 ease-out cursor-default">
           <div className="flex items-center justify-between text-xs text-foreground-secondary">
             <span className="font-medium">Total Multi-Channel Reach</span>
             <HugeIcon icon={Analytics01Icon} size={16} className="text-status-success" />
@@ -240,7 +240,7 @@ export const CommandCenterOverview: React.FC<CommandCenterOverviewProps> = ({
           </p>
         </Card>
 
-        <Card className="p-5">
+        <Card className="p-5 hover:-translate-y-1 hover:shadow-lg transition-all duration-300 ease-out cursor-default">
           <div className="flex items-center justify-between text-xs text-foreground-secondary">
             <span className="font-medium">Autonomous Automation Rate</span>
             <HugeIcon icon={BotIcon} size={16} className="text-brand-accent" />
@@ -258,7 +258,7 @@ export const CommandCenterOverview: React.FC<CommandCenterOverviewProps> = ({
           </p>
         </Card>
 
-        <Card className="p-5">
+        <Card className="p-5 hover:-translate-y-1 hover:shadow-lg transition-all duration-300 ease-out cursor-default">
           <div className="flex items-center justify-between text-xs text-foreground-secondary">
             <span className="font-medium">Posts In Queue & Scheduled</span>
             <HugeIcon icon={Calendar03Icon} size={16} className="text-status-info" />
@@ -274,7 +274,7 @@ export const CommandCenterOverview: React.FC<CommandCenterOverviewProps> = ({
           </p>
         </Card>
 
-        <Card className="p-5">
+        <Card className="p-5 hover:-translate-y-1 hover:shadow-lg transition-all duration-300 ease-out cursor-default">
           <div className="flex items-center justify-between text-xs text-foreground-secondary">
             <span className="font-medium">Publishing Status</span>
             <HugeIcon icon={CheckmarkCircle02Icon} size={16} className="text-status-success" />
@@ -486,10 +486,10 @@ export const CommandCenterOverview: React.FC<CommandCenterOverviewProps> = ({
           <button
             type="button"
             onClick={() => onNavigate('content')}
-            className="group relative flex flex-col justify-between p-5 rounded-2xl border border-border bg-surface-raised hover:border-brand-accent/60 hover:shadow-lg transition-all duration-200 text-left cursor-pointer outline-hidden focus-visible:ring-2 focus-visible:ring-focus-ring"
+            className="group relative flex flex-col justify-between p-5 rounded-2xl border border-border bg-surface-raised hover:border-brand-accent/60 hover:-translate-y-1.5 hover:shadow-xl active:translate-y-0 active:scale-[0.98] transition-all duration-300 ease-out text-left cursor-pointer outline-hidden focus-visible:ring-2 focus-visible:ring-focus-ring"
           >
             <div>
-              <div className="w-12 h-12 rounded-xl bg-background-subtle border border-border flex items-center justify-center text-foreground group-hover:scale-105 group-hover:border-brand-accent/40 transition-transform mb-3 shadow-2xs">
+              <div className="w-12 h-12 rounded-xl bg-background-subtle border border-border flex items-center justify-center text-foreground group-hover:scale-110 group-hover:border-brand-accent/40 group-hover:bg-brand-accent/10 transition-all duration-300 mb-3 shadow-2xs">
                 <HugeIcon icon={Edit02Icon} size={22} className="text-brand-accent" />
               </div>
               <h4 className="text-base font-bold text-foreground group-hover:text-brand-accent transition-colors flex items-center gap-1.5">
@@ -512,10 +512,10 @@ export const CommandCenterOverview: React.FC<CommandCenterOverviewProps> = ({
           <button
             type="button"
             onClick={() => onNavigate('creative')}
-            className="group relative flex flex-col justify-between p-5 rounded-2xl border border-border bg-surface-raised hover:border-brand-accent/60 hover:shadow-lg transition-all duration-200 text-left cursor-pointer outline-hidden focus-visible:ring-2 focus-visible:ring-focus-ring"
+            className="group relative flex flex-col justify-between p-5 rounded-2xl border border-border bg-surface-raised hover:border-brand-accent/60 hover:-translate-y-1.5 hover:shadow-xl active:translate-y-0 active:scale-[0.98] transition-all duration-300 ease-out text-left cursor-pointer outline-hidden focus-visible:ring-2 focus-visible:ring-focus-ring"
           >
             <div>
-              <div className="w-12 h-12 rounded-xl bg-background-subtle border border-border flex items-center justify-center text-foreground group-hover:scale-105 group-hover:border-brand-accent/40 transition-transform mb-3 shadow-2xs">
+              <div className="w-12 h-12 rounded-xl bg-background-subtle border border-border flex items-center justify-center text-foreground group-hover:scale-110 group-hover:border-brand-accent/40 group-hover:bg-brand-accent/10 transition-all duration-300 mb-3 shadow-2xs">
                 <HugeIcon icon={FlashIcon} size={22} className="text-brand-accent" />
               </div>
               <h4 className="text-base font-bold text-foreground group-hover:text-brand-accent transition-colors flex items-center gap-1.5">
@@ -538,10 +538,10 @@ export const CommandCenterOverview: React.FC<CommandCenterOverviewProps> = ({
           <button
             type="button"
             onClick={() => onNavigate('calendar')}
-            className="group relative flex flex-col justify-between p-5 rounded-2xl border border-border bg-surface-raised hover:border-brand-accent/60 hover:shadow-lg transition-all duration-200 text-left cursor-pointer outline-hidden focus-visible:ring-2 focus-visible:ring-focus-ring"
+            className="group relative flex flex-col justify-between p-5 rounded-2xl border border-border bg-surface-raised hover:border-brand-accent/60 hover:-translate-y-1.5 hover:shadow-xl active:translate-y-0 active:scale-[0.98] transition-all duration-300 ease-out text-left cursor-pointer outline-hidden focus-visible:ring-2 focus-visible:ring-focus-ring"
           >
             <div>
-              <div className="w-12 h-12 rounded-xl bg-background-subtle border border-border flex items-center justify-center text-foreground group-hover:scale-105 group-hover:border-brand-accent/40 transition-transform mb-3 shadow-2xs">
+              <div className="w-12 h-12 rounded-xl bg-background-subtle border border-border flex items-center justify-center text-foreground group-hover:scale-110 group-hover:border-brand-accent/40 group-hover:bg-brand-accent/10 transition-all duration-300 mb-3 shadow-2xs">
                 <HugeIcon icon={Calendar03Icon} size={22} className="text-status-info" />
               </div>
               <h4 className="text-base font-bold text-foreground group-hover:text-brand-accent transition-colors flex items-center gap-1.5">
