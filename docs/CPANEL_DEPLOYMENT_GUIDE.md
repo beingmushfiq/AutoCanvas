@@ -167,14 +167,15 @@ FILESYSTEM_DISK=public
 SANCTUM_STATEFUL_DOMAINS=autocanvas.devcenterpoint.com
 SESSION_DOMAIN=.devcenterpoint.com
 
-# Mail Server Configuration
+# Mail Server Configuration (Verified cPanel SMTP)
 MAIL_MAILER=smtp
+MAIL_SCHEME=smtps
 MAIL_HOST=mail.devcenterpoint.com
 MAIL_PORT=465
-MAIL_USERNAME=noreply@devcenterpoint.com
-MAIL_PASSWORD=YourEmailPasswordHere
+MAIL_USERNAME=hello@devcenterpoint.com
+MAIL_PASSWORD=Hello@DCP2026
 MAIL_ENCRYPTION=ssl
-MAIL_FROM_ADDRESS="noreply@devcenterpoint.com"
+MAIL_FROM_ADDRESS="hello@devcenterpoint.com"
 MAIL_FROM_NAME="AutoCanvas"
 
 # AI Provider Gateway Keys

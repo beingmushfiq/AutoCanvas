@@ -98,9 +98,9 @@ ${PHP_BIN} artisan storage:link || true
 echo -e "${GREEN}✓ Database schema and seeds initialized.${NC}"
 
 echo -e "\n${BLUE}▶ [5/7] Provisioning Sovereign Platform Superadmin...${NC}"
-ADMIN_EMAIL="${ADMIN_EMAIL:-admin@devcenterpoint.com}"
+ADMIN_EMAIL="${ADMIN_EMAIL:-hello@devcenterpoint.com}"
 ADMIN_NAME="${ADMIN_NAME:-Platform Superadmin}"
-ADMIN_PASS="${ADMIN_PASS:-SuperAdminPassword123!}"
+ADMIN_PASS="${ADMIN_PASS:-Hello@DCP2026}"
 
 ${PHP_BIN} artisan control-plane:create-admin \
   --email="${ADMIN_EMAIL}" \
