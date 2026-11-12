@@ -5,6 +5,7 @@ namespace App\Core\Scopes;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
+use Illuminate\Support\Facades\Auth;
 
 class TenantScope implements Scope
 {
@@ -27,9 +28,9 @@ class TenantScope implements Scope
 
         if (app()->has('current_organization_id')) {
             $organizationId = app('current_organization_id');
-        } elseif (auth()->check()) {
+        } elseif (Auth::check()) {
             /** @var \App\Models\User|null $user */
-            $user = auth()->user();
+            $user = Auth::user();
             if ($user && isset($user->current_organization_id)) {
                 $organizationId = $user->current_organization_id;
             }

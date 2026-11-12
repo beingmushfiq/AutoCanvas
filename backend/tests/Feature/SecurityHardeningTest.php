@@ -20,6 +20,7 @@ use Database\Seeders\PlanSeeder;
 use Database\Seeders\RbacSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
@@ -282,7 +283,7 @@ SVG;
     {
         // Unbind any current organization
         app()->forgetInstance('current_organization_id');
-        auth()->logout();
+        Auth::logout();
 
         $scope = new TenantScope;
         $scope->enforceInConsole = true;

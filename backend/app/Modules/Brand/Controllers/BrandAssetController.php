@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Modules\Brand\Models\Brand;
 use App\Modules\Brand\Models\BrandAsset;
 use App\Modules\Organization\Services\AuditLogger;
+use Illuminate\Contracts\Filesystem\Cloud;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
@@ -67,18 +68,21 @@ class BrandAssetController extends Controller
         $mime = $file->getMimeType() ?: 'application/octet-stream';
         $isSvg = $extension === 'svg' || $mime === 'image/svg+xml';
 
+        /** @var Cloud $publicDisk */
+        $publicDisk = Storage::disk('public');
+
         if ($isSvg) {
             $realPath = $file->getRealPath();
             $rawContent = $realPath ? file_get_contents($realPath) : '';
             $sanitized = SvgSanitizer::sanitize($rawContent ?: '');
             $fileName = Str::random(40) . '.svg';
             $path = "brands/{$brand->id}/assets/{$fileName}";
-            Storage::disk('public')->put($path, $sanitized);
+            $publicDisk->put($path, $sanitized);
         } else {
             $path = $file->store("brands/{$brand->id}/assets", 'public');
         }
 
-        $url = Storage::disk('public')->url($path);
+        $url = $publicDisk->url($path);
 
         $dimensions = null;
         if (str_starts_with($mime, 'image/') && $mime !== 'image/svg+xml') {
@@ -125,8 +129,10 @@ class BrandAssetController extends Controller
         AuditLogger::log('brand.asset_deleted', $asset, ['name' => $asset->name], null, $orgId);
 
         // Optionally delete storage file
-        if ($asset->file_path && Storage::disk('public')->exists($asset->file_path)) {
-            Storage::disk('public')->delete($asset->file_path);
+        /** @var Cloud $publicDisk */
+        $publicDisk = Storage::disk('public');
+        if ($asset->file_path && $publicDisk->exists($asset->file_path)) {
+            $publicDisk->delete($asset->file_path);
         }
 
         $asset->delete();

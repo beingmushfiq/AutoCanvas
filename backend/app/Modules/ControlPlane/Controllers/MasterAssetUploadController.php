@@ -6,6 +6,7 @@ use App\Core\Security\SvgSanitizer;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Modules\ControlPlane\Models\SystemChangeLog;
+use Illuminate\Contracts\Filesystem\Cloud;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
@@ -39,6 +40,9 @@ class MasterAssetUploadController extends Controller
         $fileName = "{$safeName}-" . Str::random(8) . ".{$extension}";
         $storageDir = 'platform-assets';
 
+        /** @var Cloud $publicDisk */
+        $publicDisk = Storage::disk('public');
+
         // Perform SVG sanitization to neutralize stored XSS vulnerabilities
         if ($extension === 'svg' || $mime === 'image/svg+xml') {
             $realPath = $file->getRealPath();
@@ -46,12 +50,12 @@ class MasterAssetUploadController extends Controller
             $sanitized = SvgSanitizer::sanitize($content ?: '');
 
             $path = "{$storageDir}/{$fileName}";
-            Storage::disk('public')->put($path, $sanitized);
+            $publicDisk->put($path, $sanitized);
         } else {
             $path = $file->storeAs($storageDir, $fileName, 'public');
         }
 
-        $url = Storage::disk('public')->url($path);
+        $url = $publicDisk->url($path);
 
         // Record in system change log
         /** @var User|null $admin */
