@@ -50,7 +50,7 @@ class MasterCmsService
                 'hero' => $blocks->get('hero')?->content_json ?? $this->getFactoryHero(),
                 'features' => $blocks->get('features')?->content_json ?? $this->getFactoryFeatures(),
                 'comparison' => $blocks->get('comparison')?->content_json ?? $this->getFactoryComparison(),
-                'pricing' => $blocks->get('pricing')?->content_json ?? $this->getFactoryPricing(),
+                'pricing' => $this->resolvePricingBlock($blocks->get('pricing')?->content_json),
                 'faq' => $blocks->get('faq')?->content_json ?? $this->getFactoryFaq(),
                 'seo' => $blocks->get('seo')?->content_json ?? $this->getFactorySeo(),
             ];
@@ -220,11 +220,15 @@ class MasterCmsService
         $result = [];
         foreach ($keys as $key => $meta) {
             $block = $existing->get($key);
+            $content = $block?->content_json ?? $meta['default'];
+            if ($key === 'pricing') {
+                $content = $this->resolvePricingBlock($content);
+            }
             $result[$key] = [
                 'id' => $block?->id,
                 'block_key' => $key,
                 'title' => $block?->title ?? $meta['title'],
-                'content_json' => $block?->content_json ?? $meta['default'],
+                'content_json' => $content,
                 'is_active' => $block?->is_active ?? true,
                 'is_customized' => $block !== null,
                 'updated_at' => $block?->updated_at?->toIso8601String() ?? null,
@@ -477,7 +481,47 @@ class MasterCmsService
         ];
     }
 
-    protected function getFactoryPricing(): array
+    /**
+     * Resolve pricing configuration, upgrading legacy 3-tier structures ($49/$149/$399) to official 4-tier matrix.
+     */
+    public function resolvePricingBlock(?array $dbPricing): array
+    {
+        $factory = $this->getFactoryPricing();
+        if (empty($dbPricing) || empty($dbPricing['tiers'])) {
+            return $factory;
+        }
+
+        $tiers = $dbPricing['tiers'];
+        $tierIds = array_column($tiers, 'id');
+        $hasStarter = in_array('starter', $tierIds);
+        $hasGrowth = in_array('growth', $tierIds);
+        $hasAgency = in_array('agency', $tierIds);
+        $hasEnterprise = in_array('enterprise', $tierIds);
+
+        $isLegacy = !$hasGrowth 
+            || !$hasAgency 
+            || !$hasEnterprise 
+            || count($tiers) < 4
+            || (isset($tiers[0]['monthly_price_usd']) && $tiers[0]['monthly_price_usd'] == 49)
+            || (isset($tiers[0]['name']) && stripos($tiers[0]['name'], 'Creator') !== false)
+            || (isset($tiers[1]['monthly_price_usd']) && $tiers[1]['monthly_price_usd'] == 149);
+
+        if ($isLegacy) {
+            // Self-healing database update
+            try {
+                CmsBlock::where('block_key', 'pricing')->update([
+                    'title' => 'Transparent Tier Pricing Matrix',
+                    'content_json' => $factory,
+                ]);
+            } catch (\Throwable) {}
+
+            return $factory;
+        }
+
+        return $dbPricing;
+    }
+
+    public function getFactoryPricing(): array
     {
         return [
             'section_title' => 'Transparent, Simple Subscriptions',

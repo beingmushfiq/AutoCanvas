@@ -214,7 +214,7 @@ export const ResearchStudio: React.FC<ResearchStudioProps> = ({ onNavigateToCont
               className="flex items-center gap-2 px-3 py-2 rounded-xl border border-border bg-surface text-xs font-semibold text-foreground hover:bg-surface-raised shadow-2xs transition-colors outline-hidden focus-visible:ring-2 focus-visible:ring-focus-ring"
             >
               <Building2 className="w-4 h-4 text-brand-accent" />
-              <span className="max-w-[140px] truncate">{activeBrand?.name || 'Select Brand'}</span>
+              <span className="max-w-35 truncate">{activeBrand?.name || 'Select Brand'}</span>
               <ChevronDown className="w-3.5 h-3.5 text-foreground-muted" />
             </button>
 

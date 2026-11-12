@@ -1223,7 +1223,7 @@ export const MasterControlDashboard: React.FC<MasterControlDashboardProps> = ({ 
                         </button>
                       </div>
 
-                      <div className="space-y-4 max-h-[460px] overflow-y-auto pr-1">
+                      <div className="space-y-4 max-h-115 overflow-y-auto pr-1">
                         {(cmsBlockForm.tiers || []).map((tier: any, idx: number) => (
                           <div
                             key={idx}

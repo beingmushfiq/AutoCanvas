@@ -165,7 +165,7 @@ export const HeroInteractiveShowcase: React.FC = () => {
         {/* Deck Core Workspace Grid */}
         <div className="p-4 sm:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
           {/* Left Canvas Preview Area */}
-          <div className="lg:col-span-7 flex flex-col items-center justify-center p-4 sm:p-8 rounded-xl border border-border/80 bg-background-sunken/40 relative min-h-[320px] sm:min-h-[380px] overflow-hidden">
+          <div className="lg:col-span-7 flex flex-col items-center justify-center p-4 sm:p-8 rounded-xl border border-border/80 bg-background-sunken/40 relative min-h-80 sm:min-h-95 overflow-hidden">
             {/* Dimensions Overlay */}
             <div className="absolute top-3 left-3 text-[10px] font-mono text-foreground-muted flex items-center gap-1.5">
               <Layers className="w-3 h-3 text-brand-accent" />
@@ -185,7 +185,7 @@ export const HeroInteractiveShowcase: React.FC = () => {
                   ? 'aspect-square'
                   : aspectRatio === '16:9'
                   ? 'aspect-video'
-                  : 'aspect-[9/14]'
+                  : 'aspect-9/14'
               }`}
             >
               {/* Subtle Canvas Watermark & Logo Anchor */}

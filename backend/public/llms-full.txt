@@ -47,12 +47,14 @@ AutoCanvas connects exclusively via official, cryptographically verified platfor
 
 ## 4. Subscription Tiers & Commercial Pricing
 
-- **Creator & Boutique** ($49/mo or $39/mo billed annually): Essential publishing calendar and brand intelligence for single-brand businesses.
-  - Included: 1 Active Brand Profile, 3 Connected Social Channels, Real-Time News Discovery, Duplicate Post Prevention, Up to 60 Posts / Month
-- **Agency Growth Pro** ($149/mo or $119/mo billed annually): Full automated scheduling, studio graphic designer, and multi-brand support.
-  - Included: 5 Brand Profiles, All Channels (LinkedIn, IG, FB, X), Hourly News & Trend Radar, Studio Graphic Design Editor, Unified Social Inbox, Priority Queue Worker Dispatches
-- **Enterprise Platform** ($399/mo or $319/mo billed annually): Custom limits, dedicated local payment terms, and platform white-labeling.
-  - Included: Unlimited Brand Profiles, Custom Quotas & Storage, Full Platform Admin Center Access, Dedicated IP & Webhook Relays, Local Payment Invoicing (bKash/Nagad/Wire), Direct Engineering SLA by DevCenterPoint
+- **Starter** ($29/mo or $24/mo billed annually): Essential brand publishing for solo founders and single businesses.
+  - Included: 1 Managed Brand, 1 Workspace, 3 Connected Channels, 2 Team Members, 500k AI Tokens / mo, 50 Renders / mo, Core Publishing Calendar, Duplicate Post Prevention
+- **Growth** ($79/mo or $65/mo billed annually) — [MOST POPULAR]: Continuous rhythm and news intelligence for expanding brands.
+  - Included: 5 Managed Brands, 3 Workspaces, 10 Connected Channels, 8 Team Members, 2.5M AI Tokens / mo, 300 Renders / mo, Real-Time News & Trend Radar, Studio Brand Graphic Designer, Safe Double-Post Protection
+- **Agency Pro** ($199/mo or $165/mo billed annually): High-velocity multi-brand operating system for marketing agencies.
+  - Included: 25 Managed Brands, 10 Workspaces, 50 Connected Channels, 30 Team Members, 10M AI Tokens / mo, 2,000 Renders / mo, Brand Voice & Style Memory, Unified Social Inbox & Engagement, Priority Queue Worker Dispatches
+- **Enterprise** ($499/mo or $415/mo billed annually) + "Contact Sales" option: Custom limits, dedicated infrastructure, and local payment invoicing.
+  - Included: 100 Managed Brands, 50 Workspaces, 250 Connected Channels, 100 Team Members, 50M AI Tokens / mo, 10,000 Renders / mo, Full Platform Admin Center Access, Dedicated IP & Webhook Relays, Local Payment Invoicing (bKash/Nagad/Bank Wire), Direct Engineering SLA by DevCenterPoint
 
 *Note: AutoCanvas supports local Bangladeshi currency billing (BDT) via bKash, Nagad, Rocket, and Bangladeshi bank wire, alongside international Stripe card payments.*
 

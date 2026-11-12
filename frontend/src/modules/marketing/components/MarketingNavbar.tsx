@@ -129,7 +129,7 @@ export const MarketingNavbar: React.FC<MarketingNavbarProps> = ({
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
-            className="md:hidden p-2 rounded-xl border border-border bg-surface text-foreground-secondary hover:text-foreground transition-colors min-h-[40px] min-w-[40px] flex items-center justify-center cursor-pointer shadow-2xs"
+            className="md:hidden p-2 rounded-xl border border-border bg-surface text-foreground-secondary hover:text-foreground transition-colors min-h-10 min-w-10 flex items-center justify-center cursor-pointer shadow-2xs"
           >
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
@@ -145,7 +145,7 @@ export const MarketingNavbar: React.FC<MarketingNavbarProps> = ({
                 key={link.href}
                 href={link.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className="px-3 py-2 text-xs font-medium text-foreground-secondary hover:text-foreground hover:bg-background-subtle rounded-lg transition-colors min-h-[44px] flex items-center cursor-pointer"
+                className="px-3 py-2 text-xs font-medium text-foreground-secondary hover:text-foreground hover:bg-background-subtle rounded-lg transition-colors min-h-11 flex items-center cursor-pointer"
               >
                 {link.label}
               </a>
@@ -159,7 +159,7 @@ export const MarketingNavbar: React.FC<MarketingNavbarProps> = ({
                   setMobileMenuOpen(false)
                   onEnterApp?.()
                 }}
-                className="cursor-pointer w-full py-2.5 px-4 text-xs font-semibold bg-interactive-primary text-interactive-primary-fg rounded-xl hover:opacity-90 transition-colors shadow-xs min-h-[44px] flex items-center justify-center gap-2"
+                className="cursor-pointer w-full py-2.5 px-4 text-xs font-semibold bg-interactive-primary text-interactive-primary-fg rounded-xl hover:opacity-90 transition-colors shadow-xs min-h-11 flex items-center justify-center gap-2"
               >
                 <span>Enter Workspace</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -169,7 +169,7 @@ export const MarketingNavbar: React.FC<MarketingNavbarProps> = ({
                   setMobileMenuOpen(false)
                   onLogout?.()
                 }}
-                className="cursor-pointer w-full py-2.5 px-4 text-xs font-semibold text-foreground-secondary border border-border rounded-xl hover:bg-background-subtle transition-colors min-h-[44px]"
+                className="cursor-pointer w-full py-2.5 px-4 text-xs font-semibold text-foreground-secondary border border-border rounded-xl hover:bg-background-subtle transition-colors min-h-11"
               >
                 Sign Out
               </button>
@@ -181,7 +181,7 @@ export const MarketingNavbar: React.FC<MarketingNavbarProps> = ({
                   setMobileMenuOpen(false)
                   onOpenAuth('login')
                 }}
-                className="cursor-pointer w-full py-2.5 px-4 text-xs font-semibold text-foreground-secondary border border-border rounded-xl hover:bg-background-subtle transition-colors min-h-[44px]"
+                className="cursor-pointer w-full py-2.5 px-4 text-xs font-semibold text-foreground-secondary border border-border rounded-xl hover:bg-background-subtle transition-colors min-h-11"
               >
                 Sign In
               </button>
@@ -190,7 +190,7 @@ export const MarketingNavbar: React.FC<MarketingNavbarProps> = ({
                   setMobileMenuOpen(false)
                   onOpenAuth('register')
                 }}
-                className="cursor-pointer w-full py-2.5 px-4 text-xs font-semibold bg-interactive-primary text-interactive-primary-fg rounded-xl hover:opacity-90 transition-colors shadow-xs min-h-[44px]"
+                className="cursor-pointer w-full py-2.5 px-4 text-xs font-semibold bg-interactive-primary text-interactive-primary-fg rounded-xl hover:opacity-90 transition-colors shadow-xs min-h-11"
               >
                 Get Started
               </button>

@@ -504,7 +504,7 @@ export const SocialInboxStream: React.FC = () => {
       )}
 
       {/* Main Two-Column Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-[640px]">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-160">
         {/* Left Column: Conversation Stream (5 Cols) */}
         <div className="lg:col-span-5 flex flex-col rounded-2xl border border-border bg-surface shadow-2xs overflow-hidden">
           {/* Filter Bar */}
@@ -683,7 +683,7 @@ export const SocialInboxStream: React.FC = () => {
               </div>
 
               {/* Message Thread History */}
-              <div className="flex-1 overflow-y-auto p-5 space-y-4 max-h-[380px]">
+              <div className="flex-1 overflow-y-auto p-5 space-y-4 max-h-95">
                 {isDetailLoading ? (
                   <div className="text-center py-10 text-xs text-foreground-muted">Loading thread messages...</div>
                 ) : (
