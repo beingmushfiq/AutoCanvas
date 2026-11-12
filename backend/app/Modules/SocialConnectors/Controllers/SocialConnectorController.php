@@ -67,7 +67,7 @@ class SocialConnectorController extends Controller
         $state = $request->query('state');
         $error = $request->query('error_description') ?? $request->query('error');
 
-        $frontendUrl = '/workspace/social';
+        $frontendUrl = '/workspace/accounts';
 
         if ($error) {
             return redirect("{$frontendUrl}?error=" . urlencode($error));
@@ -104,6 +104,13 @@ class SocialConnectorController extends Controller
             ], 422);
         }
 
+        if (!$this->oauthManager->hasValidCredentials($platform) && !app()->environment('testing')) {
+            return response()->json([
+                'success' => false,
+                'message' => "Official {$platform} OAuth requires verified App Credentials (Client ID & Secret). Please configure them in Settings or use the 'Direct Token / Page Binding' tab to connect your live accounts immediately without waiting for platform app review.",
+            ], 422);
+        }
+
         $orgId = $request->user()->current_organization_id;
         $workspaceId = $request->query('workspace_id');
         $brandId = $request->query('brand_id');
@@ -119,6 +126,40 @@ class SocialConnectorController extends Controller
                 'platform' => $platform,
                 'authorization_url' => $url,
                 'state' => $state,
+            ],
+        ]);
+    }
+
+    /**
+     * Discover all accessible pages, profiles, or business accounts from a token before binding.
+     */
+    public function discover(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'platform' => 'required|in:facebook,instagram,linkedin',
+            'access_token' => 'required|string',
+        ]);
+
+        $platform = strtolower($validated['platform']);
+        $token = trim($validated['access_token']);
+
+        $connector = $this->oauthManager->getConnector($platform);
+
+        $discovered = [];
+        if (method_exists($connector, 'discoverPages')) {
+            $discovered = $connector->discoverPages($token);
+        } elseif (method_exists($connector, 'discoverAccounts')) {
+            $discovered = $connector->discoverAccounts($token);
+        }
+
+        $primary = $connector->introspectToken($token);
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'platform' => $platform,
+                'primary' => $primary,
+                'discovered_items' => $discovered,
             ],
         ]);
     }
@@ -150,6 +191,7 @@ class SocialConnectorController extends Controller
         $accountName = !empty($validated['account_name']) ? $validated['account_name'] : ($profileData['name'] ?? ucfirst($platform) . ' Channel');
         $avatarUrl = $profileData['avatar_url'] ?? null;
         $accountType = !empty($validated['account_type']) ? $validated['account_type'] : ($profileData['account_type'] ?? 'page');
+        $effectiveToken = $profileData['access_token'] ?? $token;
 
         // 2. Persist encrypted SocialAccount
         $account = SocialAccount::updateOrCreate(
@@ -164,17 +206,20 @@ class SocialConnectorController extends Controller
                 'account_name' => $accountName,
                 'account_type' => $accountType,
                 'avatar_url' => $avatarUrl,
-                'access_token' => $token,
+                'access_token' => $effectiveToken,
                 'refresh_token' => null,
                 'expires_at' => $profileData['expires_at'] ?? Carbon::now()->addDays(90),
                 'scopes' => $profileData['scopes'] ?? ['publish_actions'],
                 'is_active' => true,
                 'connection_status' => 'connected',
-                'metadata' => [
-                    'binding_method' => 'direct_token',
-                    'bound_by_user_id' => $request->user()->id,
-                    'bound_at' => Carbon::now()->toIso8601String(),
-                ],
+                'metadata' => array_merge(
+                    $profileData['metadata'] ?? [],
+                    [
+                        'binding_method' => 'direct_token',
+                        'bound_by_user_id' => $request->user()->id,
+                        'bound_at' => Carbon::now()->toIso8601String(),
+                    ]
+                ),
                 'last_synced_at' => Carbon::now(),
             ]
         );

@@ -137,6 +137,18 @@ export const SocialAccountsManager: React.FC = () => {
   const [showToken, setShowToken] = useState(false)
   const [directBinding, setDirectBinding] = useState(false)
   const [directError, setDirectError] = useState<string | null>(null)
+  const [discovering, setDiscovering] = useState(false)
+  const [discoveredPages, setDiscoveredPages] = useState<
+    Array<{
+      id: string
+      name: string
+      category?: string | null
+      avatar_url?: string | null
+      account_type?: string
+      username?: string
+      page_name?: string
+    }>
+  >([])
 
   // System Admin OAuth credentials state
   const [showAppConfig, setShowAppConfig] = useState(false)
@@ -266,6 +278,7 @@ export const SocialAccountsManager: React.FC = () => {
         setDirectAccessToken('')
         setDirectProviderId('')
         setDirectAccountName('')
+        setDiscoveredPages([])
         fetchAccounts()
       } else {
         setDirectError(res.message || 'Failed to bind account.')
@@ -274,6 +287,70 @@ export const SocialAccountsManager: React.FC = () => {
       setDirectError(err.message || 'Direct token binding failed. Please verify token permissions.')
     } finally {
       setDirectBinding(false)
+    }
+  }
+
+  // Live Token & Page Auto-Discovery
+  const handleDiscoverPages = async () => {
+    if (!directAccessToken.trim()) {
+      setDirectError('Please paste an Access Token before running channel discovery.')
+      return
+    }
+
+    try {
+      setDiscovering(true)
+      setDirectError(null)
+
+      const res = await apiClient.post<{
+        success: boolean
+        data: {
+          platform: string
+          primary?: any
+          discovered_items?: Array<{
+            id: string
+            name: string
+            category?: string | null
+            avatar_url?: string | null
+            account_type?: string
+            username?: string
+            page_name?: string
+          }>
+        }
+      }>('/social/connectors/discover', {
+        platform: directPlatform,
+        access_token: directAccessToken.trim(),
+      })
+
+      const items = res.data?.discovered_items || []
+      setDiscoveredPages(items)
+
+      if (items.length > 0) {
+        appToast.success(`Discovered ${items.length} ${directPlatform} channel(s)!`, {
+          description: `Select a page below to auto-fill its configuration.`,
+        })
+        const first = items[0]
+        setDirectProviderId(first.id)
+        setDirectAccountName(first.name)
+        if (first.account_type) {
+          setDirectAccountType(first.account_type as any)
+        }
+      } else if (res.data?.primary) {
+        const prim = res.data.primary
+        appToast.success(`Channel verified: ${prim.name}`, {
+          description: `ID: ${prim.id} (${prim.account_type || 'channel'})`,
+        })
+        setDirectProviderId(prim.id)
+        setDirectAccountName(prim.name)
+        if (prim.account_type) {
+          setDirectAccountType(prim.account_type as any)
+        }
+      } else {
+        appToast.info('Token valid, but no specific commercial pages were found.')
+      }
+    } catch (err: any) {
+      setDirectError(err.message || 'Token introspection failed. Please verify token permissions.')
+    } finally {
+      setDiscovering(false)
     }
   }
 
@@ -317,7 +394,11 @@ export const SocialAccountsManager: React.FC = () => {
         window.location.href = res.data.authorization_url
       }
     } catch (err: any) {
-      setError(`Failed to generate ${platform} OAuth URL: ` + err.message)
+      appToast.error(err.message || `Failed to initiate ${platform} OAuth.`, {
+        description: 'Switched to Direct Token Binding to bind your live accounts immediately.',
+      })
+      setConnectTab('direct')
+      setDirectPlatform(platform)
     } finally {
       setProcessingId(null)
     }
@@ -853,9 +934,82 @@ export const SocialAccountsManager: React.FC = () => {
                       placeholder="Paste Page Access Token (EAAB... or AQ...)"
                       className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-surface text-foreground font-mono text-xs placeholder:text-foreground-secondary/60 focus:outline-hidden focus:border-brand-accent resize-none"
                     />
-                    <p className="text-[11px] text-foreground-secondary">
-                      Tokens are encrypted in transit and stored envelope-encrypted with AES-256-GCM at rest.
-                    </p>
+                    <div className="flex items-center justify-between pt-1 gap-2">
+                      <p className="text-[11px] text-foreground-secondary">
+                        Tokens are encrypted in transit and stored envelope-encrypted with AES-256-GCM at rest.
+                      </p>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={handleDiscoverPages}
+                        disabled={discovering || !directAccessToken.trim()}
+                        className="text-xs h-7 px-2.5 shrink-0 border-brand-accent/40 text-brand-accent hover:bg-brand-accent/10 cursor-pointer"
+                        title="Query platform API to verify token and list managed pages"
+                      >
+                        {discovering ? (
+                          <RefreshCw className="w-3 h-3 mr-1 animate-spin" />
+                        ) : (
+                          <Sparkles className="w-3 h-3 mr-1" />
+                        )}
+                        <span>{discovering ? 'Inspecting Token...' : 'Discover & Auto-Fill'}</span>
+                      </Button>
+                    </div>
+
+                    {/* Discovered Pages Preview */}
+                    {discoveredPages.length > 0 && (
+                      <div className="p-3.5 rounded-xl border border-brand-accent/40 bg-brand-accent/5 space-y-2">
+                        <div className="flex items-center justify-between text-xs font-semibold text-foreground">
+                          <span className="flex items-center gap-1.5">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-brand-accent" />
+                            Discovered {discoveredPages.length} {directPlatform === 'facebook' ? 'Facebook Page(s)' : directPlatform === 'instagram' ? 'Instagram Account(s)' : 'Channel(s)'}:
+                          </span>
+                          <span className="text-[10px] text-foreground-secondary font-normal">Click to select</span>
+                        </div>
+                        <div className="grid grid-cols-1 gap-1.5 max-h-40 overflow-y-auto pr-1">
+                          {discoveredPages.map((page) => {
+                            const isSelected = directProviderId === page.id
+                            return (
+                              <button
+                                key={page.id}
+                                type="button"
+                                onClick={() => {
+                                  setDirectProviderId(page.id)
+                                  setDirectAccountName(page.name)
+                                  if (page.account_type) setDirectAccountType(page.account_type as any)
+                                }}
+                                className={`w-full p-2.5 rounded-lg border text-left transition-all flex items-center justify-between text-xs cursor-pointer ${
+                                  isSelected
+                                    ? 'border-brand-accent bg-surface ring-1 ring-brand-accent font-medium'
+                                    : 'border-border bg-surface/80 hover:border-brand-accent/50'
+                                }`}
+                              >
+                                <div className="flex items-center gap-2.5 min-w-0">
+                                  {page.avatar_url ? (
+                                    <img src={page.avatar_url} alt="" className="w-6 h-6 rounded-full object-cover shrink-0" />
+                                  ) : (
+                                    <div className="w-6 h-6 rounded-full bg-surface-muted flex items-center justify-center shrink-0 text-[10px] font-bold">
+                                      {page.name.charAt(0)}
+                                    </div>
+                                  )}
+                                  <div className="truncate">
+                                    <div className="text-foreground truncate font-semibold">{page.name}</div>
+                                    <div className="text-[10px] text-foreground-secondary font-mono">
+                                      ID: {page.id} {page.category ? `• ${page.category}` : ''}
+                                    </div>
+                                  </div>
+                                </div>
+                                {isSelected && (
+                                  <Badge variant="outline" className="text-[10px] bg-brand-accent/10 border-brand-accent/30 text-brand-accent shrink-0">
+                                    Selected
+                                  </Badge>
+                                )}
+                              </button>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   {/* Quick Guide Callout */}

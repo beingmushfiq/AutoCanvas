@@ -35,7 +35,10 @@ class InstagramConnector implements SocialConnectorInterface
         $hasValidAppId = !empty($this->appId) && !str_starts_with($this->appId, 'mock_');
 
         if (!$hasValidAppId) {
-            return url("/oauth/social/instagram/callback?code=sandbox_sim_code&state={$state}");
+            if (app()->environment('testing')) {
+                return url("/oauth/social/instagram/callback?code=sandbox_sim_code&state={$state}");
+            }
+            throw new RuntimeException("Official Instagram OAuth requires configured Meta App credentials (App ID & Secret). Please configure App Keys in Settings or use Direct Token Binding.");
         }
 
         $scopes = $options['scopes'] ?? [
@@ -159,13 +162,29 @@ class InstagramConnector implements SocialConnectorInterface
 
     public function validateToken(string $accessToken): bool
     {
-        $res = Http::timeout(10)->get("{$this->baseUrl}/debug_token", [
-            'input_token' => $accessToken,
-            'access_token' => "{$this->appId}|{$this->appSecret}",
-        ]);
+        // 1. Direct validation via authenticated API call (works for ANY token, no app secret required!)
+        try {
+            $res = Http::timeout(10)->withToken($accessToken)->get("{$this->baseUrl}/me", [
+                'fields' => 'id,name',
+            ]);
+            if ($res->successful() && !empty($res->json('id'))) {
+                return true;
+            }
+        } catch (\Throwable) {}
 
-        if ($res->successful()) {
-            return (bool) $res->json('data.is_valid', false);
+        // 2. Fallback to debug_token only if real app credentials exist
+        $hasValidApp = !empty($this->appId) && !str_starts_with($this->appId, 'mock_') && !empty($this->appSecret) && !str_starts_with($this->appSecret, 'mock_');
+        if ($hasValidApp) {
+            try {
+                $res = Http::timeout(10)->get("{$this->baseUrl}/debug_token", [
+                    'input_token' => $accessToken,
+                    'access_token' => "{$this->appId}|{$this->appSecret}",
+                ]);
+
+                if ($res->successful()) {
+                    return (bool) $res->json('data.is_valid', false);
+                }
+            } catch (\Throwable) {}
         }
 
         return false;
@@ -181,27 +200,159 @@ class InstagramConnector implements SocialConnectorInterface
         return $res->json() ?? [];
     }
 
+    /**
+     * Discover all connected Instagram Business accounts linked to Facebook Pages managed by this token.
+     */
+    public function discoverAccounts(string $token): array
+    {
+        $discovered = [];
+
+        // 1. Check if token itself directly represents a Facebook Page with an attached IG Business Account
+        try {
+            $meRes = Http::timeout(10)->withToken($token)->get("{$this->baseUrl}/me", [
+                'fields' => 'id,name,instagram_business_account{id,username,name,profile_picture_url}',
+            ]);
+            if ($meRes->successful()) {
+                $me = $meRes->json();
+                if (!empty($me['instagram_business_account'])) {
+                    $ig = $me['instagram_business_account'];
+                    $discovered[] = [
+                        'id' => (string) $ig['id'],
+                        'username' => $ig['username'] ?? $ig['name'] ?? 'instagram_business',
+                        'name' => '@' . ($ig['username'] ?? $ig['name'] ?? 'instagram_business'),
+                        'avatar_url' => $ig['profile_picture_url'] ?? null,
+                        'access_token' => $token,
+                        'account_type' => 'business',
+                        'page_id' => $me['id'] ?? null,
+                    ];
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::warning("Instagram discover /me error: " . $e->getMessage());
+        }
+
+        // 2. Query /me/accounts for all connected pages and find their linked Instagram Business Accounts
+        try {
+            $accountsRes = Http::timeout(12)->withToken($token)->get("{$this->baseUrl}/me/accounts", [
+                'fields' => 'id,name,access_token,instagram_business_account{id,username,name,profile_picture_url}',
+            ]);
+            if ($accountsRes->successful()) {
+                $pages = $accountsRes->json('data') ?? [];
+                foreach ($pages as $p) {
+                    if (!empty($p['instagram_business_account'])) {
+                        $ig = $p['instagram_business_account'];
+                        $igId = (string) $ig['id'];
+                        $alreadyFound = false;
+                        foreach ($discovered as $d) {
+                            if ($d['id'] === $igId) {
+                                $alreadyFound = true;
+                                break;
+                            }
+                        }
+                        if (!$alreadyFound) {
+                            $discovered[] = [
+                                'id' => $igId,
+                                'username' => $ig['username'] ?? $ig['name'] ?? 'instagram_business',
+                                'name' => '@' . ($ig['username'] ?? $ig['name'] ?? 'instagram_business'),
+                                'avatar_url' => $ig['profile_picture_url'] ?? null,
+                                'access_token' => $p['access_token'] ?? $token, // Use Page token for IG API operations
+                                'account_type' => 'business',
+                                'page_id' => $p['id'],
+                                'page_name' => $p['name'],
+                            ];
+                        }
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::warning("Instagram discover /me/accounts error: " . $e->getMessage());
+        }
+
+        return $discovered;
+    }
+
     public function introspectToken(string $token, ?string $providerId = null): array
     {
-        try {
-            $target = $providerId ?: 'me';
-            $res = Http::timeout(10)->withToken($token)->get("{$this->baseUrl}/{$target}", [
-                'fields' => 'id,username,name,profile_picture_url',
-            ]);
+        // 1. If provider_id explicitly specified, try direct node lookup
+        if (!empty($providerId)) {
+            try {
+                $res = Http::timeout(10)->withToken($token)->get("{$this->baseUrl}/{$providerId}", [
+                    'fields' => 'id,username,name,profile_picture_url',
+                ]);
+                if ($res->successful()) {
+                    $data = $res->json();
+                    return [
+                        'id' => (string) $data['id'],
+                        'name' => '@' . ($data['username'] ?? $data['name'] ?? 'instagram_business'),
+                        'avatar_url' => $data['profile_picture_url'] ?? null,
+                        'account_type' => 'business',
+                        'access_token' => $token,
+                        'scopes' => ['instagram_basic', 'instagram_content_publish'],
+                        'expires_at' => Carbon::now()->addDays(90),
+                        'metadata' => [
+                            'username' => $data['username'] ?? null,
+                            'discovered_via' => 'direct_ig_lookup',
+                        ],
+                    ];
+                }
+            } catch (\Throwable $e) {
+                Log::warning("Instagram direct node lookup failed: " . $e->getMessage());
+            }
+        }
 
-            if ($res->successful()) {
-                $data = $res->json();
+        // 2. Discover accounts automatically via attached Facebook Pages
+        $accounts = $this->discoverAccounts($token);
+        if (!empty($accounts)) {
+            $selected = null;
+            if (!empty($providerId)) {
+                foreach ($accounts as $a) {
+                    if ((string)$a['id'] === (string)$providerId || (string)$a['page_id'] === (string)$providerId) {
+                        $selected = $a;
+                        break;
+                    }
+                }
+            }
+            if (!$selected) {
+                $selected = $accounts[0];
+            }
+
+            return [
+                'id' => (string) $selected['id'],
+                'name' => $selected['name'] ?? 'Instagram Business',
+                'avatar_url' => $selected['avatar_url'] ?? null,
+                'account_type' => 'business',
+                'access_token' => $selected['access_token'] ?? $token,
+                'scopes' => ['instagram_basic', 'instagram_content_publish'],
+                'expires_at' => Carbon::now()->addDays(90),
+                'metadata' => [
+                    'username' => $selected['username'] ?? null,
+                    'page_id' => $selected['page_id'] ?? null,
+                    'total_accounts_discovered' => count($accounts),
+                    'discovered_via' => 'page_link_autodiscovery',
+                ],
+            ];
+        }
+
+        // 3. Fallback to /me (direct user profile)
+        try {
+            $meRes = Http::timeout(10)->withToken($token)->get("{$this->baseUrl}/me", [
+                'fields' => 'id,name,picture.type(large)',
+            ]);
+            if ($meRes->successful()) {
+                $me = $meRes->json();
                 return [
-                    'id' => (string) ($data['id'] ?? $providerId),
-                    'name' => $data['username'] ?? $data['name'] ?? 'Instagram Business Profile',
-                    'avatar_url' => $data['profile_picture_url'] ?? null,
+                    'id' => (string) ($providerId ?: ($me['id'] ?? 'ig_' . uniqid())),
+                    'name' => $me['name'] ?? 'Instagram Professional Profile',
+                    'avatar_url' => $me['picture']['data']['url'] ?? null,
                     'account_type' => 'business',
+                    'access_token' => $token,
                     'scopes' => ['instagram_basic', 'instagram_content_publish'],
                     'expires_at' => Carbon::now()->addDays(90),
+                    'metadata' => ['discovered_via' => 'user_profile_fallback'],
                 ];
             }
         } catch (\Throwable $e) {
-            Log::warning("Instagram token introspection error: " . $e->getMessage());
+            Log::warning("Instagram /me fallback error: " . $e->getMessage());
         }
 
         return [
@@ -209,8 +360,10 @@ class InstagramConnector implements SocialConnectorInterface
             'name' => 'Instagram Professional Profile',
             'avatar_url' => null,
             'account_type' => 'business',
+            'access_token' => $token,
             'scopes' => ['instagram_basic', 'instagram_content_publish'],
             'expires_at' => Carbon::now()->addDays(90),
+            'metadata' => ['discovered_via' => 'fallback'],
         ];
     }
 

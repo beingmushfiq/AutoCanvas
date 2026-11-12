@@ -529,4 +529,142 @@ class SocialConnectorTest extends TestCase
         $this->assertEquals('EAA_real_page_access_token_xyz_987', $account->access_token);
         $this->assertEquals('direct_token', $account->metadata['binding_method']);
     }
+
+    public function test_direct_token_autodiscovers_facebook_page_from_system_user_token(): void
+    {
+        Http::fake([
+            'https://graph.facebook.com/v21.0/me?*' => Http::response([
+                'id' => 'user_12345',
+                'name' => 'System User Administrator',
+                'category' => null, // Not a page directly
+            ], 200),
+            'https://graph.facebook.com/v21.0/me/accounts*' => Http::response([
+                'data' => [
+                    [
+                        'id' => 'page_987654321',
+                        'name' => 'Acme Global Official Page',
+                        'access_token' => 'EAA_perpetual_page_token_abc_555',
+                        'category' => 'Software Company',
+                        'picture' => [
+                            'data' => [
+                                'url' => 'https://cdn.example.com/acme-page.png',
+                            ],
+                        ],
+                    ],
+                ],
+            ], 200),
+        ]);
+
+        $res = $this->withHeaders([
+            'Authorization' => "Bearer {$this->tokenA}",
+        ])->postJson('/api/v1/social/connectors/bind-direct', [
+            'platform' => 'facebook',
+            'access_token' => 'EAA_system_user_token_with_page_permissions',
+            // Notice provider_id and account_name left blank (auto-discovery)
+        ]);
+
+        $res->assertStatus(200)
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('data.account_name', 'Acme Global Official Page')
+            ->assertJsonPath('data.provider_id', 'page_987654321');
+
+        $account = SocialAccount::where('organization_id', $this->orgA->id)
+            ->where('provider_id', 'page_987654321')
+            ->first();
+
+        $this->assertNotNull($account);
+        $this->assertEquals('Acme Global Official Page', $account->account_name);
+        $this->assertEquals('page', $account->account_type);
+        // Effective token must be the perpetual page token, not the raw system user token
+        $this->assertEquals('EAA_perpetual_page_token_abc_555', $account->access_token);
+    }
+
+    public function test_direct_token_autodiscovers_instagram_business_account(): void
+    {
+        Http::fake([
+            'https://graph.facebook.com/v21.0/me?*' => Http::response([
+                'id' => 'user_12345',
+                'name' => 'Meta Business Admin',
+            ], 200),
+            'https://graph.facebook.com/v21.0/me/accounts*' => Http::response([
+                'data' => [
+                    [
+                        'id' => 'page_123',
+                        'name' => 'Acme Facebook Page',
+                        'access_token' => 'EAA_page_token_for_ig',
+                        'instagram_business_account' => [
+                            'id' => 'ig_business_555666777',
+                            'username' => 'acmeglobal_official',
+                            'name' => 'Acme Global Brand',
+                            'profile_picture_url' => 'https://cdn.example.com/ig-avatar.png',
+                        ],
+                    ],
+                ],
+            ], 200),
+        ]);
+
+        $res = $this->withHeaders([
+            'Authorization' => "Bearer {$this->tokenA}",
+        ])->postJson('/api/v1/social/connectors/bind-direct', [
+            'platform' => 'instagram',
+            'access_token' => 'EAA_meta_token_with_ig_permissions',
+        ]);
+
+        $res->assertStatus(200)
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('data.provider_id', 'ig_business_555666777')
+            ->assertJsonPath('data.account_name', '@acmeglobal_official')
+            ->assertJsonPath('data.account_type', 'business');
+
+        $account = SocialAccount::where('organization_id', $this->orgA->id)
+            ->where('provider_id', 'ig_business_555666777')
+            ->first();
+
+        $this->assertNotNull($account);
+        $this->assertEquals('@acmeglobal_official', $account->account_name);
+        $this->assertEquals('business', $account->account_type);
+        $this->assertEquals('EAA_page_token_for_ig', $account->access_token);
+    }
+
+    public function test_discover_endpoint_returns_available_pages_without_persisting(): void
+    {
+        Http::fake([
+            'https://graph.facebook.com/v21.0/me?*' => Http::response([
+                'id' => 'user_12345',
+                'name' => 'Meta Business Admin',
+            ], 200),
+            'https://graph.facebook.com/v21.0/me/accounts*' => Http::response([
+                'data' => [
+                    [
+                        'id' => 'page_alpha',
+                        'name' => 'Alpha Commercial Page',
+                        'category' => 'Technology',
+                        'access_token' => 'EAA_alpha_token',
+                    ],
+                    [
+                        'id' => 'page_beta',
+                        'name' => 'Beta Brand Page',
+                        'category' => 'Agency',
+                        'access_token' => 'EAA_beta_token',
+                    ],
+                ],
+            ], 200),
+        ]);
+
+        $res = $this->withHeaders([
+            'Authorization' => "Bearer {$this->tokenA}",
+        ])->postJson('/api/v1/social/connectors/discover', [
+            'platform' => 'facebook',
+            'access_token' => 'EAA_some_meta_token',
+        ]);
+
+        $res->assertStatus(200)
+            ->assertJsonPath('success', true)
+            ->assertJsonCount(2, 'data.discovered_items')
+            ->assertJsonPath('data.discovered_items.0.name', 'Alpha Commercial Page')
+            ->assertJsonPath('data.discovered_items.1.name', 'Beta Brand Page');
+
+        // Verify nothing was persisted to database during preview discovery
+        $this->assertEquals(0, SocialAccount::where('organization_id', $this->orgA->id)->count());
+    }
 }

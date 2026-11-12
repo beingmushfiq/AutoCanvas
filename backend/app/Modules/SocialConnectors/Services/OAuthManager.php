@@ -15,6 +15,26 @@ use RuntimeException;
 class OAuthManager
 {
     /**
+     * Check if official OAuth app keys are configured for platform.
+     */
+    public function hasValidCredentials(string $platform): bool
+    {
+        return match (strtolower($platform)) {
+            'facebook', 'instagram' => (function () {
+                $appId = \App\Modules\ControlPlane\Models\SystemSetting::where('key', 'meta_app_id')->value('value') ?? config('services.meta.app_id') ?? env('META_APP_ID');
+                $appSecret = \App\Modules\ControlPlane\Models\SystemSetting::where('key', 'meta_app_secret')->value('value') ?? config('services.meta.app_secret') ?? env('META_APP_SECRET');
+                return !empty($appId) && !str_starts_with($appId, 'mock_') && !empty($appSecret) && !str_starts_with($appSecret, 'mock_');
+            })(),
+            'linkedin' => (function () {
+                $clientId = \App\Modules\ControlPlane\Models\SystemSetting::where('key', 'linkedin_client_id')->value('value') ?? config('services.linkedin.client_id') ?? env('LINKEDIN_CLIENT_ID');
+                $clientSecret = \App\Modules\ControlPlane\Models\SystemSetting::where('key', 'linkedin_client_secret')->value('value') ?? config('services.linkedin.client_secret') ?? env('LINKEDIN_CLIENT_SECRET');
+                return !empty($clientId) && !str_starts_with($clientId, 'mock_') && !empty($clientSecret) && !str_starts_with($clientSecret, 'mock_');
+            })(),
+            default => false,
+        };
+    }
+
+    /**
      * Resolve connector instance for platform.
      */
     public function getConnector(string $platform): SocialConnectorInterface

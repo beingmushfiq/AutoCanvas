@@ -34,7 +34,10 @@ class LinkedInConnector implements SocialConnectorInterface
         $hasValidClientId = !empty($this->clientId) && !str_starts_with($this->clientId, 'mock_');
 
         if (!$hasValidClientId) {
-            return url("/oauth/social/linkedin/callback?code=sandbox_sim_code&state={$state}");
+            if (app()->environment('testing')) {
+                return url("/oauth/social/linkedin/callback?code=sandbox_sim_code&state={$state}");
+            }
+            throw new RuntimeException("Official LinkedIn OAuth requires configured LinkedIn Client ID & Secret. Please configure App Keys in Settings or use Direct Token Binding.");
         }
 
         $scopes = $options['scopes'] ?? [
@@ -72,6 +75,8 @@ class LinkedInConnector implements SocialConnectorInterface
         }
 
         $res = Http::asForm()->timeout(15)->post($this->tokenUrl, [
+            'grant_type' => 'authorization_code',
+            'code' => $code,
             'client_id' => $this->clientId,
             'client_secret' => $this->clientSecret,
             'redirect_uri' => $redirectUri,

@@ -35,7 +35,10 @@ class FacebookConnector implements SocialConnectorInterface
         $hasValidAppId = !empty($this->appId) && !str_starts_with($this->appId, 'mock_');
 
         if (!$hasValidAppId) {
-            return url("/oauth/social/facebook/callback?code=sandbox_sim_code&state={$state}");
+            if (app()->environment('testing')) {
+                return url("/oauth/social/facebook/callback?code=sandbox_sim_code&state={$state}");
+            }
+            throw new RuntimeException("Official Facebook OAuth requires configured Meta App credentials (App ID & Secret). Please configure App Keys in Settings or use Direct Token Binding.");
         }
 
         $scopes = $options['scopes'] ?? [
@@ -160,13 +163,29 @@ class FacebookConnector implements SocialConnectorInterface
 
     public function validateToken(string $accessToken): bool
     {
-        $res = Http::timeout(10)->get("{$this->baseUrl}/debug_token", [
-            'input_token' => $accessToken,
-            'access_token' => "{$this->appId}|{$this->appSecret}",
-        ]);
+        // 1. Direct validation via authenticated API call (works for ANY token, no app secret required!)
+        try {
+            $res = Http::timeout(10)->withToken($accessToken)->get("{$this->baseUrl}/me", [
+                'fields' => 'id,name',
+            ]);
+            if ($res->successful() && !empty($res->json('id'))) {
+                return true;
+            }
+        } catch (\Throwable) {}
 
-        if ($res->successful()) {
-            return (bool) $res->json('data.is_valid', false);
+        // 2. Fallback to debug_token only if real app credentials exist
+        $hasValidApp = !empty($this->appId) && !str_starts_with($this->appId, 'mock_') && !empty($this->appSecret) && !str_starts_with($this->appSecret, 'mock_');
+        if ($hasValidApp) {
+            try {
+                $res = Http::timeout(10)->get("{$this->baseUrl}/debug_token", [
+                    'input_token' => $accessToken,
+                    'access_token' => "{$this->appId}|{$this->appSecret}",
+                ]);
+
+                if ($res->successful()) {
+                    return (bool) $res->json('data.is_valid', false);
+                }
+            } catch (\Throwable) {}
         }
 
         return false;
@@ -182,27 +201,152 @@ class FacebookConnector implements SocialConnectorInterface
         return $res->json() ?? [];
     }
 
-    public function introspectToken(string $token, ?string $providerId = null): array
+    /**
+     * Discover all accessible Facebook Pages and linked accounts from a token.
+     */
+    public function discoverPages(string $token): array
     {
+        $discovered = [];
+
+        // 1. Check if token itself directly represents a Facebook Page
         try {
-            $target = $providerId ?: 'me';
-            $res = Http::timeout(10)->withToken($token)->get("{$this->baseUrl}/{$target}", [
+            $meRes = Http::timeout(10)->withToken($token)->get("{$this->baseUrl}/me", [
                 'fields' => 'id,name,picture.type(large),category',
             ]);
+            if ($meRes->successful()) {
+                $me = $meRes->json();
+                if (!empty($me['category'])) {
+                    $discovered[] = [
+                        'id' => (string) $me['id'],
+                        'name' => $me['name'] ?? 'Facebook Page',
+                        'category' => $me['category'],
+                        'avatar_url' => $me['picture']['data']['url'] ?? null,
+                        'access_token' => $token,
+                        'account_type' => 'page',
+                    ];
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::warning("Facebook discover /me error: " . $e->getMessage());
+        }
 
-            if ($res->successful()) {
-                $data = $res->json();
+        // 2. Query /me/accounts for all connected pages managed by this User / System User
+        try {
+            $accountsRes = Http::timeout(12)->withToken($token)->get("{$this->baseUrl}/me/accounts", [
+                'fields' => 'id,name,access_token,category,picture.type(large),tasks,instagram_business_account{id,username,name,profile_picture_url}',
+            ]);
+            if ($accountsRes->successful()) {
+                $pages = $accountsRes->json('data') ?? [];
+                foreach ($pages as $p) {
+                    $pageId = (string) $p['id'];
+                    $alreadyFound = false;
+                    foreach ($discovered as $d) {
+                        if ($d['id'] === $pageId) {
+                            $alreadyFound = true;
+                            break;
+                        }
+                    }
+                    if (!$alreadyFound) {
+                        $discovered[] = [
+                            'id' => $pageId,
+                            'name' => $p['name'] ?? 'Facebook Page',
+                            'category' => $p['category'] ?? null,
+                            'avatar_url' => $p['picture']['data']['url'] ?? null,
+                            'access_token' => $p['access_token'] ?? $token,
+                            'account_type' => 'page',
+                            'instagram_business_account' => $p['instagram_business_account'] ?? null,
+                        ];
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::warning("Facebook discover /me/accounts error: " . $e->getMessage());
+        }
+
+        return $discovered;
+    }
+
+    public function introspectToken(string $token, ?string $providerId = null): array
+    {
+        // 1. If provider_id explicitly specified, attempt direct node lookup
+        if (!empty($providerId)) {
+            try {
+                $res = Http::timeout(10)->withToken($token)->get("{$this->baseUrl}/{$providerId}", [
+                    'fields' => 'id,name,picture.type(large),category,access_token',
+                ]);
+                if ($res->successful()) {
+                    $data = $res->json();
+                    return [
+                        'id' => (string) $data['id'],
+                        'name' => $data['name'] ?? 'Facebook Page',
+                        'avatar_url' => $data['picture']['data']['url'] ?? null,
+                        'account_type' => !empty($data['category']) ? 'page' : 'profile',
+                        'access_token' => $data['access_token'] ?? $token,
+                        'scopes' => ['pages_show_list', 'pages_read_engagement', 'pages_manage_posts'],
+                        'expires_at' => Carbon::now()->addDays(90),
+                        'metadata' => [
+                            'category' => $data['category'] ?? null,
+                            'discovered_via' => 'direct_node_lookup',
+                        ],
+                    ];
+                }
+            } catch (\Throwable $e) {
+                Log::warning("Facebook token introspection node lookup error: " . $e->getMessage());
+            }
+        }
+
+        // 2. Discover available pages automatically
+        $pages = $this->discoverPages($token);
+        if (!empty($pages)) {
+            $selected = null;
+            if (!empty($providerId)) {
+                foreach ($pages as $p) {
+                    if ((string)$p['id'] === (string)$providerId) {
+                        $selected = $p;
+                        break;
+                    }
+                }
+            }
+            if (!$selected) {
+                $selected = $pages[0];
+            }
+
+            return [
+                'id' => (string) $selected['id'],
+                'name' => $selected['name'] ?? 'Facebook Page',
+                'avatar_url' => $selected['avatar_url'] ?? null,
+                'account_type' => 'page',
+                'access_token' => $selected['access_token'] ?? $token,
+                'scopes' => ['pages_show_list', 'pages_read_engagement', 'pages_manage_posts'],
+                'expires_at' => Carbon::now()->addDays(90),
+                'metadata' => [
+                    'category' => $selected['category'] ?? null,
+                    'total_pages_discovered' => count($pages),
+                    'discovered_via' => 'page_autodiscovery',
+                ],
+            ];
+        }
+
+        // 3. Fallback to /me (User or System User)
+        try {
+            $meRes = Http::timeout(10)->withToken($token)->get("{$this->baseUrl}/me", [
+                'fields' => 'id,name,picture.type(large)',
+            ]);
+            if ($meRes->successful()) {
+                $me = $meRes->json();
                 return [
-                    'id' => (string) ($data['id'] ?? $providerId),
-                    'name' => $data['name'] ?? 'Facebook Page',
-                    'avatar_url' => $data['picture']['data']['url'] ?? null,
-                    'account_type' => !empty($data['category']) ? 'page' : 'profile',
+                    'id' => (string) ($providerId ?: ($me['id'] ?? 'fb_' . uniqid())),
+                    'name' => $me['name'] ?? 'Facebook User',
+                    'avatar_url' => $me['picture']['data']['url'] ?? null,
+                    'account_type' => 'profile',
+                    'access_token' => $token,
                     'scopes' => ['pages_show_list', 'pages_read_engagement', 'pages_manage_posts'],
                     'expires_at' => Carbon::now()->addDays(90),
+                    'metadata' => ['discovered_via' => 'user_profile'],
                 ];
             }
         } catch (\Throwable $e) {
-            Log::warning("Facebook token introspection error: " . $e->getMessage());
+            Log::warning("Facebook /me fallback error: " . $e->getMessage());
         }
 
         return [
@@ -210,8 +354,10 @@ class FacebookConnector implements SocialConnectorInterface
             'name' => 'Facebook Business Page',
             'avatar_url' => null,
             'account_type' => 'page',
+            'access_token' => $token,
             'scopes' => ['pages_show_list', 'pages_read_engagement', 'pages_manage_posts'],
             'expires_at' => Carbon::now()->addDays(90),
+            'metadata' => ['discovered_via' => 'fallback'],
         ];
     }
 

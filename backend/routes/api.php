@@ -338,6 +338,7 @@ Route::prefix('v1')->group(function () {
             Route::prefix('social/connectors')->group(function () {
                 Route::get('/', [SocialConnectorController::class, 'index']);
                 Route::get('/{platform}/oauth-url', [SocialConnectorController::class, 'oauthUrl']);
+                Route::post('/discover', [SocialConnectorController::class, 'discover']);
                 Route::post('/bind-direct', [SocialConnectorController::class, 'bindDirect']);
                 Route::post('/{platform}/callback', [SocialConnectorController::class, 'callback']);
                 Route::post('/{accountId}/refresh', [SocialConnectorController::class, 'refresh']);
