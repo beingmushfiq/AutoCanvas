@@ -62,3 +62,4 @@ class SyncCanonicalPricingCommand extends Command
         return Command::SUCCESS;
     }
 }
+
