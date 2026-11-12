@@ -31,6 +31,8 @@ import { OfflineIndicator } from './lib/state/OfflineIndicator'
 import { DashboardSkeleton, MasterControlSkeleton } from './components/ui/skeleton'
 import { MasterControlGuard } from './modules/master-control/MasterControlGuard'
 import { MasterControlLoginPage } from './modules/master-control/MasterControlLoginPage'
+import { OAuthCallbackPage } from './modules/auth/OAuthCallbackPage'
+import { ResetPasswordPage } from './modules/auth/ResetPasswordPage'
 
 // Route-level code-splitting & lazy evaluation
 const LandingPage = lazy(() =>
@@ -59,8 +61,22 @@ const AppContent: React.FC = () => {
   const navigate = useNavigate()
 
   const [authModalOpen, setAuthModalOpen] = useState(false)
-  const [authMode, setAuthMode] = useState<'login' | 'register'>('login')
+  const [authMode, setAuthMode] = useState<'login' | 'register' | 'forgot'>('login')
   const [showOnboarding, setShowOnboarding] = useState(false)
+
+  // Direct URL navigation triggers for auth modals
+  useEffect(() => {
+    if (location.pathname === '/login') {
+      setAuthMode('login')
+      setAuthModalOpen(true)
+    } else if (location.pathname === '/register') {
+      setAuthMode('register')
+      setAuthModalOpen(true)
+    } else if (location.pathname === '/forgot-password') {
+      setAuthMode('forgot')
+      setAuthModalOpen(true)
+    }
+  }, [location.pathname])
 
   // Dynamic PWA Triple-Manifest Switcher (Landing, App Workspace, Sovereign Master Control)
   const pwaType = location.pathname.startsWith('/master-control')
@@ -102,7 +118,12 @@ const AppContent: React.FC = () => {
       {/* Authentication Modal */}
       <AuthModal
         isOpen={authModalOpen}
-        onClose={() => setAuthModalOpen(false)}
+        onClose={() => {
+          setAuthModalOpen(false)
+          if (['/login', '/register', '/forgot-password'].includes(location.pathname)) {
+            navigate('/', { replace: true })
+          }
+        }}
         initialMode={authMode}
         onRegisterSuccess={() => {
           setShowOnboarding(true)
@@ -122,7 +143,7 @@ const AppContent: React.FC = () => {
       <OfflineIndicator />
 
       <Routes>
-        {/* 1. Public Marketing Website */}
+        {/* 1. Public Marketing Website & Direct Auth Modal Routes */}
         <Route
           path="/"
           element={
@@ -138,6 +159,57 @@ const AppContent: React.FC = () => {
             </Suspense>
           }
         />
+        <Route
+          path="/login"
+          element={
+            <Suspense fallback={<DashboardSkeleton />}>
+              <LandingPage
+                isAuthenticated={isAuthenticated}
+                onOpenAuth={(mode) => {
+                  setAuthMode(mode)
+                  setAuthModalOpen(true)
+                }}
+                onEnterApp={() => navigate('/workspace/overview')}
+              />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/register"
+          element={
+            <Suspense fallback={<DashboardSkeleton />}>
+              <LandingPage
+                isAuthenticated={isAuthenticated}
+                onOpenAuth={(mode) => {
+                  setAuthMode(mode)
+                  setAuthModalOpen(true)
+                }}
+                onEnterApp={() => navigate('/workspace/overview')}
+              />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/forgot-password"
+          element={
+            <Suspense fallback={<DashboardSkeleton />}>
+              <LandingPage
+                isAuthenticated={isAuthenticated}
+                onOpenAuth={(mode) => {
+                  setAuthMode(mode)
+                  setAuthModalOpen(true)
+                }}
+                onEnterApp={() => navigate('/workspace/overview')}
+              />
+            </Suspense>
+          }
+        />
+
+        {/* OAuth Return Callback Handler */}
+        <Route path="/auth/callback" element={<OAuthCallbackPage />} />
+
+        {/* Dedicated Password Reset Page */}
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
 
         {/* 2. Client Magic Review (No workspace auth required) */}
         <Route

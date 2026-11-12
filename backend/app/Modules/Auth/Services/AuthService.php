@@ -2,6 +2,7 @@
 
 namespace App\Modules\Auth\Services;
 
+use App\Mail\WelcomeUserMail;
 use App\Models\User;
 use App\Modules\Billing\Models\Plan;
 use App\Modules\Billing\Models\Subscription;
@@ -12,6 +13,7 @@ use App\Modules\Workspace\Models\Workspace;
 use App\Modules\Workspace\Models\WorkspaceMember;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
@@ -98,7 +100,10 @@ class AuthService
             AuditLogger::log('user.registered', $user, null, ['email' => $user->email], $organization->id, $workspace->id);
             AuditLogger::log('organization.created', $organization, null, ['name' => $organization->name], $organization->id, $workspace->id);
 
-            // 9. Generate Sanctum Token
+            // 9. Dispatch Transactional Welcome Email via Verified SMTP
+            Mail::to($user->email)->queue(new WelcomeUserMail($user, $organization, $workspace));
+
+            // 10. Generate Sanctum Token
             $token = $user->createToken('auth_token')->plainTextToken;
 
             return [
@@ -156,7 +161,9 @@ class AuthService
      */
     public function logout(User $user): void
     {
-        $user->currentAccessToken()?->delete();
+        /** @var \Laravel\Sanctum\PersonalAccessToken|null $token */
+        $token = $user->currentAccessToken();
+        $token?->delete();
     }
 
     /**

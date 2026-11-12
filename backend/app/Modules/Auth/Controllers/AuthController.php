@@ -4,13 +4,18 @@ namespace App\Modules\Auth\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Modules\Auth\Services\AuthService;
+use App\Modules\Auth\Services\GoogleAuthService;
+use App\Modules\Auth\Services\PasswordResetService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class AuthController extends Controller
 {
     public function __construct(
-        protected AuthService $authService
+        protected AuthService $authService,
+        protected GoogleAuthService $googleAuthService,
+        protected PasswordResetService $passwordResetService
     ) {}
 
     /**
@@ -179,6 +184,90 @@ class AuthController extends Controller
                 ],
             ],
             'message' => 'Workspace switched successfully.',
+        ]);
+    }
+
+    /**
+     * Redirect to Google OAuth consent screen or return redirect URL.
+     */
+    public function googleRedirect(Request $request): JsonResponse|RedirectResponse
+    {
+        $url = $this->googleAuthService->generateRedirectUrl();
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'redirect_url' => $url,
+                ],
+            ]);
+        }
+
+        return redirect()->away($url);
+    }
+
+    /**
+     * Handle Google OAuth callback and redirect to frontend application with token.
+     */
+    public function googleCallback(Request $request): RedirectResponse|JsonResponse
+    {
+        $code = $request->query('code');
+        $state = $request->query('state');
+
+        if (! $code || ! $state) {
+            $frontendUrl = rtrim(config('app.url', 'https://autocanvas.devcenterpoint.com'), '/');
+            return redirect("{$frontendUrl}/login?error=" . urlencode('Missing Google OAuth parameters.'));
+        }
+
+        try {
+            $result = $this->googleAuthService->handleCallback($code, $state);
+            $frontendUrl = rtrim(config('app.url', 'https://autocanvas.devcenterpoint.com'), '/');
+            $isNew = $result['is_new'] ? '1' : '0';
+
+            return redirect("{$frontendUrl}/auth/callback?token={$result['token']}&is_new={$isNew}");
+        } catch (\Throwable $e) {
+            $frontendUrl = rtrim(config('app.url', 'https://autocanvas.devcenterpoint.com'), '/');
+            return redirect("{$frontendUrl}/login?error=" . urlencode($e->getMessage()));
+        }
+    }
+
+    /**
+     * Send password recovery email with secure reset link.
+     */
+    public function forgotPassword(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'email' => ['required', 'string', 'email'],
+        ]);
+
+        $result = $this->passwordResetService->sendResetLink($validated['email']);
+
+        return response()->json([
+            'success' => true,
+            'message' => $result['message'],
+        ]);
+    }
+
+    /**
+     * Reset user password using token and confirmation.
+     */
+    public function resetPassword(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'email' => ['required', 'string', 'email'],
+            'token' => ['required', 'string'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        $result = $this->passwordResetService->resetPassword(
+            $validated['email'],
+            $validated['token'],
+            $validated['password']
+        );
+
+        return response()->json([
+            'success' => true,
+            'message' => $result['message'],
         ]);
     }
 }

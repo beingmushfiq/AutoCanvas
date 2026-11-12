@@ -52,10 +52,14 @@ Route::prefix('v1')->group(function () {
     // 1. System Health
     Route::get('/health', [HealthController::class, 'check']);
 
-    // 2. Public / Guest Auth
+    // 2. Public / Guest Auth (Throttled for brute-force protection)
     Route::prefix('auth')->group(function () {
-        Route::post('/register', [AuthController::class, 'register']);
-        Route::post('/login', [AuthController::class, 'login']);
+        Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:10,1');
+        Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:10,1');
+        Route::get('/google/redirect', [AuthController::class, 'googleRedirect']);
+        Route::get('/google/callback', [AuthController::class, 'googleCallback']);
+        Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])->middleware('throttle:3,1');
+        Route::post('/reset-password', [AuthController::class, 'resetPassword'])->middleware('throttle:5,1');
     });
 
     // 3. Public Plans & CMS
