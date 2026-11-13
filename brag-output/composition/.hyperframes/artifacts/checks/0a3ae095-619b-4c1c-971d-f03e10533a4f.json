@@ -1,0 +1,2202 @@
+{
+  "ok": false,
+  "strict": false,
+  "browserSkipped": false,
+  "lint": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": [],
+    "filesScanned": 1
+  },
+  "runtime": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 11,
+    "infoCount": 0,
+    "findings": [
+      {
+        "code": "clip_media_fit",
+        "severity": "warning",
+        "message": "Audio \"sfx-impact-start\" is 0.12s but its slot (data-duration) is 2.00s — the slot is shortened to the media length when rendered. Set data-duration to ~0.12s if that isn't intended.",
+        "selector": "[data-composition-id]",
+        "dataAttributes": {
+          "data-composition-id": "root",
+          "data-width": "1920",
+          "data-height": "1080",
+          "data-start": "0"
+        },
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "time": 0
+      },
+      {
+        "code": "clip_media_fit",
+        "severity": "warning",
+        "message": "Audio \"sfx-switch-intro\" is 0.31s but its slot (data-duration) is 1.00s — the slot is shortened to the media length when rendered. Set data-duration to ~0.31s if that isn't intended.",
+        "selector": "[data-composition-id]",
+        "dataAttributes": {
+          "data-composition-id": "root",
+          "data-width": "1920",
+          "data-height": "1080",
+          "data-start": "0"
+        },
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "time": 0
+      },
+      {
+        "code": "clip_media_fit",
+        "severity": "warning",
+        "message": "Audio \"sfx-switch-research\" is 0.31s but its slot (data-duration) is 1.00s — the slot is shortened to the media length when rendered. Set data-duration to ~0.31s if that isn't intended.",
+        "selector": "[data-composition-id]",
+        "dataAttributes": {
+          "data-composition-id": "root",
+          "data-width": "1920",
+          "data-height": "1080",
+          "data-start": "0"
+        },
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "time": 0
+      },
+      {
+        "code": "clip_media_fit",
+        "severity": "warning",
+        "message": "Audio \"sfx-click-research\" is 0.09s but its slot (data-duration) is 0.50s — the slot is shortened to the media length when rendered. Set data-duration to ~0.09s if that isn't intended.",
+        "selector": "[data-composition-id]",
+        "dataAttributes": {
+          "data-composition-id": "root",
+          "data-width": "1920",
+          "data-height": "1080",
+          "data-start": "0"
+        },
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "time": 0
+      },
+      {
+        "code": "clip_media_fit",
+        "severity": "warning",
+        "message": "Audio \"sfx-switch-creative\" is 0.31s but its slot (data-duration) is 1.00s — the slot is shortened to the media length when rendered. Set data-duration to ~0.31s if that isn't intended.",
+        "selector": "[data-composition-id]",
+        "dataAttributes": {
+          "data-composition-id": "root",
+          "data-width": "1920",
+          "data-height": "1080",
+          "data-start": "0"
+        },
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "time": 0
+      },
+      {
+        "code": "clip_media_fit",
+        "severity": "warning",
+        "message": "Audio \"sfx-switch-calendar\" is 0.31s but its slot (data-duration) is 1.00s — the slot is shortened to the media length when rendered. Set data-duration to ~0.31s if that isn't intended.",
+        "selector": "[data-composition-id]",
+        "dataAttributes": {
+          "data-composition-id": "root",
+          "data-width": "1920",
+          "data-height": "1080",
+          "data-start": "0"
+        },
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "time": 0
+      },
+      {
+        "code": "clip_media_fit",
+        "severity": "warning",
+        "message": "Audio \"sfx-click-calendar\" is 0.09s but its slot (data-duration) is 0.50s — the slot is shortened to the media length when rendered. Set data-duration to ~0.09s if that isn't intended.",
+        "selector": "[data-composition-id]",
+        "dataAttributes": {
+          "data-composition-id": "root",
+          "data-width": "1920",
+          "data-height": "1080",
+          "data-start": "0"
+        },
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "time": 0
+      },
+      {
+        "code": "clip_media_fit",
+        "severity": "warning",
+        "message": "Audio \"sfx-switch-listening\" is 0.31s but its slot (data-duration) is 1.00s — the slot is shortened to the media length when rendered. Set data-duration to ~0.31s if that isn't intended.",
+        "selector": "[data-composition-id]",
+        "dataAttributes": {
+          "data-composition-id": "root",
+          "data-width": "1920",
+          "data-height": "1080",
+          "data-start": "0"
+        },
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "time": 0
+      },
+      {
+        "code": "clip_media_fit",
+        "severity": "warning",
+        "message": "Audio \"sfx-switch-plans\" is 0.31s but its slot (data-duration) is 1.00s — the slot is shortened to the media length when rendered. Set data-duration to ~0.31s if that isn't intended.",
+        "selector": "[data-composition-id]",
+        "dataAttributes": {
+          "data-composition-id": "root",
+          "data-width": "1920",
+          "data-height": "1080",
+          "data-start": "0"
+        },
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "time": 0
+      },
+      {
+        "code": "clip_media_fit",
+        "severity": "warning",
+        "message": "Audio \"sfx-switch-ecosystem\" is 0.31s but its slot (data-duration) is 1.00s — the slot is shortened to the media length when rendered. Set data-duration to ~0.31s if that isn't intended.",
+        "selector": "[data-composition-id]",
+        "dataAttributes": {
+          "data-composition-id": "root",
+          "data-width": "1920",
+          "data-height": "1080",
+          "data-start": "0"
+        },
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "time": 0
+      },
+      {
+        "code": "clip_media_fit",
+        "severity": "warning",
+        "message": "Audio \"sfx-impact-outro\" is 0.12s but its slot (data-duration) is 2.00s — the slot is shortened to the media length when rendered. Set data-duration to ~0.12s if that isn't intended.",
+        "selector": "[data-composition-id]",
+        "dataAttributes": {
+          "data-composition-id": "root",
+          "data-width": "1920",
+          "data-height": "1080",
+          "data-start": "0"
+        },
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "time": 0
+      }
+    ]
+  },
+  "layout": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 9,
+    "findings": [
+      {
+        "code": "container_overflow",
+        "severity": "info",
+        "time": 4.556,
+        "selector": "#mount-scene-1 > div:nth-of-type(1) > div:nth-of-type(2)",
+        "message": "Element extends outside a clipping layout container.",
+        "rect": {
+          "left": 360,
+          "top": -150,
+          "right": 1560,
+          "bottom": 450,
+          "width": 1200,
+          "height": 600
+        },
+        "containerSelector": "#mount-scene-1 > div:nth-of-type(1)",
+        "fixHint": "Resize/reposition the child or container, or mark intentional overflow with data-layout-allow-overflow.",
+        "containerRect": {
+          "left": 0,
+          "top": 0,
+          "right": 1920,
+          "bottom": 1080,
+          "width": 1920,
+          "height": 1080
+        },
+        "overflow": {
+          "top": 150
+        },
+        "dataAttributes": {},
+        "sourceFile": "./scenes/scene-1-problem.html",
+        "bbox": {
+          "x": 360,
+          "y": -150,
+          "width": 1200,
+          "height": 600
+        },
+        "firstSeen": 4.556,
+        "lastSeen": 4.556,
+        "occurrences": 1,
+        "heldMs": 0,
+        "times": [
+          4.556
+        ]
+      },
+      {
+        "code": "container_overflow",
+        "severity": "info",
+        "time": 13.667,
+        "selector": "#mount-scene-2 > div:nth-of-type(1) > div:nth-of-type(2)",
+        "message": "Element extends outside a clipping layout container.",
+        "rect": {
+          "left": 360,
+          "top": -150,
+          "right": 1560,
+          "bottom": 450,
+          "width": 1200,
+          "height": 600
+        },
+        "containerSelector": "#mount-scene-2 > div:nth-of-type(1)",
+        "fixHint": "Resize/reposition the child or container, or mark intentional overflow with data-layout-allow-overflow.",
+        "containerRect": {
+          "left": 0,
+          "top": 0,
+          "right": 1920,
+          "bottom": 1080,
+          "width": 1920,
+          "height": 1080
+        },
+        "overflow": {
+          "top": 150
+        },
+        "dataAttributes": {},
+        "sourceFile": "./scenes/scene-2-intro.html",
+        "bbox": {
+          "x": 360,
+          "y": -150,
+          "width": 1200,
+          "height": 600
+        },
+        "firstSeen": 13.667,
+        "lastSeen": 13.667,
+        "occurrences": 1,
+        "heldMs": 0,
+        "times": [
+          13.667
+        ]
+      },
+      {
+        "code": "container_overflow",
+        "severity": "info",
+        "time": 22.778,
+        "selector": "#mount-scene-3 > div:nth-of-type(1) > div:nth-of-type(2)",
+        "message": "Element extends outside a clipping layout container.",
+        "rect": {
+          "left": 360,
+          "top": -150,
+          "right": 1560,
+          "bottom": 450,
+          "width": 1200,
+          "height": 600
+        },
+        "containerSelector": "#mount-scene-3 > div:nth-of-type(1)",
+        "fixHint": "Resize/reposition the child or container, or mark intentional overflow with data-layout-allow-overflow.",
+        "containerRect": {
+          "left": 0,
+          "top": 0,
+          "right": 1920,
+          "bottom": 1080,
+          "width": 1920,
+          "height": 1080
+        },
+        "overflow": {
+          "top": 150
+        },
+        "dataAttributes": {},
+        "sourceFile": "./scenes/scene-3-research.html",
+        "bbox": {
+          "x": 360,
+          "y": -150,
+          "width": 1200,
+          "height": 600
+        },
+        "firstSeen": 22.778,
+        "lastSeen": 22.778,
+        "occurrences": 1,
+        "heldMs": 0,
+        "times": [
+          22.778
+        ]
+      },
+      {
+        "code": "container_overflow",
+        "severity": "info",
+        "time": 31.889,
+        "selector": "#mount-scene-4 > div:nth-of-type(1) > div:nth-of-type(2)",
+        "message": "Element extends outside a clipping layout container.",
+        "rect": {
+          "left": 360,
+          "top": -150,
+          "right": 1560,
+          "bottom": 450,
+          "width": 1200,
+          "height": 600
+        },
+        "containerSelector": "#mount-scene-4 > div:nth-of-type(1)",
+        "fixHint": "Resize/reposition the child or container, or mark intentional overflow with data-layout-allow-overflow.",
+        "containerRect": {
+          "left": 0,
+          "top": 0,
+          "right": 1920,
+          "bottom": 1080,
+          "width": 1920,
+          "height": 1080
+        },
+        "overflow": {
+          "top": 150
+        },
+        "dataAttributes": {},
+        "sourceFile": "./scenes/scene-4-creative.html",
+        "bbox": {
+          "x": 360,
+          "y": -150,
+          "width": 1200,
+          "height": 600
+        },
+        "firstSeen": 31.889,
+        "lastSeen": 31.889,
+        "occurrences": 1,
+        "heldMs": 0,
+        "times": [
+          31.889
+        ]
+      },
+      {
+        "code": "container_overflow",
+        "severity": "info",
+        "time": 41,
+        "selector": "#mount-scene-5 > div:nth-of-type(1) > div:nth-of-type(2)",
+        "message": "Element extends outside a clipping layout container.",
+        "rect": {
+          "left": 360,
+          "top": -150,
+          "right": 1560,
+          "bottom": 450,
+          "width": 1200,
+          "height": 600
+        },
+        "containerSelector": "#mount-scene-5 > div:nth-of-type(1)",
+        "fixHint": "Resize/reposition the child or container, or mark intentional overflow with data-layout-allow-overflow.",
+        "containerRect": {
+          "left": 0,
+          "top": 0,
+          "right": 1920,
+          "bottom": 1080,
+          "width": 1920,
+          "height": 1080
+        },
+        "overflow": {
+          "top": 150
+        },
+        "dataAttributes": {},
+        "sourceFile": "./scenes/scene-5-calendar.html",
+        "bbox": {
+          "x": 360,
+          "y": -150,
+          "width": 1200,
+          "height": 600
+        },
+        "firstSeen": 41,
+        "lastSeen": 41,
+        "occurrences": 1,
+        "heldMs": 0,
+        "times": [
+          41
+        ]
+      },
+      {
+        "code": "container_overflow",
+        "severity": "info",
+        "time": 50.111,
+        "selector": "#mount-scene-6 > div:nth-of-type(1) > div:nth-of-type(2)",
+        "message": "Element extends outside a clipping layout container.",
+        "rect": {
+          "left": 360,
+          "top": -150,
+          "right": 1560,
+          "bottom": 450,
+          "width": 1200,
+          "height": 600
+        },
+        "containerSelector": "#mount-scene-6 > div:nth-of-type(1)",
+        "fixHint": "Resize/reposition the child or container, or mark intentional overflow with data-layout-allow-overflow.",
+        "containerRect": {
+          "left": 0,
+          "top": 0,
+          "right": 1920,
+          "bottom": 1080,
+          "width": 1920,
+          "height": 1080
+        },
+        "overflow": {
+          "top": 150
+        },
+        "dataAttributes": {},
+        "sourceFile": "./scenes/scene-6-listening.html",
+        "bbox": {
+          "x": 360,
+          "y": -150,
+          "width": 1200,
+          "height": 600
+        },
+        "firstSeen": 50.111,
+        "lastSeen": 50.111,
+        "occurrences": 1,
+        "heldMs": 0,
+        "times": [
+          50.111
+        ]
+      },
+      {
+        "code": "container_overflow",
+        "severity": "info",
+        "time": 59.222,
+        "selector": "#mount-scene-7 > div:nth-of-type(1) > div:nth-of-type(2)",
+        "message": "Element extends outside a clipping layout container.",
+        "rect": {
+          "left": 360,
+          "top": -150,
+          "right": 1560,
+          "bottom": 450,
+          "width": 1200,
+          "height": 600
+        },
+        "containerSelector": "#mount-scene-7 > div:nth-of-type(1)",
+        "fixHint": "Resize/reposition the child or container, or mark intentional overflow with data-layout-allow-overflow.",
+        "containerRect": {
+          "left": 0,
+          "top": 0,
+          "right": 1920,
+          "bottom": 1080,
+          "width": 1920,
+          "height": 1080
+        },
+        "overflow": {
+          "top": 150
+        },
+        "dataAttributes": {},
+        "sourceFile": "./scenes/scene-7-plans.html",
+        "bbox": {
+          "x": 360,
+          "y": -150,
+          "width": 1200,
+          "height": 600
+        },
+        "firstSeen": 59.222,
+        "lastSeen": 59.222,
+        "occurrences": 1,
+        "heldMs": 0,
+        "times": [
+          59.222
+        ]
+      },
+      {
+        "code": "container_overflow",
+        "severity": "info",
+        "time": 68.333,
+        "selector": "#mount-scene-8 > div:nth-of-type(1) > div:nth-of-type(2)",
+        "message": "Element extends outside a clipping layout container.",
+        "rect": {
+          "left": 360,
+          "top": -150,
+          "right": 1560,
+          "bottom": 450,
+          "width": 1200,
+          "height": 600
+        },
+        "containerSelector": "#mount-scene-8 > div:nth-of-type(1)",
+        "fixHint": "Resize/reposition the child or container, or mark intentional overflow with data-layout-allow-overflow.",
+        "containerRect": {
+          "left": 0,
+          "top": 0,
+          "right": 1920,
+          "bottom": 1080,
+          "width": 1920,
+          "height": 1080
+        },
+        "overflow": {
+          "top": 150
+        },
+        "dataAttributes": {},
+        "sourceFile": "./scenes/scene-8-ecosystem.html",
+        "bbox": {
+          "x": 360,
+          "y": -150,
+          "width": 1200,
+          "height": 600
+        },
+        "firstSeen": 68.333,
+        "lastSeen": 68.333,
+        "occurrences": 1,
+        "heldMs": 0,
+        "times": [
+          68.333
+        ]
+      },
+      {
+        "code": "container_overflow",
+        "severity": "info",
+        "time": 77.444,
+        "selector": "#mount-scene-9 > div:nth-of-type(1) > div:nth-of-type(2)",
+        "message": "Element extends outside a clipping layout container.",
+        "rect": {
+          "left": 360,
+          "top": -150,
+          "right": 1560,
+          "bottom": 450,
+          "width": 1200,
+          "height": 600
+        },
+        "containerSelector": "#mount-scene-9 > div:nth-of-type(1)",
+        "fixHint": "Resize/reposition the child or container, or mark intentional overflow with data-layout-allow-overflow.",
+        "containerRect": {
+          "left": 0,
+          "top": 0,
+          "right": 1920,
+          "bottom": 1080,
+          "width": 1920,
+          "height": 1080
+        },
+        "overflow": {
+          "top": 150
+        },
+        "dataAttributes": {},
+        "sourceFile": "./scenes/scene-9-outro.html",
+        "bbox": {
+          "x": 360,
+          "y": -150,
+          "width": 1200,
+          "height": 600
+        },
+        "firstSeen": 77.444,
+        "lastSeen": 77.444,
+        "occurrences": 1,
+        "heldMs": 0,
+        "times": [
+          77.444
+        ]
+      }
+    ],
+    "duration": 82,
+    "samples": [
+      4.556,
+      13.667,
+      22.778,
+      31.889,
+      41,
+      50.111,
+      59.222,
+      68.333,
+      77.444
+    ],
+    "transitionSamples": [],
+    "transitionSamplesDropped": 0,
+    "tolerance": 2,
+    "totalIssueCount": 9,
+    "truncated": false
+  },
+  "motion": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": [],
+    "enabled": false,
+    "samples": 0
+  },
+  "contrast": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 8,
+    "infoCount": 0,
+    "findings": [
+      {
+        "code": "contrast_aa_failure",
+        "severity": "warning",
+        "message": "Contrast is 4.24:1; WCAG AA requires 4.5:1.",
+        "text": "by DevCenterPoint",
+        "fg": "rgb(100,116,139)",
+        "bg": "rgb(5,7,11)",
+        "ratio": 4.24,
+        "requiredRatio": 4.5,
+        "suggestedColor": "rgb(105,121,143)",
+        "large": false,
+        "selector": "div > div:nth-of-type(1) > div > header > div:nth-of-type(1) > div",
+        "dataAttributes": {},
+        "sourceFile": "./scenes/scene-1-problem.html",
+        "bbox": {
+          "x": 220.21875,
+          "y": 44,
+          "width": 126.9375,
+          "height": 16
+        },
+        "time": 4.556,
+        "times": [
+          4.556
+        ]
+      },
+      {
+        "code": "contrast_aa_failure",
+        "severity": "warning",
+        "message": "Contrast is 4.24:1; WCAG AA requires 4.5:1.",
+        "text": "by DevCenterPoint",
+        "fg": "rgb(100,116,139)",
+        "bg": "rgb(5,7,11)",
+        "ratio": 4.24,
+        "requiredRatio": 4.5,
+        "suggestedColor": "rgb(105,121,143)",
+        "large": false,
+        "selector": "div > div:nth-of-type(3) > div > header > div:nth-of-type(1) > div",
+        "dataAttributes": {},
+        "sourceFile": "./scenes/scene-3-research.html",
+        "bbox": {
+          "x": 220.21875,
+          "y": 44,
+          "width": 126.9375,
+          "height": 16
+        },
+        "time": 22.778,
+        "times": [
+          22.778
+        ]
+      },
+      {
+        "code": "contrast_aa_failure",
+        "severity": "warning",
+        "message": "Contrast is 4.01:1; WCAG AA requires 4.5:1.",
+        "text": "autocanvas.devcenterpoint.com/workspace/research-t",
+        "fg": "rgb(100,116,139)",
+        "bg": "rgb(13,16,20)",
+        "ratio": 4.01,
+        "requiredRatio": 4.5,
+        "suggestedColor": "rgb(110,125,146)",
+        "large": false,
+        "selector": "div > div:nth-of-type(3) > div > div:nth-of-type(4) > div:nth-of-type(2) > div > div:nth-of-type(1) > div:nth-of-type(2)",
+        "dataAttributes": {},
+        "sourceFile": "./scenes/scene-3-research.html",
+        "bbox": {
+          "x": 801,
+          "y": 265.953125,
+          "width": 393,
+          "height": 22
+        },
+        "time": 22.778,
+        "times": [
+          22.778
+        ]
+      },
+      {
+        "code": "contrast_aa_failure",
+        "severity": "warning",
+        "message": "Contrast is 4.24:1; WCAG AA requires 4.5:1.",
+        "text": "by DevCenterPoint",
+        "fg": "rgb(100,116,139)",
+        "bg": "rgb(5,7,11)",
+        "ratio": 4.24,
+        "requiredRatio": 4.5,
+        "suggestedColor": "rgb(105,121,143)",
+        "large": false,
+        "selector": "div > div:nth-of-type(5) > div > header > div:nth-of-type(1) > div",
+        "dataAttributes": {},
+        "sourceFile": "./scenes/scene-5-calendar.html",
+        "bbox": {
+          "x": 220.21875,
+          "y": 44,
+          "width": 126.9375,
+          "height": 16
+        },
+        "time": 41,
+        "times": [
+          41
+        ]
+      },
+      {
+        "code": "contrast_aa_failure",
+        "severity": "warning",
+        "message": "Contrast is 4.01:1; WCAG AA requires 4.5:1.",
+        "text": "autocanvas.devcenterpoint.com/workspace/publishing",
+        "fg": "rgb(100,116,139)",
+        "bg": "rgb(13,16,20)",
+        "ratio": 4.01,
+        "requiredRatio": 4.5,
+        "suggestedColor": "rgb(110,125,146)",
+        "large": false,
+        "selector": "div > div:nth-of-type(5) > div > div:nth-of-type(4) > div:nth-of-type(2) > div > div:nth-of-type(1) > div:nth-of-type(2)",
+        "dataAttributes": {},
+        "sourceFile": "./scenes/scene-5-calendar.html",
+        "bbox": {
+          "x": 801,
+          "y": 219.84375,
+          "width": 419.40625,
+          "height": 22
+        },
+        "time": 41,
+        "times": [
+          41
+        ]
+      },
+      {
+        "code": "contrast_aa_failure",
+        "severity": "warning",
+        "message": "Contrast is 4.24:1; WCAG AA requires 4.5:1.",
+        "text": "by DevCenterPoint",
+        "fg": "rgb(100,116,139)",
+        "bg": "rgb(5,7,11)",
+        "ratio": 4.24,
+        "requiredRatio": 4.5,
+        "suggestedColor": "rgb(105,121,143)",
+        "large": false,
+        "selector": "div > div:nth-of-type(7) > div > header > div:nth-of-type(1) > div",
+        "dataAttributes": {},
+        "sourceFile": "./scenes/scene-7-plans.html",
+        "bbox": {
+          "x": 220.21875,
+          "y": 44,
+          "width": 126.9375,
+          "height": 16
+        },
+        "time": 59.222,
+        "times": [
+          59.222
+        ]
+      },
+      {
+        "code": "contrast_aa_failure",
+        "severity": "warning",
+        "message": "Contrast is 4.01:1; WCAG AA requires 4.5:1.",
+        "text": "autocanvas.devcenterpoint.com/workspace/billing",
+        "fg": "rgb(100,116,139)",
+        "bg": "rgb(13,16,20)",
+        "ratio": 4.01,
+        "requiredRatio": 4.5,
+        "suggestedColor": "rgb(110,125,146)",
+        "large": false,
+        "selector": "div > div:nth-of-type(7) > div > div:nth-of-type(4) > div:nth-of-type(2) > div > div:nth-of-type(1) > div:nth-of-type(2)",
+        "dataAttributes": {},
+        "sourceFile": "./scenes/scene-7-plans.html",
+        "bbox": {
+          "x": 801,
+          "y": 410.40625,
+          "width": 340.203125,
+          "height": 22
+        },
+        "time": 59.222,
+        "times": [
+          59.222
+        ]
+      },
+      {
+        "code": "contrast_aa_failure",
+        "severity": "warning",
+        "message": "Contrast is 4.18:1; WCAG AA requires 4.5:1.",
+        "text": "Built with precision by DevCenterPoint",
+        "fg": "rgb(100,116,139)",
+        "bg": "rgb(7,9,14)",
+        "ratio": 4.18,
+        "requiredRatio": 4.5,
+        "suggestedColor": "rgb(106,121,144)",
+        "large": false,
+        "selector": "#outro-byline",
+        "dataAttributes": {},
+        "sourceFile": "./scenes/scene-9-outro.html",
+        "bbox": {
+          "x": 828.171875,
+          "y": 760.9375,
+          "width": 263.640625,
+          "height": 17
+        },
+        "time": 77.444,
+        "times": [
+          77.444
+        ]
+      }
+    ],
+    "enabled": true,
+    "samples": [
+      4.556,
+      22.778,
+      41,
+      59.222,
+      77.444
+    ],
+    "checked": 64,
+    "passed": 56
+  },
+  "craft": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 16,
+    "infoCount": 0,
+    "findings": [
+      {
+        "code": "text_below_floor",
+        "severity": "warning",
+        "message": "Type floor is 28 px (2.6% of the 1080 px short side, what a phone can read) and 10 text elements stay under it for 0.5 s or more, the smallest \"12 Disconnected Browser Tabs & Schedu...\" at 11 px: set reading text to at least 28 px, or put data-layout-ignore on text that is texture rather than reading; see references/look.md.",
+        "text": "12 Disconnected Browser Tabs & Schedulers",
+        "selector": "#chaos-1 > span:nth-of-type(2)",
+        "dataAttributes": {},
+        "sourceFile": "./scenes/scene-1-problem.html",
+        "bbox": {
+          "x": 288.17,
+          "y": 537.69,
+          "width": 343.37,
+          "height": 20
+        },
+        "time": 1.506,
+        "times": [
+          0,
+          0,
+          0,
+          0.411,
+          0.958,
+          1.506,
+          2.19,
+          2.738,
+          2.738,
+          3.422
+        ],
+        "fontPx": 10.86,
+        "floorPx": 28,
+        "seconds": 7.529,
+        "elements": [
+          {
+            "selector": "#chaos-1 > span:nth-of-type(2)",
+            "text": "12 Disconnected Browser Tabs & Schedulers",
+            "fontPx": 10.86,
+            "time": 1.506,
+            "seconds": 7.529
+          },
+          {
+            "selector": "#chaos-4 > span:nth-of-type(2)",
+            "text": "Fragmented Analytics & Unanswered Inboxes",
+            "fontPx": 11.35,
+            "time": 3.422,
+            "seconds": 5.75
+          },
+          {
+            "selector": "#mount-scene-1 > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(2) > span:nth-of-type(1)",
+            "text": "AUTOCANVAS OS v2.0 • LIVE PARITY",
+            "fontPx": 12,
+            "time": 0,
+            "seconds": 10.13
+          },
+          {
+            "selector": "#chaos-2 > span:nth-of-type(2)",
+            "text": "Raster AI Diffusion: Warped Text & Blurry Logos",
+            "fontPx": 12.79,
+            "time": 2.19,
+            "seconds": 6.845
+          },
+          {
+            "selector": "#mount-scene-1 > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1)",
+            "text": "by",
+            "fontPx": 13,
+            "time": 0,
+            "seconds": 10.13
+          },
+          {
+            "selector": "#mount-scene-1 > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)",
+            "text": "DevCenterPoint",
+            "fontPx": 13,
+            "time": 0,
+            "seconds": 10.13
+          },
+          {
+            "selector": "#problem-kicker",
+            "text": "THE MODERN SOCIAL BOTTLENECK",
+            "fontPx": 14,
+            "time": 0.411,
+            "seconds": 9.309
+          },
+          {
+            "selector": "#chaos-3 > span:nth-of-type(2)",
+            "text": "Publishing Rhythm Broken Across 4 Social Channels",
+            "fontPx": 14.09,
+            "time": 2.738,
+            "seconds": 6.297
+          },
+          {
+            "selector": "#chaos-3 > span:nth-of-type(1)",
+            "text": "⚠️",
+            "fontPx": 17.62,
+            "time": 2.738,
+            "seconds": 6.297
+          },
+          {
+            "selector": "#problem-subhead",
+            "text": "Managing multi-channel social media today means disconnected browser tabs, repetitive copy-pasting, and missed audience momentum.",
+            "fontPx": 21,
+            "time": 0.958,
+            "seconds": 8.762
+          }
+        ]
+      },
+      {
+        "code": "dead_stretch",
+        "severity": "warning",
+        "message": "Nothing on screen changes for 4.24 s (3.97–8.21 s): start the next move within 3 s, or put data-hold on the element whose stillness is deliberate; see references/motion.md.",
+        "selector": "[data-composition-id]",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 3.97,
+        "seconds": 4.244,
+        "floorSeconds": 3,
+        "until": 8.214
+      },
+      {
+        "code": "text_below_floor",
+        "severity": "warning",
+        "message": "Type floor is 28 px (2.6% of the 1080 px short side, what a phone can read) and 9 text elements stay under it for 0.5 s or more, the smallest \"autocanvas.devcenterpoint.com/workspa...\" at 11 px: set reading text to at least 28 px, or put data-layout-ignore on text that is texture rather than reading; see references/look.md.",
+        "text": "autocanvas.devcenterpoint.com/workspace/command-center",
+        "selector": "#intro-browser > div:nth-of-type(1) > div:nth-of-type(2)",
+        "dataAttributes": {},
+        "sourceFile": "./scenes/scene-2-intro.html",
+        "bbox": {
+          "x": 832.75,
+          "y": 265.13,
+          "width": 342.65,
+          "height": 13.46
+        },
+        "time": 10.678,
+        "times": [
+          10.13,
+          10.13,
+          10.13,
+          10.541,
+          10.541,
+          10.678,
+          10.952,
+          11.362,
+          11.636
+        ],
+        "fontPx": 10.58,
+        "floorPx": 28,
+        "seconds": 8.35,
+        "elements": [
+          {
+            "selector": "#intro-browser > div:nth-of-type(1) > div:nth-of-type(2)",
+            "text": "autocanvas.devcenterpoint.com/workspace/command-center",
+            "fontPx": 10.58,
+            "time": 10.678,
+            "seconds": 8.35
+          },
+          {
+            "selector": "#mount-scene-2 > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(2) > span:nth-of-type(1)",
+            "text": "AUTOCANVAS OS v2.0 • LIVE PARITY",
+            "fontPx": 12,
+            "time": 10.13,
+            "seconds": 8.898
+          },
+          {
+            "selector": "#mount-scene-2 > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1)",
+            "text": "by",
+            "fontPx": 13,
+            "time": 10.13,
+            "seconds": 8.898
+          },
+          {
+            "selector": "#mount-scene-2 > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)",
+            "text": "DevCenterPoint",
+            "fontPx": 13,
+            "time": 10.13,
+            "seconds": 8.898
+          },
+          {
+            "selector": "#intro-info > div:nth-of-type(1)",
+            "text": "INTRODUCING AUTOCANVAS",
+            "fontPx": 14,
+            "time": 10.541,
+            "seconds": 8.487
+          },
+          {
+            "selector": "#intro-b1 > span:nth-of-type(2)",
+            "text": "Unified Command Center for all connected channels",
+            "fontPx": 16,
+            "time": 10.952,
+            "seconds": 8.076
+          },
+          {
+            "selector": "#intro-b2 > span:nth-of-type(2)",
+            "text": "Deterministic rendering engine with zero hallucinations",
+            "fontPx": 16,
+            "time": 11.362,
+            "seconds": 7.666
+          },
+          {
+            "selector": "#intro-b3 > span:nth-of-type(2)",
+            "text": "Engineered from the ground up by DevCenterPoint",
+            "fontPx": 16,
+            "time": 11.636,
+            "seconds": 7.392
+          },
+          {
+            "selector": "#intro-info > p:nth-of-type(1)",
+            "text": "Your entire social media operation unified into a single deterministic, enterprise-grade brand OS.",
+            "fontPx": 21,
+            "time": 10.541,
+            "seconds": 8.487
+          }
+        ]
+      },
+      {
+        "code": "dead_stretch",
+        "severity": "warning",
+        "message": "Nothing on screen changes for 6.57 s (11.91–18.48 s): start the next move within 3 s, or put data-hold on the element whose stillness is deliberate; see references/motion.md.",
+        "selector": "[data-composition-id]",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 11.91,
+        "seconds": 6.571,
+        "floorSeconds": 3,
+        "until": 18.481
+      },
+      {
+        "code": "text_below_floor",
+        "severity": "warning",
+        "message": "Type floor is 28 px (2.6% of the 1080 px short side, what a phone can read) and 9 text elements stay under it for 0.5 s or more, the smallest \"autocanvas.devcenterpoint.com/workspa...\" at 11 px: set reading text to at least 28 px, or put data-layout-ignore on text that is texture rather than reading; see references/look.md.",
+        "text": "autocanvas.devcenterpoint.com/workspace/research-trends",
+        "selector": "#research-browser > div:nth-of-type(1) > div:nth-of-type(2)",
+        "dataAttributes": {},
+        "sourceFile": "./scenes/scene-3-research.html",
+        "bbox": {
+          "x": 825.55,
+          "y": 275.89,
+          "width": 355.01,
+          "height": 13.7
+        },
+        "time": 19.713,
+        "times": [
+          19.028,
+          19.028,
+          19.028,
+          19.439,
+          19.439,
+          19.713,
+          19.987,
+          20.26,
+          20.534
+        ],
+        "fontPx": 10.76,
+        "floorPx": 28,
+        "seconds": 8.214,
+        "elements": [
+          {
+            "selector": "#research-browser > div:nth-of-type(1) > div:nth-of-type(2)",
+            "text": "autocanvas.devcenterpoint.com/workspace/research-trends",
+            "fontPx": 10.76,
+            "time": 19.713,
+            "seconds": 8.214
+          },
+          {
+            "selector": "#mount-scene-3 > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(2) > span:nth-of-type(1)",
+            "text": "AUTOCANVAS OS v2.0 • LIVE PARITY",
+            "fontPx": 12,
+            "time": 19.028,
+            "seconds": 8.899
+          },
+          {
+            "selector": "#mount-scene-3 > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1)",
+            "text": "by",
+            "fontPx": 13,
+            "time": 19.028,
+            "seconds": 8.899
+          },
+          {
+            "selector": "#mount-scene-3 > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)",
+            "text": "DevCenterPoint",
+            "fontPx": 13,
+            "time": 19.028,
+            "seconds": 8.899
+          },
+          {
+            "selector": "#research-info > div:nth-of-type(1)",
+            "text": "INTELLIGENT CONTENT RESEARCH",
+            "fontPx": 14,
+            "time": 19.439,
+            "seconds": 8.488
+          },
+          {
+            "selector": "#research-b1 > span:nth-of-type(2)",
+            "text": "Hourly Industry News Monitoring & Topic Ingestion",
+            "fontPx": 16,
+            "time": 19.987,
+            "seconds": 7.94
+          },
+          {
+            "selector": "#research-b2 > span:nth-of-type(2)",
+            "text": "1-Click Campaign Angle & Hook Generator",
+            "fontPx": 16,
+            "time": 20.26,
+            "seconds": 7.667
+          },
+          {
+            "selector": "#research-b3 > span:nth-of-type(2)",
+            "text": "Guaranteed Duplicate Post Prevention",
+            "fontPx": 16,
+            "time": 20.534,
+            "seconds": 7.393
+          },
+          {
+            "selector": "#research-info > p:nth-of-type(1)",
+            "text": "Real-time industry radar detects trending topics, evaluates competitor sentiment, and crafts strategic angles before trends peak.",
+            "fontPx": 21,
+            "time": 19.439,
+            "seconds": 8.488
+          }
+        ]
+      },
+      {
+        "code": "dead_stretch",
+        "severity": "warning",
+        "message": "Nothing on screen changes for 6.57 s (20.95–27.52 s): start the next move within 3 s, or put data-hold on the element whose stillness is deliberate; see references/motion.md.",
+        "selector": "[data-composition-id]",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 20.945,
+        "seconds": 6.571,
+        "floorSeconds": 3,
+        "until": 27.516
+      },
+      {
+        "code": "text_below_floor",
+        "severity": "warning",
+        "message": "Type floor is 28 px (2.6% of the 1080 px short side, what a phone can read) and 9 text elements stay under it for 0.5 s or more, the smallest \"autocanvas.devcenterpoint.com/engine-...\" at 11 px: set reading text to at least 28 px, or put data-layout-ignore on text that is texture rather than reading; see references/look.md.",
+        "text": "autocanvas.devcenterpoint.com/engine-parity",
+        "selector": "#creative-browser > div:nth-of-type(1) > div:nth-of-type(2)",
+        "dataAttributes": {},
+        "sourceFile": "./scenes/scene-4-creative.html",
+        "bbox": {
+          "x": 823.86,
+          "y": 317.65,
+          "width": 278.67,
+          "height": 13.74
+        },
+        "time": 28.748,
+        "times": [
+          28.063,
+          28.063,
+          28.063,
+          28.474,
+          28.474,
+          28.748,
+          29.022,
+          29.295,
+          29.569
+        ],
+        "fontPx": 10.8,
+        "floorPx": 28,
+        "seconds": 8.214,
+        "elements": [
+          {
+            "selector": "#creative-browser > div:nth-of-type(1) > div:nth-of-type(2)",
+            "text": "autocanvas.devcenterpoint.com/engine-parity",
+            "fontPx": 10.8,
+            "time": 28.748,
+            "seconds": 8.214
+          },
+          {
+            "selector": "#mount-scene-4 > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(2) > span:nth-of-type(1)",
+            "text": "AUTOCANVAS OS v2.0 • LIVE PARITY",
+            "fontPx": 12,
+            "time": 28.063,
+            "seconds": 8.899
+          },
+          {
+            "selector": "#mount-scene-4 > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1)",
+            "text": "by",
+            "fontPx": 13,
+            "time": 28.063,
+            "seconds": 8.899
+          },
+          {
+            "selector": "#mount-scene-4 > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)",
+            "text": "DevCenterPoint",
+            "fontPx": 13,
+            "time": 28.063,
+            "seconds": 8.899
+          },
+          {
+            "selector": "#creative-info > div:nth-of-type(1)",
+            "text": "PRECISION BRAND ARCHITECTURE",
+            "fontPx": 14,
+            "time": 28.474,
+            "seconds": 8.488
+          },
+          {
+            "selector": "#creative-b1 > span:nth-of-type(2)",
+            "text": "Deterministic Chromium & SVG Rendering",
+            "fontPx": 16,
+            "time": 29.022,
+            "seconds": 7.94
+          },
+          {
+            "selector": "#creative-b2 > span:nth-of-type(2)",
+            "text": "100% Crisp Brand Fonts, Palettes & Vector Logos",
+            "fontPx": 16,
+            "time": 29.295,
+            "seconds": 7.667
+          },
+          {
+            "selector": "#creative-b3 > span:nth-of-type(2)",
+            "text": "Platform-optimized aspect ratios in one export",
+            "fontPx": 16,
+            "time": 29.569,
+            "seconds": 7.393
+          },
+          {
+            "selector": "#creative-info > p:nth-of-type(1)",
+            "text": "Generic AI tools garble text and distort official logos. AutoCanvas composites layered, studio-grade visuals with precision typography.",
+            "fontPx": 21,
+            "time": 28.474,
+            "seconds": 8.488
+          }
+        ]
+      },
+      {
+        "code": "dead_stretch",
+        "severity": "warning",
+        "message": "Nothing on screen changes for 6.43 s (29.98–36.41 s): start the next move within 3 s, or put data-hold on the element whose stillness is deliberate; see references/motion.md.",
+        "selector": "[data-composition-id]",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 29.98,
+        "seconds": 6.434,
+        "floorSeconds": 3,
+        "until": 36.414
+      },
+      {
+        "code": "text_below_floor",
+        "severity": "warning",
+        "message": "Type floor is 28 px (2.6% of the 1080 px short side, what a phone can read) and 9 text elements stay under it for 0.5 s or more, the smallest \"autocanvas.devcenterpoint.com/workspa...\" at 11 px: set reading text to at least 28 px, or put data-layout-ignore on text that is texture rather than reading; see references/look.md.",
+        "text": "autocanvas.devcenterpoint.com/workspace/publishing-calendar",
+        "selector": "#calendar-browser > div:nth-of-type(1) > div:nth-of-type(2)",
+        "dataAttributes": {},
+        "sourceFile": "./scenes/scene-5-calendar.html",
+        "bbox": {
+          "x": 822.38,
+          "y": 228.49,
+          "width": 383.68,
+          "height": 13.8
+        },
+        "time": 37.783,
+        "times": [
+          37.098,
+          37.098,
+          37.098,
+          37.509,
+          37.509,
+          37.783,
+          38.057,
+          38.331,
+          38.604
+        ],
+        "fontPx": 10.84,
+        "floorPx": 28,
+        "seconds": 8.214,
+        "elements": [
+          {
+            "selector": "#calendar-browser > div:nth-of-type(1) > div:nth-of-type(2)",
+            "text": "autocanvas.devcenterpoint.com/workspace/publishing-calendar",
+            "fontPx": 10.84,
+            "time": 37.783,
+            "seconds": 8.214
+          },
+          {
+            "selector": "#mount-scene-5 > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(2) > span:nth-of-type(1)",
+            "text": "AUTOCANVAS OS v2.0 • LIVE PARITY",
+            "fontPx": 12,
+            "time": 37.098,
+            "seconds": 8.899
+          },
+          {
+            "selector": "#mount-scene-5 > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1)",
+            "text": "by",
+            "fontPx": 13,
+            "time": 37.098,
+            "seconds": 8.899
+          },
+          {
+            "selector": "#mount-scene-5 > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)",
+            "text": "DevCenterPoint",
+            "fontPx": 13,
+            "time": 37.098,
+            "seconds": 8.899
+          },
+          {
+            "selector": "#calendar-info > div:nth-of-type(1)",
+            "text": "UNIFIED CONTENT CALENDAR",
+            "fontPx": 14,
+            "time": 37.509,
+            "seconds": 8.488
+          },
+          {
+            "selector": "#calendar-b1 > span:nth-of-type(2)",
+            "text": "Synchronized LinkedIn, Instagram, Facebook & X queue",
+            "fontPx": 16,
+            "time": 38.057,
+            "seconds": 7.94
+          },
+          {
+            "selector": "#calendar-b2 > span:nth-of-type(2)",
+            "text": "Dynamic peak engagement timing recommendations",
+            "fontPx": 16,
+            "time": 38.331,
+            "seconds": 7.666
+          },
+          {
+            "selector": "#calendar-b3 > span:nth-of-type(2)",
+            "text": "Idempotent Redis locking prevents double-posting",
+            "fontPx": 16,
+            "time": 38.604,
+            "seconds": 7.393
+          },
+          {
+            "selector": "#calendar-info > p:nth-of-type(1)",
+            "text": "Visualize your entire multi-channel publishing rhythm with intelligent peak engagement timing and automated dispatch.",
+            "fontPx": 21,
+            "time": 37.509,
+            "seconds": 8.488
+          }
+        ]
+      },
+      {
+        "code": "dead_stretch",
+        "severity": "warning",
+        "message": "Nothing on screen changes for 6.43 s (39.02–45.45 s): start the next move within 3 s, or put data-hold on the element whose stillness is deliberate; see references/motion.md.",
+        "selector": "[data-composition-id]",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 39.015,
+        "seconds": 6.434,
+        "floorSeconds": 3,
+        "until": 45.449
+      },
+      {
+        "code": "text_below_floor",
+        "severity": "warning",
+        "message": "Type floor is 28 px (2.6% of the 1080 px short side, what a phone can read) and 9 text elements stay under it for 0.5 s or more, the smallest \"autocanvas.devcenterpoint.com/workspa...\" at 11 px: set reading text to at least 28 px, or put data-layout-ignore on text that is texture rather than reading; see references/look.md.",
+        "text": "autocanvas.devcenterpoint.com/workspace/social-listening",
+        "selector": "#listening-browser > div:nth-of-type(1) > div:nth-of-type(2)",
+        "dataAttributes": {},
+        "sourceFile": "./scenes/scene-6-listening.html",
+        "bbox": {
+          "x": 827.46,
+          "y": 277.08,
+          "width": 359.85,
+          "height": 13.63
+        },
+        "time": 46.681,
+        "times": [
+          46.134,
+          46.134,
+          46.134,
+          46.544,
+          46.544,
+          46.681,
+          46.955,
+          47.366,
+          47.639
+        ],
+        "fontPx": 10.71,
+        "floorPx": 28,
+        "seconds": 8.351,
+        "elements": [
+          {
+            "selector": "#listening-browser > div:nth-of-type(1) > div:nth-of-type(2)",
+            "text": "autocanvas.devcenterpoint.com/workspace/social-listening",
+            "fontPx": 10.71,
+            "time": 46.681,
+            "seconds": 8.351
+          },
+          {
+            "selector": "#mount-scene-6 > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(2) > span:nth-of-type(1)",
+            "text": "AUTOCANVAS OS v2.0 • LIVE PARITY",
+            "fontPx": 12,
+            "time": 46.134,
+            "seconds": 8.898
+          },
+          {
+            "selector": "#mount-scene-6 > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1)",
+            "text": "by",
+            "fontPx": 13,
+            "time": 46.134,
+            "seconds": 8.898
+          },
+          {
+            "selector": "#mount-scene-6 > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)",
+            "text": "DevCenterPoint",
+            "fontPx": 13,
+            "time": 46.134,
+            "seconds": 8.898
+          },
+          {
+            "selector": "#listening-info > div:nth-of-type(1)",
+            "text": "BRAND SAFETY & COMMUNITY INTELLIGENCE",
+            "fontPx": 14,
+            "time": 46.544,
+            "seconds": 8.488
+          },
+          {
+            "selector": "#listening-b1 > span:nth-of-type(2)",
+            "text": "Urgent Flag Alerts requiring team review in Unified Inbox",
+            "fontPx": 16,
+            "time": 46.955,
+            "seconds": 8.077
+          },
+          {
+            "selector": "#listening-b2 > span:nth-of-type(2)",
+            "text": "Real-time competitor share of voice tracking",
+            "fontPx": 16,
+            "time": 47.366,
+            "seconds": 7.666
+          },
+          {
+            "selector": "#listening-b3 > span:nth-of-type(2)",
+            "text": "1-Click Safety Pause stops all dispatches instantly",
+            "fontPx": 16,
+            "time": 47.639,
+            "seconds": 7.393
+          },
+          {
+            "selector": "#listening-info > p:nth-of-type(1)",
+            "text": "Real-time keyword sentiment tracking, competitor share of voice, and an instant 1-click publishing circuit breaker.",
+            "fontPx": 21,
+            "time": 46.544,
+            "seconds": 8.488
+          }
+        ]
+      },
+      {
+        "code": "dead_stretch",
+        "severity": "warning",
+        "message": "Nothing on screen changes for 6.57 s (47.91–54.48 s): start the next move within 3 s, or put data-hold on the element whose stillness is deliberate; see references/motion.md.",
+        "selector": "[data-composition-id]",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 47.913,
+        "seconds": 6.571,
+        "floorSeconds": 3,
+        "until": 54.484
+      },
+      {
+        "code": "text_below_floor",
+        "severity": "warning",
+        "message": "Type floor is 28 px (2.6% of the 1080 px short side, what a phone can read) and 9 text elements stay under it for 0.5 s or more, the smallest \"autocanvas.devcenterpoint.com/workspa...\" at 11 px: set reading text to at least 28 px, or put data-layout-ignore on text that is texture rather than reading; see references/look.md.",
+        "text": "autocanvas.devcenterpoint.com/workspace/billing",
+        "selector": "#plans-browser > div:nth-of-type(1) > div:nth-of-type(2)",
+        "dataAttributes": {},
+        "sourceFile": "./scenes/scene-7-plans.html",
+        "bbox": {
+          "x": 825.55,
+          "y": 417.17,
+          "width": 303.38,
+          "height": 13.69
+        },
+        "time": 55.716,
+        "times": [
+          55.032,
+          55.032,
+          55.032,
+          55.442,
+          55.442,
+          55.716,
+          55.99,
+          56.264,
+          56.538
+        ],
+        "fontPx": 10.76,
+        "floorPx": 28,
+        "seconds": 8.214,
+        "elements": [
+          {
+            "selector": "#plans-browser > div:nth-of-type(1) > div:nth-of-type(2)",
+            "text": "autocanvas.devcenterpoint.com/workspace/billing",
+            "fontPx": 10.76,
+            "time": 55.716,
+            "seconds": 8.214
+          },
+          {
+            "selector": "#mount-scene-7 > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(2) > span:nth-of-type(1)",
+            "text": "AUTOCANVAS OS v2.0 • LIVE PARITY",
+            "fontPx": 12,
+            "time": 55.032,
+            "seconds": 8.898
+          },
+          {
+            "selector": "#mount-scene-7 > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1)",
+            "text": "by",
+            "fontPx": 13,
+            "time": 55.032,
+            "seconds": 8.898
+          },
+          {
+            "selector": "#mount-scene-7 > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)",
+            "text": "DevCenterPoint",
+            "fontPx": 13,
+            "time": 55.032,
+            "seconds": 8.898
+          },
+          {
+            "selector": "#plans-info > div:nth-of-type(1)",
+            "text": "MULTI-BRAND & WORKSPACE SCALE",
+            "fontPx": 14,
+            "time": 55.442,
+            "seconds": 8.488
+          },
+          {
+            "selector": "#plans-b1 > span:nth-of-type(2)",
+            "text": "Starter ($29) • Growth ($79) • Agency Pro ($199) • Enterprise ($499)",
+            "fontPx": 16,
+            "time": 55.99,
+            "seconds": 7.94
+          },
+          {
+            "selector": "#plans-b2 > span:nth-of-type(2)",
+            "text": "Granular RBAC team permissions & workspace isolation",
+            "fontPx": 16,
+            "time": 56.264,
+            "seconds": 7.666
+          },
+          {
+            "selector": "#plans-b3 > span:nth-of-type(2)",
+            "text": "Direct enterprise SLA and local payment options",
+            "fontPx": 16,
+            "time": 56.538,
+            "seconds": 7.392
+          },
+          {
+            "selector": "#plans-info > p:nth-of-type(1)",
+            "text": "Multi-tenant architecture built for solo creators, growing marketing teams, and high-volume global agencies.",
+            "fontPx": 21,
+            "time": 55.442,
+            "seconds": 8.488
+          }
+        ]
+      },
+      {
+        "code": "dead_stretch",
+        "severity": "warning",
+        "message": "Nothing on screen changes for 6.57 s (56.95–63.52 s): start the next move within 3 s, or put data-hold on the element whose stillness is deliberate; see references/motion.md.",
+        "selector": "[data-composition-id]",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 56.948,
+        "seconds": 6.571,
+        "floorSeconds": 3,
+        "until": 63.519
+      },
+      {
+        "code": "text_below_floor",
+        "severity": "warning",
+        "message": "Type floor is 28 px (2.6% of the 1080 px short side, what a phone can read) and 21 text elements stay under it for 0.5 s or more, the smallest \"AUTOCANVAS OS v2.0 • LIVE PARITY\" at 12 px: set reading text to at least 28 px, or put data-layout-ignore on text that is texture rather than reading; see references/look.md.",
+        "text": "AUTOCANVAS OS v2.0 • LIVE PARITY",
+        "selector": "#mount-scene-8 > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(2) > span:nth-of-type(1)",
+        "dataAttributes": {},
+        "sourceFile": "./scenes/scene-8-ecosystem.html",
+        "bbox": {
+          "x": 1610.59,
+          "y": 44,
+          "width": 230.41,
+          "height": 16
+        },
+        "time": 64.067,
+        "times": [
+          64.067,
+          64.067,
+          64.067,
+          64.067,
+          64.067,
+          64.067,
+          64.067,
+          64.067,
+          64.067,
+          64.067,
+          64.067,
+          64.067,
+          64.067,
+          64.067,
+          64.067,
+          64.067,
+          64.067,
+          64.067,
+          64.067,
+          64.341,
+          64.888
+        ],
+        "fontPx": 12,
+        "floorPx": 28,
+        "seconds": 8.898,
+        "elements": [
+          {
+            "selector": "#mount-scene-8 > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(2) > span:nth-of-type(1)",
+            "text": "AUTOCANVAS OS v2.0 • LIVE PARITY",
+            "fontPx": 12,
+            "time": 64.067,
+            "seconds": 8.898
+          },
+          {
+            "selector": "#mount-scene-8 > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1)",
+            "text": "by",
+            "fontPx": 13,
+            "time": 64.067,
+            "seconds": 8.898
+          },
+          {
+            "selector": "#mount-scene-8 > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)",
+            "text": "DevCenterPoint",
+            "fontPx": 13,
+            "time": 64.067,
+            "seconds": 8.898
+          },
+          {
+            "selector": "#eco-kicker",
+            "text": "THE COMPLETE OPERATING SYSTEM",
+            "fontPx": 14,
+            "time": 64.341,
+            "seconds": 8.624
+          },
+          {
+            "selector": "#label-1",
+            "text": "RESEARCH",
+            "fontPx": 15,
+            "time": 64.067,
+            "seconds": 8.898
+          },
+          {
+            "selector": "#label-2",
+            "text": "CREATE",
+            "fontPx": 15,
+            "time": 64.067,
+            "seconds": 8.898
+          },
+          {
+            "selector": "#label-3",
+            "text": "PLAN",
+            "fontPx": 15,
+            "time": 64.067,
+            "seconds": 8.898
+          },
+          {
+            "selector": "#label-4",
+            "text": "APPROVE",
+            "fontPx": 15,
+            "time": 64.067,
+            "seconds": 8.898
+          },
+          {
+            "selector": "#label-5",
+            "text": "PUBLISH",
+            "fontPx": 15,
+            "time": 64.067,
+            "seconds": 8.898
+          },
+          {
+            "selector": "#label-6",
+            "text": "ENGAGE",
+            "fontPx": 15,
+            "time": 64.067,
+            "seconds": 8.898
+          },
+          {
+            "selector": "#label-7",
+            "text": "ANALYZE",
+            "fontPx": 15,
+            "time": 64.067,
+            "seconds": 8.898
+          },
+          {
+            "selector": "#label-8",
+            "text": "OPTIMIZE",
+            "fontPx": 15,
+            "time": 64.067,
+            "seconds": 8.898
+          },
+          {
+            "selector": "#circle-1",
+            "text": "01",
+            "fontPx": 19,
+            "time": 64.067,
+            "seconds": 8.898
+          },
+          {
+            "selector": "#circle-2",
+            "text": "02",
+            "fontPx": 19,
+            "time": 64.067,
+            "seconds": 8.898
+          },
+          {
+            "selector": "#circle-3",
+            "text": "03",
+            "fontPx": 19,
+            "time": 64.067,
+            "seconds": 8.898
+          },
+          {
+            "selector": "#circle-4",
+            "text": "04",
+            "fontPx": 19,
+            "time": 64.067,
+            "seconds": 8.898
+          },
+          {
+            "selector": "#circle-5",
+            "text": "05",
+            "fontPx": 19,
+            "time": 64.067,
+            "seconds": 8.898
+          },
+          {
+            "selector": "#circle-6",
+            "text": "06",
+            "fontPx": 19,
+            "time": 64.067,
+            "seconds": 8.898
+          },
+          {
+            "selector": "#circle-7",
+            "text": "07",
+            "fontPx": 19,
+            "time": 64.067,
+            "seconds": 8.898
+          },
+          {
+            "selector": "#circle-8",
+            "text": "08",
+            "fontPx": 19,
+            "time": 64.067,
+            "seconds": 8.898
+          },
+          {
+            "selector": "#eco-subhead",
+            "text": "An unbroken creative and operational loop powering modern social media publishing.",
+            "fontPx": 21,
+            "time": 64.888,
+            "seconds": 8.077
+          }
+        ]
+      },
+      {
+        "code": "text_below_floor",
+        "severity": "warning",
+        "message": "Type floor is 28 px (2.6% of the 1080 px short side, what a phone can read) and 5 text elements stay under it for 0.5 s or more, the smallest \"Built with precision by\" at 14 px: set reading text to at least 28 px, or put data-layout-ignore on text that is texture rather than reading; see references/look.md.",
+        "text": "Built with precision by",
+        "selector": "#outro-byline",
+        "dataAttributes": {},
+        "sourceFile": "./scenes/scene-9-outro.html",
+        "bbox": {
+          "x": 828.17,
+          "y": 760.94,
+          "width": 147.21,
+          "height": 17
+        },
+        "time": 75.84,
+        "times": [
+          74.471,
+          75.018,
+          75.566,
+          75.84,
+          75.84
+        ],
+        "fontPx": 14,
+        "floorPx": 28,
+        "seconds": 6.16,
+        "elements": [
+          {
+            "selector": "#outro-byline",
+            "text": "Built with precision by",
+            "fontPx": 14,
+            "time": 75.84,
+            "seconds": 6.16
+          },
+          {
+            "selector": "#outro-byline > strong:nth-of-type(1)",
+            "text": "DevCenterPoint",
+            "fontPx": 14,
+            "time": 75.84,
+            "seconds": 6.16
+          },
+          {
+            "selector": "#outro-btn > span:nth-of-type(1)",
+            "text": "Discover AutoCanvas",
+            "fontPx": 17.74,
+            "time": 75.018,
+            "seconds": 6.982
+          },
+          {
+            "selector": "#outro-url",
+            "text": "autocanvas.devcenterpoint.com",
+            "fontPx": 18,
+            "time": 75.566,
+            "seconds": 6.434
+          },
+          {
+            "selector": "#outro-sub",
+            "text": "Create smarter. Publish consistently. Grow with confidence.",
+            "fontPx": 21,
+            "time": 74.471,
+            "seconds": 7.529
+          }
+        ]
+      }
+    ],
+    "enabled": true,
+    "step": 0.13700000000000045,
+    "samples": 599
+  },
+  "audio": {
+    "ok": false,
+    "errorCount": 12,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": [
+      {
+        "code": "audio_source_unreadable",
+        "severity": "error",
+        "message": "./assets/music/bg-music.mp3 cannot be read as audio ([FFmpeg] ffprobe not found. Please install FFmpeg.), so the render's audio mix fails and the render stops.",
+        "selector": "#bg-music",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 0,
+        "timeRange": [
+          0,
+          82
+        ],
+        "fixHint": "Point src at a file with an audio track, or re-export this one."
+      },
+      {
+        "code": "audio_source_unreadable",
+        "severity": "error",
+        "message": "./assets/sfx/impact.ogg cannot be read as audio ([FFmpeg] ffprobe not found. Please install FFmpeg.), so the render's audio mix fails and the render stops.",
+        "selector": "#sfx-impact-start",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 0.4,
+        "timeRange": [
+          0.4,
+          2.4
+        ],
+        "fixHint": "Point src at a file with an audio track, or re-export this one."
+      },
+      {
+        "code": "audio_source_unreadable",
+        "severity": "error",
+        "message": "./assets/sfx/switch.ogg cannot be read as audio ([FFmpeg] ffprobe not found. Please install FFmpeg.), so the render's audio mix fails and the render stops.",
+        "selector": "#sfx-switch-intro",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 10,
+        "timeRange": [
+          10,
+          11
+        ],
+        "fixHint": "Point src at a file with an audio track, or re-export this one."
+      },
+      {
+        "code": "audio_source_unreadable",
+        "severity": "error",
+        "message": "./assets/sfx/switch.ogg cannot be read as audio ([FFmpeg] ffprobe not found. Please install FFmpeg.), so the render's audio mix fails and the render stops.",
+        "selector": "#sfx-switch-research",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 19,
+        "timeRange": [
+          19,
+          20
+        ],
+        "fixHint": "Point src at a file with an audio track, or re-export this one."
+      },
+      {
+        "code": "audio_source_unreadable",
+        "severity": "error",
+        "message": "./assets/sfx/click.ogg cannot be read as audio ([FFmpeg] ffprobe not found. Please install FFmpeg.), so the render's audio mix fails and the render stops.",
+        "selector": "#sfx-click-research",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 22.5,
+        "timeRange": [
+          22.5,
+          23
+        ],
+        "fixHint": "Point src at a file with an audio track, or re-export this one."
+      },
+      {
+        "code": "audio_source_unreadable",
+        "severity": "error",
+        "message": "./assets/sfx/switch.ogg cannot be read as audio ([FFmpeg] ffprobe not found. Please install FFmpeg.), so the render's audio mix fails and the render stops.",
+        "selector": "#sfx-switch-creative",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 28,
+        "timeRange": [
+          28,
+          29
+        ],
+        "fixHint": "Point src at a file with an audio track, or re-export this one."
+      },
+      {
+        "code": "audio_source_unreadable",
+        "severity": "error",
+        "message": "./assets/sfx/switch.ogg cannot be read as audio ([FFmpeg] ffprobe not found. Please install FFmpeg.), so the render's audio mix fails and the render stops.",
+        "selector": "#sfx-switch-calendar",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 37,
+        "timeRange": [
+          37,
+          38
+        ],
+        "fixHint": "Point src at a file with an audio track, or re-export this one."
+      },
+      {
+        "code": "audio_source_unreadable",
+        "severity": "error",
+        "message": "./assets/sfx/click.ogg cannot be read as audio ([FFmpeg] ffprobe not found. Please install FFmpeg.), so the render's audio mix fails and the render stops.",
+        "selector": "#sfx-click-calendar",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 40,
+        "timeRange": [
+          40,
+          40.5
+        ],
+        "fixHint": "Point src at a file with an audio track, or re-export this one."
+      },
+      {
+        "code": "audio_source_unreadable",
+        "severity": "error",
+        "message": "./assets/sfx/switch.ogg cannot be read as audio ([FFmpeg] ffprobe not found. Please install FFmpeg.), so the render's audio mix fails and the render stops.",
+        "selector": "#sfx-switch-listening",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 46,
+        "timeRange": [
+          46,
+          47
+        ],
+        "fixHint": "Point src at a file with an audio track, or re-export this one."
+      },
+      {
+        "code": "audio_source_unreadable",
+        "severity": "error",
+        "message": "./assets/sfx/switch.ogg cannot be read as audio ([FFmpeg] ffprobe not found. Please install FFmpeg.), so the render's audio mix fails and the render stops.",
+        "selector": "#sfx-switch-plans",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 55,
+        "timeRange": [
+          55,
+          56
+        ],
+        "fixHint": "Point src at a file with an audio track, or re-export this one."
+      },
+      {
+        "code": "audio_source_unreadable",
+        "severity": "error",
+        "message": "./assets/sfx/switch.ogg cannot be read as audio ([FFmpeg] ffprobe not found. Please install FFmpeg.), so the render's audio mix fails and the render stops.",
+        "selector": "#sfx-switch-ecosystem",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 64,
+        "timeRange": [
+          64,
+          65
+        ],
+        "fixHint": "Point src at a file with an audio track, or re-export this one."
+      },
+      {
+        "code": "audio_source_unreadable",
+        "severity": "error",
+        "message": "./assets/sfx/impact.ogg cannot be read as audio ([FFmpeg] ffprobe not found. Please install FFmpeg.), so the render's audio mix fails and the render stops.",
+        "selector": "#sfx-impact-outro",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 73,
+        "timeRange": [
+          73,
+          75
+        ],
+        "fixHint": "Point src at a file with an audio track, or re-export this one."
+      }
+    ]
+  },
+  "hdr": {
+    "autoPromotion": null,
+    "inspection": "available"
+  },
+  "snapshots": {
+    "enabled": false,
+    "files": [],
+    "times": [],
+    "findingFiles": []
+  }
+}

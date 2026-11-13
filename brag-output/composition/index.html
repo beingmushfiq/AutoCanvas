@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920, height=1080, initial-scale=1.0">
+  <title>AutoCanvas — Premium Product Introduction & Feature Demo</title>
+  <link rel="stylesheet" href="./shared.css">
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
+</head>
+<body>
+  <div id="root" data-composition-id="root" data-width="1920" data-height="1080">
+    <!-- Master Audio Tracks -->
+    <audio id="bg-music" src="./assets/music/bg-music.mp3" data-start="0" data-duration="82" data-volume="0.75" data-fade-in="1" data-fade-out="2"></audio>
+    <audio id="sfx-impact-start" src="./assets/sfx/impact.ogg" data-start="0.4" data-duration="0.5" data-volume="0.45"></audio>
+    <audio id="sfx-switch-intro" src="./assets/sfx/switch.ogg" data-start="10.0" data-duration="0.5" data-volume="0.35"></audio>
+    <audio id="sfx-switch-research" src="./assets/sfx/switch.ogg" data-start="19.0" data-duration="0.5" data-volume="0.35"></audio>
+    <audio id="sfx-click-research" src="./assets/sfx/click.ogg" data-start="22.5" data-duration="0.5" data-volume="0.25"></audio>
+    <audio id="sfx-switch-creative" src="./assets/sfx/switch.ogg" data-start="28.0" data-duration="0.5" data-volume="0.35"></audio>
+    <audio id="sfx-switch-calendar" src="./assets/sfx/switch.ogg" data-start="37.0" data-duration="0.5" data-volume="0.35"></audio>
+    <audio id="sfx-click-calendar" src="./assets/sfx/click.ogg" data-start="40.0" data-duration="0.5" data-volume="0.25"></audio>
+    <audio id="sfx-switch-listening" src="./assets/sfx/switch.ogg" data-start="46.0" data-duration="0.5" data-volume="0.35"></audio>
+    <audio id="sfx-switch-plans" src="./assets/sfx/switch.ogg" data-start="55.0" data-duration="0.5" data-volume="0.35"></audio>
+    <audio id="sfx-switch-ecosystem" src="./assets/sfx/switch.ogg" data-start="64.0" data-duration="0.5" data-volume="0.35"></audio>
+    <audio id="sfx-impact-outro" src="./assets/sfx/impact.ogg" data-start="73.0" data-duration="0.5" data-volume="0.55"></audio>
+
+    <!-- 9 Sub-Compositions -->
+    <div id="mount-scene-1" data-composition-id="scene-problem" data-composition-src="./scenes/scene-1-problem.html" data-start="0" data-duration="10"></div>
+    <div id="mount-scene-2" data-composition-id="scene-intro" data-composition-src="./scenes/scene-2-intro.html" data-start="10" data-duration="9"></div>
+    <div id="mount-scene-3" data-composition-id="scene-research" data-composition-src="./scenes/scene-3-research.html" data-start="19" data-duration="9"></div>
+    <div id="mount-scene-4" data-composition-id="scene-creative" data-composition-src="./scenes/scene-4-creative.html" data-start="28" data-duration="9"></div>
+    <div id="mount-scene-5" data-composition-id="scene-calendar" data-composition-src="./scenes/scene-5-calendar.html" data-start="37" data-duration="9"></div>
+    <div id="mount-scene-6" data-composition-id="scene-listening" data-composition-src="./scenes/scene-6-listening.html" data-start="46" data-duration="9"></div>
+    <div id="mount-scene-7" data-composition-id="scene-plans" data-composition-src="./scenes/scene-7-plans.html" data-start="55" data-duration="9"></div>
+    <div id="mount-scene-8" data-composition-id="scene-ecosystem" data-composition-src="./scenes/scene-8-ecosystem.html" data-start="64" data-duration="9"></div>
+    <div id="mount-scene-9" data-composition-id="scene-outro" data-composition-src="./scenes/scene-9-outro.html" data-start="73" data-duration="9"></div>
+  </div>
+
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    window.__timelines = window.__timelines || {};
+    window.__timelines["root"] = tl;
+  </script>
+</body>
+</html>

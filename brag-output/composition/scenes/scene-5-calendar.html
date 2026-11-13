@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Scene 5: Unified Content Calendar</title>
+  <link rel="stylesheet" href="../shared.css">
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
+</head>
+<body>
+  <div id="scene-calendar-root" class="scene-root" data-composition-id="scene-calendar" data-width="1920" data-height="1080">
+    <div class="bg-grid"></div>
+    <div class="bg-ambient-glow"></div>
+    <div class="vignette"></div>
+
+    <header class="top-bar" data-layout-ignore="true">
+      <div class="brand-mark-group">
+        <img src="../assets/images/logo-dark.svg" alt="AutoCanvas" class="brand-logo-img">
+        <div class="brand-byline">by <span>DevCenterPoint</span></div>
+      </div>
+      <div class="status-pill">
+        <div class="status-dot"></div>
+        <span>AUTOCANVAS OS v2.0 • LIVE PARITY</span>
+      </div>
+    </header>
+
+    <div class="showcase-grid">
+      <div class="showcase-info" id="calendar-info">
+        <div class="kicker" data-layout-ignore="true">UNIFIED CONTENT CALENDAR</div>
+        <h2 class="headline-medium">
+          Every post. Every channel.<br>
+          <span class="text-amber">One calendar.</span>
+        </h2>
+        <p class="subhead">
+          Visualize your entire multi-channel publishing rhythm with intelligent peak engagement timing and automated dispatch.
+        </p>
+        <div class="feature-bullet-list">
+          <div class="feature-bullet-item" id="calendar-b1">
+            <span class="bullet-check">✓</span>
+            <span>Synchronized LinkedIn, IG, FB & X queue</span>
+          </div>
+          <div class="feature-bullet-item" id="calendar-b2">
+            <span class="bullet-check">✓</span>
+            <span>Dynamic peak engagement timing insights</span>
+          </div>
+          <div class="feature-bullet-item" id="calendar-b3">
+            <span class="bullet-check">✓</span>
+            <span>Idempotent Redis locking stops duplicates</span>
+          </div>
+        </div>
+      </div>
+      <div class="showcase-visual">
+        <div class="browser-frame" id="calendar-browser" style="width: 1040px;" data-hold="true">
+          <div class="browser-header" data-layout-ignore="true">
+            <div class="browser-dots">
+              <div class="browser-dot"></div>
+              <div class="browser-dot"></div>
+              <div class="browser-dot"></div>
+            </div>
+            <div class="browser-url">autocanvas.devcenterpoint.com/workspace/publishing-calendar</div>
+          </div>
+          <div class="browser-content">
+            <img src="../assets/images/calendar-ui.jpg" alt="AutoCanvas Publishing Calendar" id="img-calendar">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    window.__timelines = window.__timelines || {};
+    window.__timelines["scene-calendar"] = tl;
+
+    tl.from("#calendar-info", { x: -40, opacity: 0, duration: 0.8, ease: "power3.out" }, 0.3);
+    tl.from("#calendar-b1", { x: -20, opacity: 0, duration: 0.5, ease: "power2.out" }, 0.8);
+    tl.from("#calendar-b2", { x: -20, opacity: 0, duration: 0.5, ease: "power2.out" }, 1.1);
+    tl.from("#calendar-b3", { x: -20, opacity: 0, duration: 0.5, ease: "power2.out" }, 1.4);
+    tl.from("#calendar-browser", { scale: 0.94, opacity: 0, duration: 0.9, ease: "power3.out" }, 0.5);
+
+    tl.to("#scene-calendar-root", { opacity: 0, duration: 0.5, ease: "power2.in" }, 8.5);
+  </script>
+</body>
+</html>

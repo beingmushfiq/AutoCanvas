@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Scene 8: The Bigger Picture Ecosystem Loop</title>
+  <link rel="stylesheet" href="../shared.css">
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
+  <style>
+    .pipeline-wrapper {
+      width: 100%;
+      max-width: 1640px;
+      margin-top: 60px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      z-index: 10;
+    }
+
+    .pipeline-track {
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      padding: 30px 20px;
+    }
+
+    .pipeline-line-bg {
+      position: absolute;
+      top: 50%;
+      left: 70px;
+      right: 70px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.08);
+      transform: translateY(-50%);
+      z-index: 1;
+    }
+
+    .pipeline-line-active {
+      position: absolute;
+      top: 50%;
+      left: 70px;
+      width: 0%;
+      height: 4px;
+      background: linear-gradient(90deg, var(--brand-amber), var(--brand-amber-light));
+      box-shadow: 0 0 16px var(--brand-amber);
+      transform: translateY(-50%);
+      z-index: 2;
+    }
+
+    .pipeline-node {
+      position: relative;
+      z-index: 3;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .node-circle {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: #0d1117;
+      border: 2px solid rgba(255, 255, 255, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 19px;
+      font-weight: 800;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    }
+
+    .node-circle.active {
+      border-color: var(--brand-amber);
+      background: rgba(245, 158, 11, 0.18);
+      color: #ffffff;
+      box-shadow: 0 0 25px rgba(245, 158, 11, 0.5);
+    }
+
+    .node-label {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+
+    .node-label.active {
+      color: var(--brand-amber-light);
+    }
+  </style>
+</head>
+<body>
+  <div id="scene-ecosystem-root" class="scene-root" data-composition-id="scene-ecosystem" data-width="1920" data-height="1080">
+    <div class="bg-grid"></div>
+    <div class="bg-ambient-glow"></div>
+    <div class="vignette"></div>
+
+    <header class="top-bar" data-layout-ignore="true">
+      <div class="brand-mark-group">
+        <img src="../assets/images/logo-dark.svg" alt="AutoCanvas" class="brand-logo-img">
+        <div class="brand-byline">by <span>DevCenterPoint</span></div>
+      </div>
+      <div class="status-pill">
+        <div class="status-dot"></div>
+        <span>AUTOCANVAS OS v2.0 • LIVE PARITY</span>
+      </div>
+    </header>
+
+    <div class="kicker" id="eco-kicker" data-layout-ignore="true">THE COMPLETE OPERATING SYSTEM</div>
+    <h1 class="headline-large" id="eco-headline">
+      From the first idea to the final insight.<br>
+      <span class="text-amber">Everything connected. Everything in control.</span>
+    </h1>
+    <p class="subhead" id="eco-subhead">
+      An unbroken creative and operational loop powering modern social media publishing.
+    </p>
+
+    <div class="pipeline-wrapper">
+      <div class="pipeline-track">
+        <div class="pipeline-line-bg"></div>
+        <div class="pipeline-line-active" id="pipeline-active-line"></div>
+
+        <div class="pipeline-node" id="node-1">
+          <div class="node-circle" id="circle-1" data-layout-ignore="true">01</div>
+          <div class="node-label" id="label-1" data-layout-ignore="true">RESEARCH</div>
+        </div>
+        <div class="pipeline-node" id="node-2">
+          <div class="node-circle" id="circle-2" data-layout-ignore="true">02</div>
+          <div class="node-label" id="label-2" data-layout-ignore="true">CREATE</div>
+        </div>
+        <div class="pipeline-node" id="node-3">
+          <div class="node-circle" id="circle-3" data-layout-ignore="true">03</div>
+          <div class="node-label" id="label-3" data-layout-ignore="true">PLAN</div>
+        </div>
+        <div class="pipeline-node" id="node-4">
+          <div class="node-circle" id="circle-4" data-layout-ignore="true">04</div>
+          <div class="node-label" id="label-4" data-layout-ignore="true">APPROVE</div>
+        </div>
+        <div class="pipeline-node" id="node-5">
+          <div class="node-circle" id="circle-5" data-layout-ignore="true">05</div>
+          <div class="node-label" id="label-5" data-layout-ignore="true">PUBLISH</div>
+        </div>
+        <div class="pipeline-node" id="node-6">
+          <div class="node-circle" id="circle-6" data-layout-ignore="true">06</div>
+          <div class="node-label" id="label-6" data-layout-ignore="true">ENGAGE</div>
+        </div>
+        <div class="pipeline-node" id="node-7">
+          <div class="node-circle" id="circle-7" data-layout-ignore="true">07</div>
+          <div class="node-label" id="label-7" data-layout-ignore="true">ANALYZE</div>
+        </div>
+        <div class="pipeline-node" id="node-8">
+          <div class="node-circle" id="circle-8" data-layout-ignore="true">08</div>
+          <div class="node-label" id="label-8" data-layout-ignore="true">OPTIMIZE</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    window.__timelines = window.__timelines || {};
+    window.__timelines["scene-ecosystem"] = tl;
+
+    tl.from("#eco-kicker", { opacity: 0, y: -15, duration: 0.6, ease: "power2.out" }, 0.2);
+    tl.from("#eco-headline", { y: 25, opacity: 0, duration: 0.8, ease: "power3.out" }, 0.4);
+    tl.from("#eco-subhead", { y: 20, opacity: 0, duration: 0.8, ease: "power3.out" }, 0.7);
+
+    // Active line draws across
+    tl.to("#pipeline-active-line", { width: "calc(100% - 140px)", duration: 4.8, ease: "none" }, 1.0);
+
+    // Sequential nodes lighting up with explicit timelines
+    function activateNode(circleId, labelId, atTime) {
+      tl.to(circleId, { 
+        borderColor: "#f59e0b", 
+        backgroundColor: "rgba(245, 158, 11, 0.2)", 
+        color: "#ffffff",
+        boxShadow: "0 0 25px rgba(245, 158, 11, 0.6)",
+        scale: 1.12,
+        duration: 0.35, 
+        ease: "back.out(1.5)" 
+      }, atTime);
+      tl.to(circleId, { scale: 1.0, duration: 0.2, ease: "power1.out" }, atTime + 0.35);
+      tl.to(labelId, { color: "#fbbf24", duration: 0.3 }, atTime);
+    }
+
+    activateNode("#circle-1", "#label-1", 1.0);
+    activateNode("#circle-2", "#label-2", 1.6);
+    activateNode("#circle-3", "#label-3", 2.2);
+    activateNode("#circle-4", "#label-4", 2.8);
+    activateNode("#circle-5", "#label-5", 3.4);
+    activateNode("#circle-6", "#label-6", 4.0);
+    activateNode("#circle-7", "#label-7", 4.6);
+    activateNode("#circle-8", "#label-8", 5.2);
+
+    tl.to("#scene-ecosystem-root", { opacity: 0, duration: 0.5, ease: "power2.in" }, 8.5);
+  </script>
+</body>
+</html>

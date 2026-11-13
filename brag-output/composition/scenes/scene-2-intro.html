@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Scene 2: Introducing AutoCanvas</title>
+  <link rel="stylesheet" href="../shared.css">
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
+</head>
+<body>
+  <div id="scene-intro-root" class="scene-root" data-composition-id="scene-intro" data-width="1920" data-height="1080">
+    <div class="bg-grid"></div>
+    <div class="bg-ambient-glow"></div>
+    <div class="vignette"></div>
+
+    <header class="top-bar" data-layout-ignore="true">
+      <div class="brand-mark-group">
+        <img src="../assets/images/logo-dark.svg" alt="AutoCanvas" class="brand-logo-img">
+        <div class="brand-byline">by <span>DevCenterPoint</span></div>
+      </div>
+      <div class="status-pill">
+        <div class="status-dot"></div>
+        <span>AUTOCANVAS OS v2.0 • LIVE PARITY</span>
+      </div>
+    </header>
+
+    <div class="showcase-grid">
+      <div class="showcase-info" id="intro-info">
+        <div class="kicker" data-layout-ignore="true">INTRODUCING AUTOCANVAS</div>
+        <h2 class="headline-medium">
+          Meet AutoCanvas.<br>
+          <span class="text-gradient">One intelligent workspace.</span>
+        </h2>
+        <p class="subhead">
+          Your entire social media operation unified into a single deterministic, enterprise-grade brand OS.
+        </p>
+        <div class="feature-bullet-list">
+          <div class="feature-bullet-item" id="intro-b1">
+            <span class="bullet-check">✓</span>
+            <span>Unified Command Center for all channels</span>
+          </div>
+          <div class="feature-bullet-item" id="intro-b2">
+            <span class="bullet-check">✓</span>
+            <span>Deterministic engine with zero hallucinations</span>
+          </div>
+          <div class="feature-bullet-item" id="intro-b3">
+            <span class="bullet-check">✓</span>
+            <span>Engineered from the ground up by DevCenterPoint</span>
+          </div>
+        </div>
+      </div>
+      <div class="showcase-visual">
+        <div class="browser-frame" id="intro-browser" style="width: 1040px;" data-hold="true">
+          <div class="browser-header" data-layout-ignore="true">
+            <div class="browser-dots">
+              <div class="browser-dot"></div>
+              <div class="browser-dot"></div>
+              <div class="browser-dot"></div>
+            </div>
+            <div class="browser-url">autocanvas.devcenterpoint.com/workspace/command-center</div>
+          </div>
+          <div class="browser-content">
+            <img src="../assets/images/command-center-dark.jpg" alt="AutoCanvas Command Center" id="img-command-center">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    window.__timelines = window.__timelines || {};
+    window.__timelines["scene-intro"] = tl;
+
+    tl.from("#intro-info", { x: -40, opacity: 0, duration: 0.8, ease: "power3.out" }, 0.3);
+    tl.from("#intro-b1", { x: -20, opacity: 0, duration: 0.5, ease: "power2.out" }, 0.8);
+    tl.from("#intro-b2", { x: -20, opacity: 0, duration: 0.5, ease: "power2.out" }, 1.1);
+    tl.from("#intro-b3", { x: -20, opacity: 0, duration: 0.5, ease: "power2.out" }, 1.4);
+    tl.from("#intro-browser", { scale: 0.92, y: 30, opacity: 0, duration: 1.0, ease: "power3.out" }, 0.5);
+
+    tl.to("#scene-intro-root", { opacity: 0, duration: 0.5, ease: "power2.in" }, 8.5);
+  </script>
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Scene 9: Final Brand Reveal & CTA</title>
+  <link rel="stylesheet" href="../shared.css">
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
+  <style>
+    .outro-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+      z-index: 10;
+    }
+
+    .outro-logo-wrap {
+      margin-bottom: 28px;
+      position: relative;
+    }
+
+    .outro-logo-wrap img {
+      height: 68px;
+      width: auto;
+    }
+
+    .outro-cta-btn {
+      margin-top: 36px;
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 20px 48px;
+      border-radius: 12px;
+      background: #ffffff;
+      color: #090a0f;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      border: 2px solid #ffffff;
+      box-shadow: 0 10px 30px rgba(255, 255, 255, 0.2), 0 0 40px rgba(245, 158, 11, 0.25);
+    }
+
+    .outro-url {
+      margin-top: 24px;
+      font-size: 28px;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--brand-amber-light);
+      letter-spacing: 0.02em;
+    }
+
+    .outro-byline {
+      margin-top: 36px;
+      font-size: 18px;
+      font-weight: 500;
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .outro-byline strong {
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+  <div id="scene-outro-root" class="scene-root" data-composition-id="scene-outro" data-width="1920" data-height="1080">
+    <div class="bg-grid"></div>
+    <div class="bg-ambient-glow"></div>
+    <div class="vignette"></div>
+
+    <div class="outro-content" data-hold="true">
+      <div class="outro-logo-wrap" id="outro-logo">
+        <img src="../assets/images/logo-dark.svg" alt="AutoCanvas" id="img-outro-logo">
+      </div>
+      <h2 class="headline-large" id="outro-headline">
+        Your Social Presence.<br>
+        <span class="text-amber">Intelligently Orchestrated.</span>
+      </h2>
+      <p class="subhead" id="outro-sub">
+        Create smarter. Publish consistently. Grow with confidence.
+      </p>
+      <div class="outro-cta-btn" id="outro-btn">
+        <span>Discover AutoCanvas</span>
+        <span style="font-size: 26px;">→</span>
+      </div>
+      <div class="outro-url" id="outro-url">autocanvas.devcenterpoint.com</div>
+      <div class="outro-byline" id="outro-byline" data-layout-ignore="true">
+        Built with precision by <strong>DevCenterPoint</strong>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    window.__timelines = window.__timelines || {};
+    window.__timelines["scene-outro"] = tl;
+
+    tl.from("#outro-logo", { scale: 0.85, opacity: 0, duration: 1.0, ease: "power3.out" }, 0.4);
+    tl.from("#outro-headline", { y: 25, opacity: 0, duration: 0.8, ease: "power3.out" }, 0.9);
+    tl.from("#outro-sub", { y: 20, opacity: 0, duration: 0.8, ease: "power3.out" }, 1.3);
+    tl.from("#outro-btn", { scale: 0.9, opacity: 0, duration: 0.7, ease: "back.out(1.5)" }, 1.8);
+    tl.from("#outro-url", { opacity: 0, duration: 0.6, ease: "power2.out" }, 2.3);
+    tl.from("#outro-byline", { opacity: 0, duration: 0.6, ease: "power2.out" }, 2.7);
+  </script>
+</body>
+</html>

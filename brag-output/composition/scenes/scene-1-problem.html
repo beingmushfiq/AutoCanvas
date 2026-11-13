@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Scene 1: The Problem</title>
+  <link rel="stylesheet" href="../shared.css">
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
+  <style>
+    .chaos-container {
+      position: relative;
+      width: 100%;
+      height: 380px;
+      margin-top: 40px;
+      z-index: 10;
+    }
+
+    .chaos-card {
+      position: absolute;
+      padding: 18px 28px;
+      border-radius: 14px;
+      background: rgba(20, 24, 33, 0.88);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 22px;
+      font-weight: 600;
+      color: #fca5a5;
+    }
+
+    .chaos-icon {
+      font-size: 24px;
+    }
+  </style>
+</head>
+<body>
+  <div id="scene-problem-root" class="scene-root" data-composition-id="scene-problem" data-width="1920" data-height="1080">
+    <div class="bg-grid"></div>
+    <div class="bg-ambient-glow"></div>
+    <div class="vignette"></div>
+
+    <header class="top-bar" data-layout-ignore="true">
+      <div class="brand-mark-group">
+        <img src="../assets/images/logo-dark.svg" alt="AutoCanvas" class="brand-logo-img">
+        <div class="brand-byline">by <span>DevCenterPoint</span></div>
+      </div>
+      <div class="status-pill">
+        <div class="status-dot"></div>
+        <span>AUTOCANVAS OS v2.0 • LIVE PARITY</span>
+      </div>
+    </header>
+
+    <div class="kicker" id="problem-kicker" data-layout-ignore="true">THE MODERN SOCIAL BOTTLENECK</div>
+    <h1 class="headline-large" id="problem-headline">
+      Too many platforms. Too many tasks.<br>
+      <span class="text-amber">Not enough time.</span>
+    </h1>
+    <p class="subhead" id="problem-subhead">
+      Managing multi-channel social media today means disconnected browser tabs, repetitive copy-pasting, and missed audience momentum.
+    </p>
+
+    <div class="chaos-container" id="chaos-wrap" data-hold="true">
+      <div class="chaos-card" id="chaos-1" style="top: 20px; left: 140px;" data-layout-ignore="true">
+        <span class="chaos-icon">⚡</span>
+        <span>12 Disconnected Browser Tabs & Schedulers</span>
+      </div>
+      <div class="chaos-card" id="chaos-2" style="top: 40px; right: 120px;" data-layout-ignore="true">
+        <span class="chaos-icon">❌</span>
+        <span>Raster AI Diffusion: Warped Text & Blurry Logos</span>
+      </div>
+      <div class="chaos-card" id="chaos-3" style="bottom: 70px; left: 220px;" data-layout-ignore="true">
+        <span class="chaos-icon">⚠️</span>
+        <span>Publishing Rhythm Broken Across 4 Social Channels</span>
+      </div>
+      <div class="chaos-card" id="chaos-4" style="bottom: 50px; right: 200px;" data-layout-ignore="true">
+        <span class="chaos-icon">📊</span>
+        <span>Fragmented Analytics & Unanswered Inboxes</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    window.__timelines = window.__timelines || {};
+    window.__timelines["scene-problem"] = tl;
+
+    tl.from("#problem-kicker", { opacity: 0, y: -15, duration: 0.6, ease: "power2.out" }, 0.2);
+    tl.from("#problem-headline", { y: 30, opacity: 0, duration: 0.8, ease: "power3.out" }, 0.4);
+    tl.from("#problem-subhead", { y: 20, opacity: 0, duration: 0.8, ease: "power3.out" }, 0.8);
+    tl.from("#chaos-1", { x: -80, opacity: 0, duration: 0.7, ease: "back.out(1.2)" }, 1.4);
+    tl.from("#chaos-2", { x: 80, opacity: 0, duration: 0.7, ease: "back.out(1.2)" }, 2.0);
+    tl.from("#chaos-3", { x: -60, opacity: 0, duration: 0.7, ease: "back.out(1.2)" }, 2.6);
+    tl.from("#chaos-4", { x: 60, opacity: 0, duration: 0.7, ease: "back.out(1.2)" }, 3.2);
+
+    // Chaos collapse into focal point before scene ends
+    tl.to(".chaos-card", { scale: 0.2, opacity: 0, duration: 0.8, ease: "power4.in", stagger: 0.06 }, 8.2);
+    tl.to("#problem-headline, #problem-subhead, #problem-kicker", { opacity: 0, duration: 0.6, ease: "power2.in" }, 9.2);
+  </script>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Scene 6: Brand Safety & Social Listening</title>
+  <link rel="stylesheet" href="../shared.css">
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
+</head>
+<body>
+  <div id="scene-listening-root" class="scene-root" data-composition-id="scene-listening" data-width="1920" data-height="1080">
+    <div class="bg-grid"></div>
+    <div class="bg-ambient-glow"></div>
+    <div class="vignette"></div>
+
+    <header class="top-bar" data-layout-ignore="true">
+      <div class="brand-mark-group">
+        <img src="../assets/images/logo-dark.svg" alt="AutoCanvas" class="brand-logo-img">
+        <div class="brand-byline">by <span>DevCenterPoint</span></div>
+      </div>
+      <div class="status-pill">
+        <div class="status-dot"></div>
+        <span>AUTOCANVAS OS v2.0 • LIVE PARITY</span>
+      </div>
+    </header>
+
+    <div class="showcase-grid">
+      <div class="showcase-info" id="listening-info">
+        <div class="kicker" data-layout-ignore="true">BRAND SAFETY & COMMUNITY INTELLIGENCE</div>
+        <h2 class="headline-medium">
+          Automation with<br>
+          <span class="text-amber">accountability.</span>
+        </h2>
+        <p class="subhead">
+          Real-time keyword sentiment tracking, competitor share of voice, and an instant 1-click publishing circuit breaker.
+        </p>
+        <div class="feature-bullet-list">
+          <div class="feature-bullet-item" id="listening-b1">
+            <span class="bullet-check">✓</span>
+            <span>Urgent Flags for review in Unified Inbox</span>
+          </div>
+          <div class="feature-bullet-item" id="listening-b2">
+            <span class="bullet-check">✓</span>
+            <span>Real-time competitor share of voice metrics</span>
+          </div>
+          <div class="feature-bullet-item" id="listening-b3">
+            <span class="bullet-check">✓</span>
+            <span>1-Click Safety Pause halts all dispatches</span>
+          </div>
+        </div>
+      </div>
+      <div class="showcase-visual">
+        <div class="browser-frame" id="listening-browser" style="width: 1040px;" data-hold="true">
+          <div class="browser-header" data-layout-ignore="true">
+            <div class="browser-dots">
+              <div class="browser-dot"></div>
+              <div class="browser-dot"></div>
+              <div class="browser-dot"></div>
+            </div>
+            <div class="browser-url">autocanvas.devcenterpoint.com/workspace/social-listening</div>
+          </div>
+          <div class="browser-content">
+            <img src="../assets/images/social-listening-ui.jpg" alt="Social Listening and Brand Radar" id="img-listening">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    window.__timelines = window.__timelines || {};
+    window.__timelines["scene-listening"] = tl;
+
+    tl.from("#listening-info", { x: -40, opacity: 0, duration: 0.8, ease: "power3.out" }, 0.3);
+    tl.from("#listening-b1", { x: -20, opacity: 0, duration: 0.5, ease: "power2.out" }, 0.8);
+    tl.from("#listening-b2", { x: -20, opacity: 0, duration: 0.5, ease: "power2.out" }, 1.1);
+    tl.from("#listening-b3", { x: -20, opacity: 0, duration: 0.5, ease: "power2.out" }, 1.4);
+    tl.from("#listening-browser", { scale: 0.94, opacity: 0, duration: 0.9, ease: "power3.out" }, 0.5);
+
+    tl.to("#scene-listening-root", { opacity: 0, duration: 0.5, ease: "power2.in" }, 8.5);
+  </script>
+</body>
+</html>

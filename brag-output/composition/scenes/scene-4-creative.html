@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Scene 4: Deterministic Creative Studio</title>
+  <link rel="stylesheet" href="../shared.css">
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
+</head>
+<body>
+  <div id="scene-creative-root" class="scene-root" data-composition-id="scene-creative" data-width="1920" data-height="1080">
+    <div class="bg-grid"></div>
+    <div class="bg-ambient-glow"></div>
+    <div class="vignette"></div>
+
+    <header class="top-bar" data-layout-ignore="true">
+      <div class="brand-mark-group">
+        <img src="../assets/images/logo-dark.svg" alt="AutoCanvas" class="brand-logo-img">
+        <div class="brand-byline">by <span>DevCenterPoint</span></div>
+      </div>
+      <div class="status-pill">
+        <div class="status-dot"></div>
+        <span>AUTOCANVAS OS v2.0 • LIVE PARITY</span>
+      </div>
+    </header>
+
+    <div class="showcase-grid">
+      <div class="showcase-info" id="creative-info">
+        <div class="kicker" data-layout-ignore="true">PRECISION BRAND ARCHITECTURE</div>
+        <h2 class="headline-medium">
+          Create with purpose.<br>
+          <span class="text-gradient">Pixel-perfect graphics.</span>
+        </h2>
+        <p class="subhead">
+          Generic AI tools garble text and distort official logos. AutoCanvas composites layered, studio-grade visuals with precision typography.
+        </p>
+        <div class="feature-bullet-list">
+          <div class="feature-bullet-item" id="creative-b1">
+            <span class="bullet-check">✓</span>
+            <span>Deterministic Chromium & SVG Rendering</span>
+          </div>
+          <div class="feature-bullet-item" id="creative-b2">
+            <span class="bullet-check">✓</span>
+            <span>100% Crisp Brand Fonts, Palettes & Vector Logos</span>
+          </div>
+          <div class="feature-bullet-item" id="creative-b3">
+            <span class="bullet-check">✓</span>
+            <span>Platform-optimized aspect ratios in one export</span>
+          </div>
+        </div>
+      </div>
+      <div class="showcase-visual">
+        <div class="browser-frame" id="creative-browser" style="width: 1040px;" data-hold="true">
+          <div class="browser-header" data-layout-ignore="true">
+            <div class="browser-dots">
+              <div class="browser-dot"></div>
+              <div class="browser-dot"></div>
+              <div class="browser-dot"></div>
+            </div>
+            <div class="browser-url">autocanvas.devcenterpoint.com/engine-parity</div>
+          </div>
+          <div class="browser-content">
+            <img src="../assets/images/comparison-engine-ui.png" alt="AutoCanvas Comparison Engine" id="img-comparison-engine">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    window.__timelines = window.__timelines || {};
+    window.__timelines["scene-creative"] = tl;
+
+    tl.from("#creative-info", { x: -40, opacity: 0, duration: 0.8, ease: "power3.out" }, 0.3);
+    tl.from("#creative-b1", { x: -20, opacity: 0, duration: 0.5, ease: "power2.out" }, 0.8);
+    tl.from("#creative-b2", { x: -20, opacity: 0, duration: 0.5, ease: "power2.out" }, 1.1);
+    tl.from("#creative-b3", { x: -20, opacity: 0, duration: 0.5, ease: "power2.out" }, 1.4);
+    tl.from("#creative-browser", { scale: 0.94, opacity: 0, duration: 0.9, ease: "power3.out" }, 0.5);
+
+    tl.to("#scene-creative-root", { opacity: 0, duration: 0.5, ease: "power2.in" }, 8.5);
+  </script>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Scene 3: Intelligent Research & Trends</title>
+  <link rel="stylesheet" href="../shared.css">
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
+</head>
+<body>
+  <div id="scene-research-root" class="scene-root" data-composition-id="scene-research" data-width="1920" data-height="1080">
+    <div class="bg-grid"></div>
+    <div class="bg-ambient-glow"></div>
+    <div class="vignette"></div>
+
+    <header class="top-bar" data-layout-ignore="true">
+      <div class="brand-mark-group">
+        <img src="../assets/images/logo-dark.svg" alt="AutoCanvas" class="brand-logo-img">
+        <div class="brand-byline">by <span>DevCenterPoint</span></div>
+      </div>
+      <div class="status-pill">
+        <div class="status-dot"></div>
+        <span>AUTOCANVAS OS v2.0 • LIVE PARITY</span>
+      </div>
+    </header>
+
+    <div class="showcase-grid">
+      <div class="showcase-info" id="research-info">
+        <div class="kicker" data-layout-ignore="true">INTELLIGENT CONTENT RESEARCH</div>
+        <h2 class="headline-medium">
+          Never run out of<br>
+          <span class="text-amber">relevant ideas.</span>
+        </h2>
+        <p class="subhead">
+          Real-time industry radar detects trending topics, evaluates competitor sentiment, and crafts strategic angles before trends peak.
+        </p>
+        <div class="feature-bullet-list">
+          <div class="feature-bullet-item" id="research-b1">
+            <span class="bullet-check">✓</span>
+            <span>Hourly News Monitoring & Topic Ingestion</span>
+          </div>
+          <div class="feature-bullet-item" id="research-b2">
+            <span class="bullet-check">✓</span>
+            <span>1-Click Campaign Angle & Hook Generator</span>
+          </div>
+          <div class="feature-bullet-item" id="research-b3">
+            <span class="bullet-check">✓</span>
+            <span>Guaranteed Duplicate Post Prevention</span>
+          </div>
+        </div>
+      </div>
+      <div class="showcase-visual">
+        <div class="browser-frame" id="research-browser" style="width: 1040px;" data-hold="true">
+          <div class="browser-header" data-layout-ignore="true">
+            <div class="browser-dots">
+              <div class="browser-dot"></div>
+              <div class="browser-dot"></div>
+              <div class="browser-dot"></div>
+            </div>
+            <div class="browser-url">autocanvas.devcenterpoint.com/workspace/research-trends</div>
+          </div>
+          <div class="browser-content">
+            <img src="../assets/images/research-trends-ui.jpg" alt="Research and Trends Studio" id="img-research-trends">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    window.__timelines = window.__timelines || {};
+    window.__timelines["scene-research"] = tl;
+
+    tl.from("#research-info", { x: -40, opacity: 0, duration: 0.8, ease: "power3.out" }, 0.3);
+    tl.from("#research-b1", { x: -20, opacity: 0, duration: 0.5, ease: "power2.out" }, 0.8);
+    tl.from("#research-b2", { x: -20, opacity: 0, duration: 0.5, ease: "power2.out" }, 1.1);
+    tl.from("#research-b3", { x: -20, opacity: 0, duration: 0.5, ease: "power2.out" }, 1.4);
+    tl.from("#research-browser", { scale: 0.94, opacity: 0, duration: 0.9, ease: "power3.out" }, 0.5);
+
+    tl.to("#scene-research-root", { opacity: 0, duration: 0.5, ease: "power2.in" }, 8.5);
+  </script>
+</body>
+</html>
